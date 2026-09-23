@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מפענח JWT</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#5fc1cf}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+textarea{width:100%;font-family:Consolas,monospace;direction:ltr;text-align:left;font-size:.9rem}
+#tok{min-height:110px;word-break:break-all}
+.seg{font-family:Consolas,monospace;word-break:break-all;direction:ltr;text-align:left;line-height:1.6;font-size:.9rem}
+.h{color:#ff8fab}.p{color:#c49bff}.s{color:#5fc1cf}
+pre{margin:0;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:10px;padding:10px;overflow:auto;direction:ltr;text-align:left;font-size:.88rem;max-height:340px}
+.ok{color:#90e0a0}.bad{color:#ff8fab}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🔐 מפענח JWT</h1>
+<p class="sub">מדביקים טוקן JWT ורואים את הכותרת, את התוכן ואת זמני התוקף בשפה ברורה. אפשר גם לאמת חתימת HS256 עם סוד. הכל רץ מקומית, והטוקן לא נשלח לשום מקום.</p>
+<div class="panel">
+  <textarea id="tok" spellcheck="false" placeholder="eyJhbGciOi..."></textarea>
+  <div class="seg" id="seg" style="margin-top:8px"></div>
+  <div class="row" style="margin-top:8px"><button id="sample">טוקן לדוגמה</button><button id="clr">ניקוי</button><span id="st"></span></div>
+</div>
+<div class="grid2">
+  <div class="panel"><h2 class="h">Header</h2><pre id="hd"></pre></div>
+  <div class="panel"><h2 class="p">Payload</h2><pre id="pl"></pre></div>
+</div>
+<div class="grid2">
+  <div class="panel"><h2>⏱️ זמנים וטענות מוכרות</h2><table><tbody id="claims"></tbody></table></div>
+  <div class="panel"><h2 class="s">בדיקת חתימה (HS256/384/512)</h2><input id="sec" placeholder="secret" style="width:100%;direction:ltr"><label class="inline" style="margin-top:6px"><input type="checkbox" id="b64s"> הסוד מקודד ב־Base64</label><div id="ver" style="margin-top:10px;font-weight:700"></div>
+    <p class="hint" style="margin-top:8px">חתימות RS/ES (מפתח ציבורי) לא נבדקות כאן. אל תדביקו טוקנים של סביבת ייצור במקומות שאתם לא סומכים עליהם.</p></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const b64u=s=>{s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return Uint8Array.from(atob(s),c=>c.charCodeAt(0))};
+const dec=s=>JSON.parse(new TextDecoder().decode(b64u(s)));
+const enc=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const hl=o=>JSON.stringify(o,null,2).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/("[^"]+")(:)/g,'<span style="color:#ffd166">$1</span>$2');
+const CL={iss:'מנפיק (issuer)',sub:'נושא (subject)',aud:'קהל יעד (audience)',exp:'פג תוקף',nbf:'לא תקף לפני',iat:'הונפק ב־',jti:'מזהה טוקן',name:'שם',email:'אימייל',role:'תפקיד',scope:'הרשאות'};
+const rel=s=>{const d=s*1000-Date.now(),a=Math.abs(d)/1000,u=a<60?[a,'שניות']:a<3600?[a/60,'דקות']:a<86400?[a/3600,'שעות']:[a/86400,'ימים'];return(d>0?'בעוד ':'לפני ')+Math.round(u[0])+' '+u[1]};
+async function run(){const t=$('tok').value.trim().replace(/^Bearer\s+/i,'');const ps=t.split('.');$('ver').textContent='';
+  if(ps.length!==3){$('seg').textContent='';$('st').innerHTML=t?'<span class="bad">❌ JWT צריך שלושה חלקים מופרדים בנקודות</span>':'';$('hd').textContent=$('pl').textContent='';$('claims').innerHTML='';return}
+  $('seg').innerHTML=`<span class="h">${ps[0]}</span>.<span class="p">${ps[1]}</span>.<span class="s">${ps[2]}</span>`;
+  let h,p;try{h=dec(ps[0]);p=dec(ps[1])}catch{$('st').innerHTML='<span class="bad">❌ לא הצלחתי לפענח. זה באמת JWT?</span>';return}
+  $('hd').innerHTML=hl(h);$('pl').innerHTML=hl(p);const now=Date.now()/1000;
+  const exp=p.exp?(p.exp<now?'<span class="bad">⛔ פג תוקף</span>':'<span class="ok">✔ בתוקף</span>'):'<span class="muted">אין exp</span>';$('st').innerHTML=`אלגוריתם: <b>${h.alg||'?'}</b> · ${exp}`;
+  $('claims').innerHTML=Object.entries(p).map(([k,v])=>{const time=['exp','nbf','iat','auth_time'].includes(k)&&typeof v==='number';return`<tr><td>${CL[k]||k}<div class="muted" style="font-size:.75rem;direction:ltr;text-align:right">${k}</div></td><td class="num">${time?new Date(v*1000).toLocaleString('he-IL')+'<div class="muted" style="font-size:.8rem">'+rel(v)+'</div>':String(typeof v==='object'?JSON.stringify(v):v).replace(/</g,'&lt;')}</td></tr>`}).join('');
+  const sec=$('sec').value;if(sec&&/^HS(256|384|512)$/.test(h.alg)){try{const key=$('b64s').checked?b64u(sec.replace(/=+$/,'')):new TextEncoder().encode(sec);const k=await crypto.subtle.importKey('raw',key,{name:'HMAC',hash:'SHA-'+h.alg.slice(2)},false,['sign']);
+    const sig=enc(await crypto.subtle.sign('HMAC',k,new TextEncoder().encode(ps[0]+'.'+ps[1])));$('ver').innerHTML=sig===ps[2]?'<span class="ok">✔ החתימה תקינה</span>':'<span class="bad">✘ החתימה לא תואמת לסוד</span>'}catch(e){$('ver').innerHTML='<span class="bad">שגיאה: '+e.message+'</span>'}}
+  else if(sec)$('ver').innerHTML='<span class="muted">בדיקת חתימה זמינה רק ל־HS256/384/512</span>'}
+async function sample(){const h={alg:'HS256',typ:'JWT'},n=Math.floor(Date.now()/1000),p={sub:'1234567890',name:'ישראל ישראלי',role:'admin',iat:n,exp:n+3600};
+  const e=o=>enc(new TextEncoder().encode(JSON.stringify(o)));const k=await crypto.subtle.importKey('raw',new TextEncoder().encode('my-secret'),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+  const body=e(h)+'.'+e(p);$('tok').value=body+'.'+enc(await crypto.subtle.sign('HMAC',k,new TextEncoder().encode(body)));$('sec').value='my-secret';run()}
+['tok','sec'].forEach(k=>$(k).oninput=run);$('b64s').onchange=run;$('sample').onclick=sample;$('clr').onclick=()=>{$('tok').value='';$('sec').value='';run()};
+sample();
+</script>
+</div>
+</body>
+</html>

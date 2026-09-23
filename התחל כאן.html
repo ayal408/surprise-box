@@ -17,7 +17,7 @@ header p{margin:4px 0 0;color:var(--muted)}
 .search{flex:1;min-width:220px;display:flex}
 .search input{width:100%;font:inherit;font-size:1.05rem;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
 .search input:focus{outline:2px solid #ffd60a;outline-offset:1px}
-nav.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;position:sticky;top:0;z-index:5;padding:8px 0;background:linear-gradient(var(--bg) 70%,transparent)}
+nav.tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;position:sticky;top:0;z-index:5;padding:8px 0;background:linear-gradient(var(--bg) 70%,transparent)}
 .tab{font:inherit;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px;border-radius:18px;background:var(--card);border:1px solid var(--line);transition:transform .2s,background .2s,border-color .2s}
 .tab:hover{transform:translateY(-3px);border-color:var(--t)}
 .tab[aria-selected="true"]{background:color-mix(in srgb,var(--t) 22%,transparent);border-color:var(--t);box-shadow:0 6px 24px color-mix(in srgb,var(--t) 30%,transparent)}
@@ -45,11 +45,11 @@ footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padd
 <div class="wrap">
   <header>
     <span class="gift">🎁</span>
-    <div><h1>קופסת ההפתעות</h1><p>84 כלים, משחקים והפתעות. בוחרים נושא ולוחצים על כרטיס.</p></div>
+    <div><h1>קופסת ההפתעות</h1><p>96 כלים, משחקים והפתעות. בוחרים נושא ולוחצים על כרטיס.</p></div>
     <label class="search"><input id="q" type="search" placeholder="🔍 חיפוש בכל הכלים (למשל: מע״מ, שבת, ירח)" aria-label="חיפוש"></label>
   </header>
   <nav class="tabs" role="tablist">
-    <button class="tab" role="tab" data-tab="acc" style="--t:#7ee0b0"><span class="ti">📊</span><span class="tn">חשבונות ומיסים</span><span class="tc">22</span></button><button class="tab" role="tab" data-tab="home" style="--t:#ffd166"><span class="ti">🏠</span><span class="tn">בית ומשפחה</span><span class="tc">16</span></button><button class="tab" role="tab" data-tab="tools" style="--t:#9bd1ff"><span class="ti">🧰</span><span class="tn">כלים</span><span class="tc">22</span></button><button class="tab" role="tab" data-tab="science" style="--t:#c49bff"><span class="ti">🔭</span><span class="tn">מדע וחלל</span><span class="tc">10</span></button><button class="tab" role="tab" data-tab="games" style="--t:#ff8fab"><span class="ti">🎮</span><span class="tn">משחקים ומוזיקה</span><span class="tc">14</span></button>
+    <button class="tab" role="tab" data-tab="acc" style="--t:#7ee0b0"><span class="ti">📊</span><span class="tn">חשבונות ומיסים</span><span class="tc">22</span></button><button class="tab" role="tab" data-tab="home" style="--t:#ffd166"><span class="ti">🏠</span><span class="tn">בית ומשפחה</span><span class="tc">16</span></button><button class="tab" role="tab" data-tab="tools" style="--t:#9bd1ff"><span class="ti">🧰</span><span class="tn">כלים</span><span class="tc">20</span></button><button class="tab" role="tab" data-tab="work" style="--t:#ff9f68"><span class="ti">💼</span><span class="tn">ניהול ומייל</span><span class="tc">8</span></button><button class="tab" role="tab" data-tab="dev" style="--t:#5fc1cf"><span class="ti">💻</span><span class="tn">מפתחים</span><span class="tc">6</span></button><button class="tab" role="tab" data-tab="science" style="--t:#c49bff"><span class="ti">🔭</span><span class="tn">מדע וחלל</span><span class="tc">10</span></button><button class="tab" role="tab" data-tab="games" style="--t:#ff8fab"><span class="ti">🎮</span><span class="tn">משחקים ומוזיקה</span><span class="tc">14</span></button>
   </nav>
   <section class="panel" role="tabpanel" id="p-acc" data-tab="acc" hidden>
     <h3>מיסים ושכר</h3>
@@ -121,7 +121,6 @@ footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padd
     </div>
     <h3>ארגון וזמן</h3>
     <div class="grid">
-      <a class="card" href="kanban.html" style="--c:#c77dff"><span class="ic">📋</span><b>לוח משימות</b><span>לוח קנבן עם גרירה בין עמודות, עדיפות, תאריך יעד, תגיות, חיפוש וגיבוי.</span></a>
       <a class="card" href="notes.html" style="--c:#ffd60a"><span class="ic">🗒️</span><b>פתקים דביקים</b><span>לוח שעם עם פתקים צבעוניים שגוררים לכל מקום, עם חיפוש וסידור אוטומטי.</span></a>
       <a class="card" href="timers.html" style="--c:#4cc9f0"><span class="ic">⏱️</span><b>שעון עצר וטיימרים</b><span>שעון עצר עם הקפות, והרבה טיימרים במקביל (ביצים, פסטה, כביסה) עם צליל והתראה.</span></a>
       <a class="card" href="dates.html" style="--c:#8ab6ff"><span class="ic">📅</span><b>מחשבון תאריכים</b><span>הפרש בין תאריכים, ימי עבודה, הוספת ימים, גיל מדויק ותאריך עברי.</span></a>
@@ -147,7 +146,33 @@ footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padd
       <a class="card" href="password.html" style="--c:#8ecae6"><span class="ic">🔐</span><b>מעבדת הסיסמאות</b><span>יוצרים סיסמאות חזקות ובודקים כמה סיסמה קיימת חזקה באמת.</span></a>
       <a class="card" href="weather.html" style="--c:#7ec8ff"><span class="ic">🌦️</span><b>מזג אוויר חי</b><span>תחזית עדכנית לפי מיקום או לפי עיר.</span></a>
       <a class="card" href="grades.html" style="--c:#ffd166"><span class="ic">🎓</span><b>ממוצע ציונים</b><span>ממוצע משוקלל לאוניברסיטה או לבגרות עם בונוסים, וכמה צריך בקורס הבא.</span></a>
+    </div>
+  </section>
+  <section class="panel" role="tabpanel" id="p-work" data-tab="work" hidden>
+    <h3>ניהול צוות וזמן</h3>
+    <div class="grid">
+      <a class="card" href="meeting.html" style="--c:#ff9f68"><span class="ic">⏱️</span><b>ישיבה חכמה</b><span>עלות הישיבה בזמן אמת, סדר יום מתוזמן, החלטות ומשימות, וסיכום מוכן למייל.</span></a>
+      <a class="card" href="eisenhower.html" style="--c:#ff8fab"><span class="ic">🎯</span><b>מטריצת אייזנהאואר</b><span>דחוף מול חשוב: לעשות, לתכנן, להאציל או לוותר, עם גרירה ושיוך לאנשים.</span></a>
+      <a class="card" href="decision.html" style="--c:#90e0a0"><span class="ic">🧭</span><b>מטריצת החלטות</b><span>משווים אפשרויות לפי קריטריונים עם משקלות, ובודקים כמה ההחלטה יציבה.</span></a>
+      <a class="card" href="shifts.html" style="--c:#4cc9f0"><span class="ic">🗓️</span><b>סידור משמרות</b><span>עובדים, משמרות ואילוצים, שיבוץ אוטומטי הוגן, סיכום שעות ושליחה בוואטסאפ.</span></a>
+      <a class="card" href="kanban.html" style="--c:#c77dff"><span class="ic">📋</span><b>לוח משימות</b><span>לוח קנבן עם גרירה בין עמודות, עדיפות, תאריך יעד, תגיות, חיפוש וגיבוי.</span></a>
+    </div>
+    <h3>מייל</h3>
+    <div class="grid">
+      <a class="card" href="emailtpl.html" style="--c:#ffd166"><span class="ic">📨</span><b>תבניות מייל</b><span>תזכורת תשלום, בקשת מסמכים, זימון לפגישה ועוד, בשלושה טונים, ושליחה בג׳ימייל או באאוטלוק.</span></a>
+      <a class="card" href="signature.html" style="--c:#ff8fab"><span class="ic">✉️</span><b>מחולל חתימה למייל</b><span>חתימה מעוצבת עם לוגו, טלפונים ורשתות, בארבעה עיצובים, מוכנה להדבקה.</span></a>
+      <a class="card" href="emailtools.html" style="--c:#4cc9f0"><span class="ic">📬</span><b>ארגז כלים לכתובות מייל</b><span>שליפה מטקסט, בדיקת תקינות, הסרת כפולים, תיקון gmial.com ובונה קישור mailto.</span></a>
+    </div>
+  </section>
+  <section class="panel" role="tabpanel" id="p-dev" data-tab="dev" hidden>
+    <h3>כלי קוד ונתונים</h3>
+    <div class="grid">
       <a class="card" href="devtools.html" style="--c:#5fc1cf"><span class="ic">🧑‍💻</span><b>ארגז כלים למפתחים</b><span>JSON, Base64, קידוד URL, SHA, UUID, Timestamp, בסיסי מספרים ובודק Regex.</span></a>
+      <a class="card" href="jsoncsv.html" style="--c:#c77dff"><span class="ic">🔄</span><b>ממיר JSON ↔ CSV</b><span>JSON, CSV, TSV, SQL ו־Markdown, עם תצוגת טבלה שאפשר למיין ותמיכה בעברית.</span></a>
+      <a class="card" href="jwt.html" style="--c:#5fc1cf"><span class="ic">🔐</span><b>מפענח JWT</b><span>כותרת, תוכן וזמני תוקף בשפה ברורה, ובדיקת חתימת HS256. הכל מקומי.</span></a>
+      <a class="card" href="diff.html" style="--c:#90e0a0"><span class="ic">🔀</span><b>השוואת טקסטים (Diff)</b><span>מה נוסף, נמחק ושונה בין שתי גרסאות, שורה אחרי שורה ובתוך השורה.</span></a>
+      <a class="card" href="cron.html" style="--c:#ffb703"><span class="ic">⏲️</span><b>מפענח Cron</b><span>הסבר בעברית לביטוי cron, 10 ההרצות הבאות ותבניות מוכנות.</span></a>
+      <a class="card" href="markdown.html" style="--c:#9bd1ff"><span class="ic">📝</span><b>עורך Markdown</b><span>כתיבה עם תצוגה חיה, טבלאות, משימות וקוד, והעתקה כ־HTML.</span></a>
     </div>
   </section>
   <section class="panel" role="tabpanel" id="p-science" data-tab="science" hidden>

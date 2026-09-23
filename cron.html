@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מפענח Cron</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffb703}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+#ex{font-family:Consolas,monospace;font-size:1.6rem;direction:ltr;text-align:center;width:100%;letter-spacing:2px}
+.lbl{display:grid;grid-template-columns:repeat(5,1fr);text-align:center;color:var(--muted);font-size:.8rem;direction:ltr;margin-top:4px}
+.say{font-size:1.25rem;font-weight:700;color:var(--acc);text-align:center;margin:12px 0;min-height:1.5em}
+.pre{display:flex;flex-wrap:wrap;gap:6px}
+.pre button{font-size:.85rem;padding:6px 10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>⏲️ מפענח ובונה ביטויי Cron</h1>
+<p class="sub">מקלידים ביטוי cron ומקבלים הסבר בעברית ואת 10 ההרצות הבאות. אפשר גם לבנות ביטוי בלחיצות.</p>
+<div class="panel">
+  <input id="ex" value="30 8 * * 0-4" spellcheck="false">
+  <div class="lbl"><span>דקה</span><span>שעה</span><span>יום בחודש</span><span>חודש</span><span>יום בשבוע</span></div>
+  <div class="say" id="say"></div>
+  <div class="pre" id="pre"></div>
+</div>
+<div class="grid2">
+  <div class="panel"><h2>▶ ההרצות הבאות</h2><table><tbody id="next"></tbody></table><label class="inline" style="margin-top:8px">אזור זמן: <select id="tz"><option value="local">המקומי שלי</option><option value="UTC">UTC</option></select></label></div>
+  <div class="panel"><h2>📖 תחביר</h2><table><tbody>
+    <tr><td class="num">*</td><td>כל ערך</td></tr><tr><td class="num">5</td><td>ערך מסוים</td></tr><tr><td class="num">1-5</td><td>טווח</td></tr><tr><td class="num">1,15,30</td><td>רשימה</td></tr><tr><td class="num">*/10</td><td>כל 10</td></tr><tr><td class="num">0</td><td>יום בשבוע: 0 = ראשון, 6 = שבת (גם 7 = ראשון)</td></tr><tr><td class="num">@daily</td><td>קיצורים: ‎@hourly, @daily, @weekly, @monthly, @yearly</td></tr>
+  </tbody></table></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const DN=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'],MN=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+const AL={'@yearly':'0 0 1 1 *','@annually':'0 0 1 1 *','@monthly':'0 0 1 * *','@weekly':'0 0 * * 0','@daily':'0 0 * * *','@midnight':'0 0 * * *','@hourly':'0 * * * *'};
+const NM={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12,sun:0,mon:1,tue:2,wed:3,thu:4,fri:5,sat:6};
+const RNG=[[0,59],[0,23],[1,31],[1,12],[0,7]];
+function field(s,[lo,hi]){s=s.toLowerCase().replace(/[a-z]{3}/g,m=>NM[m]??m);const set=new Set();for(const part of s.split(',')){const m=/^(\*|(\d+)(?:-(\d+))?)(?:\/(\d+))?$/.exec(part);if(!m)throw 0;
+  let a=m[1]==='*'?lo:+m[2],b=m[1]==='*'?hi:m[3]!==undefined?+m[3]:(m[4]?hi:a);const st=m[4]?+m[4]:1;if(a<lo||b>hi||a>b||st<1)throw 0;for(let v=a;v<=b;v+=st)set.add(v)}return set}
+function parse(ex){ex=AL[ex.trim()]||ex.trim();const p=ex.split(/\s+/);if(p.length!==5)throw 0;const F=p.map((s,i)=>field(s,RNG[i]));if(F[4].has(7)){F[4].delete(7);F[4].add(0)}return{F,p}}
+const list=(set,names,off=0)=>{const a=[...set].sort((x,y)=>x-y);return a.map(v=>names?names[v-off]:v).join(', ')};
+function say({F,p}){const[mi,h,dom,mo,dow]=p,parts=[];
+  if(mi==='*'&&h==='*')parts.push('כל דקה');else if(/^\*\/\d+$/.test(mi)&&h==='*')parts.push(`כל ${mi.slice(2)} דקות`);
+  else if(h==='*')parts.push(`בכל שעה בדקה ${list(F[0])}`);else if(/^\*\/\d+$/.test(h))parts.push(`כל ${h.slice(2)} שעות בדקה ${list(F[0])}`);
+  else parts.push('בשעה '+[...F[1]].sort((a,b)=>a-b).flatMap(hh=>[...F[0]].sort((a,b)=>a-b).map(m=>String(hh).padStart(2,'0')+':'+String(m).padStart(2,'0'))).slice(0,8).join(', ')+(F[0].size*F[1].size>8?'...':''));
+  if(dow!=='*')parts.push('בימי '+list(F[4],DN));if(dom!=='*')parts.push(`ב־${list(F[2])} לחודש`);if(mo!=='*')parts.push('בחודשים '+list(F[3],MN,1));
+  if(dom!=='*'&&dow!=='*')parts.push('(מספיק שאחד מהתנאים מתקיים)');return parts.join(' ')}
+function next({F,p},n,utc){const out=[];let d=new Date();d.setSeconds(0,0);d=new Date(+d+6e4);const G=k=>utc?d['getUTC'+k]():d['get'+k]();
+  const domAny=p[2]==='*',dowAny=p[4]==='*';for(let i=0;i<600000&&out.length<n;i++){const mo=G('Month')+1,dm=G('Date'),dw=G('Day'),h=G('Hours'),mi=G('Minutes');
+    const dayOk=domAny&&dowAny?true:domAny?F[4].has(dw):dowAny?F[2].has(dm):(F[2].has(dm)||F[4].has(dw));
+    if(!F[3].has(mo)||!dayOk){d=new Date(+d+(1440-h*60-mi)*6e4);continue}if(!F[1].has(h)){d=new Date(+d+(60-mi)*6e4);continue}if(!F[0].has(mi)){d=new Date(+d+6e4);continue}out.push(new Date(d));d=new Date(+d+6e4)}return out}
+function run(){try{const c=parse($('ex').value);$('say').textContent=say(c);$('ex').style.outline='';const utc=$('tz').value==='UTC';
+  $('next').innerHTML=next(c,10,utc).map(d=>`<tr><td>${d.toLocaleString('he-IL',{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:utc?'UTC':undefined})}</td><td class="num muted">${Math.round((d-Date.now())/6e4)<120?'בעוד '+Math.round((d-Date.now())/6e4)+' דק׳':''}</td></tr>`).join('')}catch{$('say').textContent='❌ ביטוי לא תקין';$('ex').style.outline='2px solid #ff4d6d';$('next').innerHTML=''}}
+const PRE=[['כל דקה','* * * * *'],['כל 5 דקות','*/5 * * * *'],['כל שעה עגולה','0 * * * *'],['כל יום בחצות','0 0 * * *'],['ימים א׳–ה׳ ב־08:30','30 8 * * 0-4'],['כל יום שישי ב־14:00','0 14 * * 5'],['ב־1 לכל חודש','0 9 1 * *'],['ב־15 לחודש (דיווח מע״מ)','0 9 15 * *'],['כל רבעון','0 0 1 1,4,7,10 *']];
+$('pre').innerHTML=PRE.map(([n,e])=>`<button data-e="${e}">${n}</button>`).join('');$('pre').onclick=e=>{if(e.target.dataset.e){$('ex').value=e.target.dataset.e;run()}};
+$('ex').oninput=run;$('tz').onchange=run;run();
+</script>
+</div>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>סידור משמרות</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#4cc9f0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1200px!important}
+.sch{overflow:auto}
+.sch table{min-width:760px}
+.sch td,.sch th{text-align:center;vertical-align:top;padding:5px}
+.sch th:first-child,.sch td:first-child{text-align:right;white-space:nowrap}
+.cell{min-height:40px;display:flex;flex-direction:column;gap:3px}
+.chip{border-radius:8px;padding:3px 6px;font-size:.82rem;font-weight:700;color:#140f2b;cursor:pointer}
+.cell select{font-size:.8rem;padding:2px 4px}
+.need{font-size:.72rem;color:#ff8fab}
+.emp{display:grid;grid-template-columns:18px 1fr 80px 1fr 30px;gap:6px;align-items:center;margin-bottom:5px}
+.emp i{width:14px;height:14px;border-radius:50%;display:block}
+@media print{body{background:#fff;color:#000}.noprint,.back,.sub{display:none}.chip{border:1px solid #000}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🗓️ סידור משמרות</h1>
+<p class="sub">בונים סידור עבודה שבועי: עובדים, משמרות, אילוצים ושיבוץ אוטומטי הוגן. רואים שעות לכל עובד ומדפיסים או שולחים לקבוצה.</p>
+<div class="grid2 noprint">
+  <div class="panel">
+    <h2>👷 עובדים</h2>
+    <div class="emp muted" style="font-size:.78rem"><span></span><span>שם</span><span>מקס׳ משמרות</span><span>לא יכול/ה (למשל: ו,ש)</span><span></span></div>
+    <div id="emps"></div>
+    <button id="adde">+ עובד/ת</button>
+  </div>
+  <div class="panel">
+    <h2>🕐 משמרות</h2>
+    <div id="shs"></div>
+    <button id="adds">+ משמרת</button>
+    <div class="row" style="margin-top:10px"><label class="inline">ימי עבודה <select id="days"><option value="5">א׳–ה׳</option><option value="6" selected>א׳–ו׳</option><option value="7">א׳–ש׳</option></select></label></div>
+    <div class="row" style="margin-top:10px"><button class="pri" id="auto">⚡ שיבוץ אוטומטי</button><button id="clr">ניקוי</button></div>
+  </div>
+</div>
+<div class="panel sch"><h2 id="wk"></h2><table><thead id="th"></thead><tbody id="tb"></tbody></table></div>
+<div class="panel"><h2>⚖️ סיכום לעובד</h2><table><tbody id="sum"></tbody></table></div>
+<div class="row noprint"><button onclick="print()">🖨️ הדפסה</button><button id="wa">📤 שליחה בוואטסאפ</button></div>
+<script>
+const $=id=>document.getElementById(id);const DN=['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'];const COL=['#ff8fab','#4cc9f0','#90e0a0','#ffd166','#c49bff','#ff9f68','#7cf2c4','#9bd1ff','#f78c6b','#e0a0ff'];
+let S;try{S=JSON.parse(localStorage.getItem('shifts'))}catch{}
+if(!S)S={E:[{n:'דנה',max:5,no:'ש'},{n:'יוסי',max:5,no:'ו,ש'},{n:'מיכל',max:4,no:''},{n:'אבי',max:5,no:'א'},{n:'רותי',max:3,no:'ב,ג'}],H:[{n:'בוקר',from:'07:00',to:'15:00',need:2},{n:'ערב',from:'15:00',to:'23:00',need:1}],A:{}};
+const save=()=>{try{localStorage.setItem('shifts',JSON.stringify(S))}catch{}};
+const hrs=h=>{const[a,b]=[h.from,h.to].map(t=>{const[x,y]=t.split(':').map(Number);return x*60+y});return((b-a+1440)%1440)/60};
+const nd=()=>+$('days').value;const noDays=e=>e.no.split(/[,\s]+/).map(s=>s.replace(/['׳]/g,'׳').trim()).filter(Boolean).map(s=>s.endsWith('׳')?s:s+'׳');
+function ui(){$('emps').innerHTML=S.E.map((e,i)=>`<div class="emp"><i style="background:${COL[i%COL.length]}"></i><input data-e="${i}" data-k="n" value="${e.n.replace(/"/g,'&quot;')}"><input data-e="${i}" data-k="max" type="number" min="0" value="${e.max}"><input data-e="${i}" data-k="no" value="${e.no}" placeholder="—"><button data-ex="${i}" style="padding:2px 6px">✕</button></div>`).join('');
+  $('shs').innerHTML=S.H.map((h,i)=>`<div class="row" style="margin-bottom:5px"><input data-h="${i}" data-k="n" value="${h.n}" style="width:80px"><input data-h="${i}" data-k="from" type="time" value="${h.from}"><input data-h="${i}" data-k="to" type="time" value="${h.to}"><label class="inline">צריך <input data-h="${i}" data-k="need" type="number" min="1" value="${h.need}" style="width:56px"></label><button data-hx="${i}" style="padding:2px 6px">✕</button></div>`).join('')}
+function table(){const D=nd();$('th').innerHTML=`<tr><th>משמרת</th>${DN.slice(0,D).map(d=>`<th>${d}</th>`).join('')}</tr>`;
+  $('tb').innerHTML=S.H.map((h,hi)=>`<tr><td><b>${h.n}</b><div class="muted" style="font-size:.78rem;direction:ltr;text-align:right">${h.from}–${h.to}</div></td>${DN.slice(0,D).map((_,d)=>{const k=d+'-'+hi,a=S.A[k]||[];
+    return`<td><div class="cell">${a.map(ei=>S.E[ei]?`<span class="chip" style="background:${COL[ei%COL.length]}" data-rm="${k}|${ei}" title="לחיצה להסרה">${S.E[ei].n}</span>`:'').join('')}${a.length<h.need?`<span class="need">חסר ${h.need-a.length}</span><select class="noprint" data-add="${k}"><option value="">+</option>${S.E.map((e,ei)=>a.includes(ei)?'':`<option value="${ei}">${e.n}${noDays(e).includes(DN[d])?' ⚠':''}</option>`).join('')}</select>`:''}</div></td>`}).join('')}</tr>`).join('');
+  const cnt=S.E.map(()=>[0,0]);Object.entries(S.A).forEach(([k,a])=>{const[d,hi]=k.split('-').map(Number);if(d>=D||!S.H[hi])return;a.forEach(ei=>{if(cnt[ei]){cnt[ei][0]++;cnt[ei][1]+=hrs(S.H[hi])}})});
+  $('sum').innerHTML=S.E.map((e,i)=>`<tr><td><span class="chip" style="background:${COL[i%COL.length]}">${e.n}</span></td><td class="num">${cnt[i][0]} משמרות</td><td class="num">${cnt[i][1]} שעות</td><td class="num ${cnt[i][0]>e.max?'':'muted'}" style="${cnt[i][0]>e.max?'color:#ff8fab':''}">${cnt[i][0]>e.max?'⚠ מעל המקסימום':'מקס׳ '+e.max}</td></tr>`).join('');
+  const s=new Date();s.setDate(s.getDate()-s.getDay()+7);$('wk').textContent='סידור לשבוע שמתחיל ב־'+s.toLocaleDateString('he-IL',{day:'numeric',month:'long'});save()}
+function auto(){S.A={};const D=nd(),cnt=S.E.map(()=>0),last=S.E.map(()=>-9);
+  for(let d=0;d<D;d++)S.H.forEach((h,hi)=>{const k=d+'-'+hi;S.A[k]=[];for(let n=0;n<h.need;n++){const c=S.E.map((e,ei)=>ei).filter(ei=>!S.A[k].includes(ei)&&cnt[ei]<S.E[ei].max&&!noDays(S.E[ei]).includes(DN[d])&&!S.H.some((_,h2)=>h2!==hi&&(S.A[d+'-'+h2]||[]).includes(ei)))
+    .sort((a,b)=>cnt[a]/S.E[a].max-cnt[b]/S.E[b].max||(last[a]===d-1&&hi===0)-(last[b]===d-1&&hi===0)||Math.random()-.5);if(c.length){S.A[k].push(c[0]);cnt[c[0]]++;last[c[0]]=d}}});table()}
+document.addEventListener('input',e=>{const t=e.target,d=t.dataset;if(d.e!==undefined){S.E[d.e][d.k]=d.k==='max'?+t.value:t.value;table()}else if(d.h!==undefined){S.H[d.h][d.k]=d.k==='need'?Math.max(1,+t.value):t.value;table()}});
+document.addEventListener('change',e=>{const k=e.target.dataset.add;if(k&&e.target.value!==''){(S.A[k]=S.A[k]||[]).push(+e.target.value);table()}});
+document.addEventListener('click',e=>{const d=e.target.dataset;if(d.rm){const[k,ei]=d.rm.split('|');S.A[k]=S.A[k].filter(x=>x!=ei);table()}else if(d.ex!==undefined){S.E.splice(+d.ex,1);S.A={};ui();table()}else if(d.hx!==undefined){S.H.splice(+d.hx,1);S.A={};ui();table()}});
+$('adde').onclick=()=>{S.E.push({n:'עובד/ת',max:5,no:''});ui();table()};$('adds').onclick=()=>{S.H.push({n:'לילה',from:'23:00',to:'07:00',need:1});ui();table()};
+$('auto').onclick=auto;$('clr').onclick=()=>{S.A={};table()};$('days').onchange=table;
+$('wa').onclick=()=>{const D=nd();const t='🗓️ '+$('wk').textContent+'\n\n'+DN.slice(0,D).map((dn,d)=>`*יום ${dn}*\n`+S.H.map((h,hi)=>`${h.n} (${h.from}–${h.to}): ${(S.A[d+'-'+hi]||[]).map(ei=>S.E[ei]?.n).filter(Boolean).join(', ')||'—'}`).join('\n')).join('\n\n');open('https://wa.me/?text='+encodeURIComponent(t),'_blank')};
+ui();if(!Object.keys(S.A).length)auto();else table();
+</script>
+</div>
+</body>
+</html>

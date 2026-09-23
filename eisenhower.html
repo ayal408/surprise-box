@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מטריצת אייזנהאואר</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff8fab}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1100px!important}
+.mx{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.q{border-radius:18px;padding:12px;min-height:220px;border:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.q.over{outline:2px dashed var(--ink)}
+.q h3{margin:0;font-size:1.05rem;display:flex;justify-content:space-between}
+.q small{color:var(--muted);font-weight:400}
+.q1{background:rgba(255,77,109,.12)}.q2{background:rgba(88,214,141,.1)}.q3{background:rgba(255,183,3,.1)}.q4{background:rgba(155,155,255,.08)}
+.t{background:rgba(0,0,0,.25);border-radius:10px;padding:7px 10px;display:flex;gap:8px;align-items:center;cursor:grab}
+.t.done span{text-decoration:line-through;opacity:.5}
+.t span{flex:1}.t button{padding:1px 6px;font-size:.8rem}
+.t .who{font-size:.78rem}
+.axis{display:grid;grid-template-columns:1fr 1fr;text-align:center;color:var(--muted);font-weight:700;margin-bottom:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🎯 מטריצת אייזנהאואר: דחוף מול חשוב</h1>
+<p class="sub">מחלקים משימות לארבעה רבעים: לעשות עכשיו, לתכנן, להאציל או לוותר. גוררים משימות בין הרבעים, מסמנים מה בוצע ומייצאים רשימה לצוות.</p>
+<div class="panel"><form class="row" id="f"><input id="n" placeholder="משימה חדשה" style="flex:1" required><label class="inline"><input type="checkbox" id="u"> דחוף</label><label class="inline"><input type="checkbox" id="i" checked> חשוב</label><button class="pri">הוספה</button></form></div>
+<div class="axis"><span>⚡ דחוף</span><span>🕰️ לא דחוף</span></div>
+<div class="mx">
+  <div class="q q1" data-q="1"><h3>🔥 לעשות עכשיו <small>חשוב ודחוף</small></h3><div class="list"></div></div>
+  <div class="q q2" data-q="2"><h3>📅 לתכנן <small>חשוב, לא דחוף</small></h3><div class="list"></div></div>
+  <div class="q q3" data-q="3"><h3>🤝 להאציל <small>דחוף, לא חשוב</small></h3><div class="list"></div></div>
+  <div class="q q4" data-q="4"><h3>🗑️ לוותר <small>לא דחוף ולא חשוב</small></h3><div class="list"></div></div>
+</div>
+<div class="row"><button id="cp">📋 העתקה כרשימה</button><button id="clean">🧹 מחיקת משימות שבוצעו</button><span class="muted" id="st"></span></div>
+<p class="hint">רוב הזמן כדאי להשקיע ברבע "לתכנן": דברים חשובים שעוד לא בוערים. ככה פחות דברים מגיעים לרבע "לעשות עכשיו". משימה ברבע "להאציל" אפשר לשייך לאדם.</p>
+<script>
+const $=id=>document.getElementById(id);const esc=s=>String(s).replace(/</g,'&lt;');
+let T;try{T=JSON.parse(localStorage.getItem('eisen'))}catch{}
+if(!T)T=[{id:1,n:'להגיש דוח מע״מ עד ה־15',q:1},{id:2,n:'לתכנן את התקציב לשנה הבאה',q:2},{id:3,n:'ללמוד את הכלי החדש',q:2},{id:4,n:'לענות לשיחות ספקים',q:3,w:'דנה'},{id:5,n:'לסדר את תיבת המייל',q:4}];
+const save=()=>{try{localStorage.setItem('eisen',JSON.stringify(T))}catch{}};
+function render(){document.querySelectorAll('.q').forEach(q=>{const k=+q.dataset.q;q.querySelector('.list').innerHTML=T.filter(t=>t.q===k).map(t=>`<div class="t ${t.d?'done':''}" draggable="true" data-id="${t.id}"><input type="checkbox" ${t.d?'checked':''} data-ck="${t.id}"><span>${esc(t.n)}</span>${k===3?`<input class="who" data-w="${t.id}" value="${esc(t.w||'')}" placeholder="למי?" style="width:70px;padding:2px 6px">`:''}<button data-x="${t.id}">✕</button></div>`).join('')||'<small class="muted">גררו לכאן</small>'});
+  const open=T.filter(t=>!t.d);$('st').textContent=`${open.length} פתוחות · ${T.filter(t=>t.d).length} בוצעו`;save()}
+document.addEventListener('dragstart',e=>{const t=e.target.closest('.t');if(t)e.dataTransfer.setData('text',t.dataset.id)});
+document.querySelectorAll('.q').forEach(q=>{q.addEventListener('dragover',e=>{e.preventDefault();q.classList.add('over')});q.addEventListener('dragleave',()=>q.classList.remove('over'));
+  q.addEventListener('drop',e=>{e.preventDefault();q.classList.remove('over');const t=T.find(x=>x.id==e.dataTransfer.getData('text'));if(t){t.q=+q.dataset.q;render()}})});
+document.addEventListener('click',e=>{const d=e.target.dataset;if(d.x){T=T.filter(t=>t.id!=d.x);render()}else if(d.ck){const t=T.find(x=>x.id==d.ck);t.d=e.target.checked;render()}});
+document.addEventListener('input',e=>{const w=e.target.dataset.w;if(w){T.find(x=>x.id==w).w=e.target.value;save()}});
+$('f').onsubmit=e=>{e.preventDefault();const u=$('u').checked,i=$('i').checked;T.push({id:Date.now(),n:$('n').value,q:u&&i?1:i?2:u?3:4});$('n').value='';render()};
+$('clean').onclick=()=>{T=T.filter(t=>!t.d);render()};
+$('cp').onclick=()=>{const N={1:'🔥 לעשות עכשיו',2:'📅 לתכנן',3:'🤝 להאציל',4:'🗑️ לוותר'};navigator.clipboard.writeText([1,2,3,4].map(k=>N[k]+'\n'+(T.filter(t=>t.q===k).map(t=>`${t.d?'✔':'•'} ${t.n}${t.w?' ('+t.w+')':''}`).join('\n')||'—')).join('\n\n'));$('cp').textContent='✓ הועתק';setTimeout(()=>$('cp').textContent='📋 העתקה כרשימה',1400)};
+render();
+</script>
+</div>
+</body>
+</html>

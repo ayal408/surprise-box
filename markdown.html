@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>עורך Markdown</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#9bd1ff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1300px!important}
+.ed{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#src{width:100%;min-height:65vh;font-family:Consolas,monospace;font-size:.95rem;line-height:1.6}
+#pv{background:#fff;color:#1d1d1f;border-radius:14px;padding:18px 22px;min-height:65vh;overflow:auto;line-height:1.7;font-family:"Segoe UI",Arial,sans-serif}
+#pv h1,#pv h2{border-bottom:1px solid #e5e5ea;padding-bottom:4px}#pv code{background:#f2f2f7;padding:1px 5px;border-radius:4px;font-family:Consolas,monospace;direction:ltr;unicode-bidi:embed}
+#pv pre{background:#1d1840;color:#f3efff;padding:12px;border-radius:10px;overflow:auto;direction:ltr;text-align:left}#pv pre code{background:none;color:inherit}
+#pv table{border-collapse:collapse}#pv th,#pv td{border:1px solid #d1d1d6;padding:6px 10px}#pv th{background:#f2f2f7}#pv blockquote{border-inline-start:4px solid #9bd1ff;margin:0;padding:4px 14px;color:#555;background:#f7f9ff}
+#pv img{max-width:100%}#pv a{color:#0a58ca}#pv hr{border:0;border-top:1px solid #ddd}
+.tb{display:flex;flex-wrap:wrap;gap:4px}.tb button{padding:5px 10px;font-size:.9rem}
+@media(max-width:800px){.ed{grid-template-columns:1fr}#src,#pv{min-height:40vh}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>📝 עורך Markdown עם תצוגה חיה</h1>
+<p class="sub">כותבים Markdown בצד אחד ורואים את התוצאה בצד השני, כולל כותרות, רשימות, טבלאות, קוד וקישורים. אפשר להעתיק כ־HTML או להוריד קובץ. תומך בעברית ובאנגלית באותו מסמך.</p>
+<div class="panel tb">
+  <button data-w="**|**" title="מודגש"><b>B</b></button><button data-w="*|*" title="נטוי"><i>I</i></button><button data-w="~~|~~">S̶</button><button data-l="# ">H1</button><button data-l="## ">H2</button><button data-l="- ">• רשימה</button><button data-l="1. ">1. רשימה</button><button data-l="- [ ] ">☐ משימה</button><button data-l="> ">❝ ציטוט</button><button data-w="`|`">‹/›</button><button data-b="```\n|\n```">קוד</button><button data-b="[|](https://)">🔗</button><button data-b="| עמודה | עמודה |\n|---|---|\n| | |\n">טבלה</button>
+  <span style="flex:1"></span><button id="cph">📋 העתק HTML</button><button id="dlm">⬇ .md</button><button id="dlh">⬇ .html</button>
+</div>
+<div class="ed"><textarea id="src" spellcheck="false"></textarea><div id="pv" dir="auto"></div></div>
+<script>
+const $=id=>document.getElementById(id),S=$('src');
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function inl(s){const codes=[];s=esc(s).replace(/`([^`]+)`/g,(_,c)=>{codes.push(c);return'\u0000'+(codes.length-1)+'\u0000'});
+  s=s.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g,'<img alt="$1" src="$2">').replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,(_,t,u)=>/^(https?:|mailto:|#|\/)/.test(u)?`<a href="${u}" target="_blank" rel="noopener">${t}</a>`:t)
+   .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/__([^_]+)__/g,'<strong>$1</strong>').replace(/(^|[^*])\*([^*\n]+)\*/g,'$1<em>$2</em>').replace(/~~([^~]+)~~/g,'<del>$1</del>')
+   .replace(/(^|\s)(https?:\/\/[^\s<]+)/g,'$1<a href="$2" target="_blank" rel="noopener">$2</a>');return s.replace(/\u0000(\d+)\u0000/g,(_,i)=>'<code>'+codes[i]+'</code>')}
+function md(t){const L=t.replace(/\r/g,'').split('\n');let h='',i=0;const para=[];const flush=()=>{if(para.length){h+='<p>'+para.map(inl).join('<br>')+'</p>';para.length=0}};
+  while(i<L.length){const l=L[i];
+    if(/^```/.test(l)){flush();const lang=l.slice(3).trim();let c=[];i++;while(i<L.length&&!/^```/.test(L[i]))c.push(L[i++]);i++;h+=`<pre><code${lang?` class="lang-${esc(lang)}"`:''}>${esc(c.join('\n'))}</code></pre>`;continue}
+    let m;if(m=/^(#{1,6})\s+(.*)/.exec(l)){flush();h+=`<h${m[1].length} dir="auto">${inl(m[2])}</h${m[1].length}>`;i++;continue}
+    if(/^(-{3,}|\*{3,})$/.test(l.trim())){flush();h+='<hr>';i++;continue}
+    if(/^>\s?/.test(l)){flush();const q=[];while(i<L.length&&/^>\s?/.test(L[i]))q.push(L[i++].replace(/^>\s?/,''));h+='<blockquote>'+md(q.join('\n'))+'</blockquote>';continue}
+    if(/^\|.*\|\s*$/.test(l)&&i+1<L.length&&/^\|?\s*:?-+/.test(L[i+1])){flush();const row=s=>s.trim().replace(/^\||\|$/g,'').split('|').map(c=>c.trim());const hd=row(l);i+=2;let b='';while(i<L.length&&/^\|/.test(L[i]))b+='<tr>'+row(L[i++]).map(c=>`<td>${inl(c)}</td>`).join('')+'</tr>';h+=`<table><thead><tr>${hd.map(c=>`<th>${inl(c)}</th>`).join('')}</tr></thead><tbody>${b}</tbody></table>`;continue}
+    if(/^\s*([-*+]|\d+\.)\s+/.test(l)){flush();const ord=/^\s*\d+\./.test(l);let items='';while(i<L.length&&/^\s*([-*+]|\d+\.)\s+/.test(L[i])){let it=L[i++].replace(/^\s*([-*+]|\d+\.)\s+/,'');const tk=/^\[( |x)\]\s*/i.exec(it);if(tk)it=`<input type="checkbox" disabled ${tk[1]!==' '?'checked':''}> `+inl(it.slice(tk[0].length));else it=inl(it);items+=`<li>${it}</li>`}h+=ord?`<ol>${items}</ol>`:`<ul>${items}</ul>`;continue}
+    if(!l.trim()){flush();i++;continue}para.push(l);i++}flush();return h}
+function render(){$('pv').innerHTML=md(S.value);try{localStorage.setItem('md',S.value)}catch{}}
+document.querySelectorAll('.tb [data-w],.tb [data-l],.tb [data-b]').forEach(b=>b.onclick=()=>{const s=S.selectionStart,e=S.selectionEnd,sel=S.value.slice(s,e);
+  if(b.dataset.w){const[a,z]=b.dataset.w.split('|');S.setRangeText(a+(sel||'טקסט')+z,s,e,'select')}
+  else if(b.dataset.l){const ls=S.value.lastIndexOf('\n',s-1)+1;S.setRangeText(b.dataset.l,ls,ls,'end')}
+  else{const[a,z]=b.dataset.b.replace(/\\n/g,'\n').split('|');S.setRangeText(a+sel+z,s,e,'end')}S.focus();render()});
+S.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='b'){e.preventDefault();document.querySelector('[data-w="**|**"]').click()}if((e.ctrlKey||e.metaKey)&&e.key==='i'){e.preventDefault();document.querySelector('[data-w="*|*"]').click()}});
+const dl=(txt,name,type)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=name;a.click()};
+$('cph').onclick=()=>{navigator.clipboard.writeText($('pv').innerHTML);$('cph').textContent='✓ הועתק';setTimeout(()=>$('cph').textContent='📋 העתק HTML',1400)};
+$('dlm').onclick=()=>dl(S.value,'document.md','text/markdown');
+$('dlh').onclick=()=>dl(`<!DOCTYPE html><html dir="rtl" lang="he"><meta charset="utf-8"><body style="font-family:Segoe UI,Arial;max-width:800px;margin:auto;line-height:1.7">${$('pv').innerHTML}</body></html>`,'document.html','text/html');
+S.oninput=render;
+try{S.value=localStorage.getItem('md')||''}catch{}
+if(!S.value)S.value='# כותרת ראשית\n\nזו **דוגמה** לעורך *Markdown*. אפשר לכתוב עברית ו־English באותו מסמך.\n\n## רשימת משימות\n- [x] לכתוב מסמך\n- [ ] לשלוח לצוות\n\n> ציטוט חשוב\n\n| מוצר | מחיר |\n|---|---|\n| מחברת | 12 ₪ |\n| עט | 4 ₪ |\n\n```js\nconsole.log("שלום עולם");\n```\n\nקישור: https://ayal408.github.io/surprise-box/';
+render();
+</script>
+</div>
+</body>
+</html>

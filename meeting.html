@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מונה עלות ישיבה</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff9f68}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.cost{font-size:clamp(2.6rem,10vw,4.4rem);font-weight:800;text-align:center;color:var(--acc);font-variant-numeric:tabular-nums;direction:ltr}
+.clock{font-size:1.6rem;text-align:center;font-variant-numeric:tabular-nums;direction:ltr}
+.ag{display:grid;grid-template-columns:1fr 70px 70px 30px;gap:6px;align-items:center;padding:6px;border-radius:10px;margin-bottom:4px}
+.ag.cur{background:rgba(255,159,104,.15);outline:1px solid var(--acc)}.ag.over{background:rgba(255,77,109,.18)}.ag.done{opacity:.5}
+.ppl{display:grid;grid-template-columns:1fr 70px 110px 30px;gap:6px;margin-bottom:4px;align-items:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>⏱️ ישיבה חכמה: עלות, סדר יום וסיכום</h1>
+<p class="sub">כמה עולה הישיבה הזו לארגון, בזמן אמת. עם סדר יום מתוזמן שמתריע כשנושא חורג, ורישום החלטות ומשימות שיוצא כסיכום מוכן למייל.</p>
+<div class="grid2">
+  <div class="panel">
+    <div class="cost" id="cost">₪0</div>
+    <div class="clock" id="clk">00:00:00</div>
+    <div class="row" style="justify-content:center;margin-top:10px"><button class="pri" id="go">▶ התחלת ישיבה</button><button id="rs">↺ איפוס</button></div>
+    <p class="muted" id="per" style="text-align:center;margin:8px 0 0"></p>
+  </div>
+  <div class="panel">
+    <h2>👥 משתתפים</h2>
+    <div class="ppl muted" style="font-size:.8rem"><span>תפקיד</span><span>כמות</span><span>עלות לשעה (₪)</span><span></span></div>
+    <div id="ppl"></div>
+    <button id="addp">+ תפקיד</button>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel">
+    <h2>📋 סדר יום</h2>
+    <div id="ag"></div>
+    <form class="row" id="fa" style="margin-top:6px"><input id="an" placeholder="נושא" style="flex:1" required><input id="am" type="number" value="10" style="width:70px" title="דקות"><button>+</button></form>
+    <button id="nx" style="margin-top:8px">⏭ לנושא הבא</button>
+  </div>
+  <div class="panel">
+    <h2>✅ החלטות ומשימות</h2>
+    <form class="row" id="fd"><select id="dk"><option value="d">החלטה</option><option value="t">משימה</option></select><input id="dt" placeholder="מה הוחלט / מה צריך לעשות" style="flex:1" required><input id="dw" placeholder="אחראי" style="width:90px"><button>+</button></form>
+    <ul id="dl" style="padding-inline-start:18px;line-height:1.8"></ul>
+    <div class="row"><button class="pri" id="sum">📧 סיכום ישיבה למייל</button><button id="cp">📋 העתקה</button></div>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');
+let S;try{S=JSON.parse(localStorage.getItem('meeting'))}catch{}
+if(!S)S={p:[{r:'מנהלים',n:2,c:220},{r:'עובדים',n:4,c:110}],a:[{t:'עדכון סטטוס',m:10},{t:'תקציב רבעון הבא',m:20},{t:'שאלות ופתוחים',m:10}],d:[],t0:null,acc:0,cur:0,aStart:0};
+const save=()=>{try{localStorage.setItem('meeting',JSON.stringify(S))}catch{}};
+const el=()=>S.acc+(S.t0?Date.now()-S.t0:0);const rate=()=>S.p.reduce((s,p)=>s+(+p.n||0)*(+p.c||0),0);
+const hms=ms=>{const s=ms/1000|0;return[s/3600|0,s%3600/60|0,s%60].map(v=>String(v).padStart(2,'0')).join(':')};
+function tick(){const e=el();$('cost').textContent=f(rate()*e/36e5);$('clk').textContent=hms(e);$('per').textContent=`${f(rate())} לשעה · ${f(rate()/60)} לדקה · ${S.p.reduce((s,p)=>s+(+p.n||0),0)} משתתפים`;
+  const plan=S.a.reduce((s,a)=>s+(+a.m||0),0);document.title=S.t0?f(rate()*e/36e5)+' · ישיבה':'ישיבה חכמה';agenda(e,plan)}
+let lastAg='';function agenda(e,plan){const inTopic=(e-(S.aStart||0))/6e4;const html=S.a.map((a,i)=>{const cls=i<S.cur?'done':i===S.cur&&S.t0!==null?(inTopic>a.m?'over':'cur'):'';
+  return`<div class="ag ${cls}"><span>${i<S.cur?'✓ ':''}${a.t.replace(/</g,'&lt;')}</span><span class="num">${a.m} דק׳</span><span class="num">${i===S.cur&&(S.t0||S.acc)?Math.floor(inTopic)+'′':''}</span><button data-x="${i}" style="padding:2px 6px">✕</button></div>`}).join('')+`<div class="muted" style="font-size:.85rem;margin-top:4px">מתוכנן: ${plan} דק׳ · עלות מתוכננת: ${f(rate()*plan/60)}</div>`;if(html!==lastAg){$('ag').innerHTML=html;lastAg=html}
+  const cur=S.a[S.cur];if(cur&&S.t0&&inTopic>cur.m&&!S.warned){S.warned=1;try{const a=new AudioContext(),o=a.createOscillator();o.frequency.value=660;o.connect(a.destination);o.start();o.stop(a.currentTime+.2)}catch{}}}
+function ppl(){$('ppl').innerHTML=S.p.map((p,i)=>`<div class="ppl"><input data-i="${i}" data-k="r" value="${p.r.replace(/"/g,'&quot;')}"><input data-i="${i}" data-k="n" type="number" min="0" value="${p.n}"><input data-i="${i}" data-k="c" type="number" value="${p.c}"><button data-px="${i}" style="padding:2px 6px">✕</button></div>`).join('')}
+function dec(){$('dl').innerHTML=S.d.map((d,i)=>`<li>${d.k==='d'?'📌 החלטה':'☐ משימה'}: ${d.t.replace(/</g,'&lt;')}${d.w?` <span class="tag">${d.w.replace(/</g,'&lt;')}</span>`:''} <button data-dx="${i}" style="padding:0 6px;font-size:.8rem">✕</button></li>`).join('')}
+function summary(){const e=el(),d=new Date().toLocaleDateString('he-IL');return`סיכום ישיבה – ${d}\n\nמשך: ${Math.round(e/6e4)} דקות · משתתפים: ${S.p.map(p=>p.n+' '+p.r).join(', ')}\n\nנושאים:\n${S.a.map((a,i)=>`${i+1}. ${a.t}`).join('\n')}\n\nהחלטות:\n${S.d.filter(x=>x.k==='d').map(x=>'• '+x.t).join('\n')||'—'}\n\nמשימות:\n${S.d.filter(x=>x.k==='t').map(x=>`• ${x.t}${x.w?' – באחריות '+x.w:''}`).join('\n')||'—'}\n\nתודה לכולם.`}
+$('go').onclick=()=>{if(S.t0){S.acc+=Date.now()-S.t0;S.t0=null;$('go').textContent='▶ המשך'}else{S.t0=Date.now();$('go').textContent='⏸ השהיה'}save()};
+$('rs').onclick=()=>{if(!confirm('לאפס את הישיבה? ההחלטות יימחקו.'))return;S.t0=null;S.acc=0;S.cur=0;S.aStart=0;S.d=[];S.warned=0;$('go').textContent='▶ התחלת ישיבה';dec();save()};
+$('nx').onclick=()=>{if(S.cur<S.a.length){S.cur++;S.aStart=el();S.warned=0;save()}};
+$('ppl').oninput=e=>{const{i,k}=e.target.dataset;if(i!==undefined){S.p[i][k]=k==='r'?e.target.value:+e.target.value;save()}};
+$('ppl').onclick=e=>{const x=e.target.dataset.px;if(x!==undefined){S.p.splice(+x,1);ppl();save()}};
+$('addp').onclick=()=>{S.p.push({r:'תפקיד',n:1,c:100});ppl();save()};
+$('ag').onclick=e=>{const x=e.target.dataset.x;if(x!==undefined){S.a.splice(+x,1);save()}};
+$('fa').onsubmit=e=>{e.preventDefault();S.a.push({t:$('an').value,m:+$('am').value||5});$('an').value='';save()};
+$('fd').onsubmit=e=>{e.preventDefault();S.d.push({k:$('dk').value,t:$('dt').value,w:$('dw').value});$('dt').value='';$('dw').value='';dec();save()};
+$('dl').onclick=e=>{const x=e.target.dataset.dx;if(x!==undefined){S.d.splice(+x,1);dec();save()}};
+$('sum').onclick=()=>{location.href='mailto:?subject='+encodeURIComponent('סיכום ישיבה '+new Date().toLocaleDateString('he-IL'))+'&body='+encodeURIComponent(summary())};
+$('cp').onclick=()=>{navigator.clipboard.writeText(summary());$('cp').textContent='✓ הועתק';setTimeout(()=>$('cp').textContent='📋 העתקה',1400)};
+if(S.t0)$('go').textContent='⏸ השהיה';else if(S.acc)$('go').textContent='▶ המשך';
+ppl();dec();tick();setInterval(tick,250);setInterval(save,5000);
+</script>
+</div>
+</body>
+</html>

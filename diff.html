@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>השוואת טקסטים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#90e0a0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1200px!important}
+textarea{width:100%;min-height:200px;font-family:Consolas,monospace;font-size:.88rem;direction:ltr;text-align:left;white-space:pre;overflow:auto}
+.out{font-family:Consolas,monospace;font-size:.86rem;direction:ltr;text-align:left;border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:70vh}
+.ln{display:grid;grid-template-columns:44px 44px 18px 1fr;white-space:pre-wrap;word-break:break-word}
+.ln span{padding:1px 6px}
+.ln .n{color:var(--muted);text-align:right;background:rgba(0,0,0,.2);user-select:none}
+.add{background:rgba(88,214,141,.14)}.del{background:rgba(255,77,109,.14)}
+.add ins{background:rgba(88,214,141,.45);text-decoration:none;border-radius:3px}.del del{background:rgba(255,77,109,.5);text-decoration:none;border-radius:3px}
+.fold{color:var(--muted);text-align:center;padding:3px;background:rgba(255,255,255,.03);cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🔀 השוואת טקסטים וקוד (Diff)</h1>
+<p class="sub">מדביקים שתי גרסאות ורואים מה נוסף, מה נמחק ומה השתנה, שורה אחרי שורה ובתוך השורה. מתאים לקוד, לחוזים, לקבצי הגדרות ולרשימות.</p>
+<div class="grid2">
+  <div class="panel"><h2>לפני</h2><textarea id="a" spellcheck="false"></textarea></div>
+  <div class="panel"><h2>אחרי</h2><textarea id="b" spellcheck="false"></textarea></div>
+</div>
+<div class="panel row">
+  <label class="inline"><input type="checkbox" id="ws"> להתעלם מרווחים</label>
+  <label class="inline"><input type="checkbox" id="cs"> להתעלם מאותיות גדולות/קטנות</label>
+  <label class="inline"><input type="checkbox" id="ctx" checked> להציג רק שינויים (עם 3 שורות הקשר)</label>
+  <button id="swap">⇄ החלפה</button>
+  <span id="st" style="margin-inline-start:auto"></span>
+</div>
+<div class="out" id="out"></div>
+<script>
+const $=id=>document.getElementById(id);const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function lcs(A,B,eq){const n=A.length,m=B.length;if(n*m>4e6)return null;const dp=Array.from({length:n+1},()=>new Uint32Array(m+1));
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)dp[i][j]=eq(A[i],B[j])?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);
+  const out=[];let i=0,j=0;while(i<n&&j<m){if(eq(A[i],B[j])){out.push(['=',A[i],B[j],i,j]);i++;j++}else if(dp[i+1][j]>=dp[i][j+1]){out.push(['-',A[i],null,i,null]);i++}else{out.push(['+',null,B[j],null,j]);j++}}
+  while(i<n){out.push(['-',A[i],null,i,null]);i++}while(j<m){out.push(['+',null,B[j],null,j]);j++}return out}
+function inline(a,b){const A=a.split(/(\s+|\b)/),B=b.split(/(\s+|\b)/),d=lcs(A,B,(x,y)=>x===y);if(!d)return[esc(a),esc(b)];let l='',r='';
+  d.forEach(([t,x,y])=>{if(t==='=')(l+=esc(x),r+=esc(y));else if(t==='-')l+='<del>'+esc(x)+'</del>';else r+='<ins>'+esc(y)+'</ins>'});return[l,r]}
+function run(){const A=$('a').value.split('\n'),B=$('b').value.split('\n'),k=s=>{if($('ws').checked)s=s.replace(/\s+/g,' ').trim();if($('cs').checked)s=s.toLowerCase();return s};
+  const d=lcs(A,B,(x,y)=>k(x)===k(y));if(!d){$('out').innerHTML='<p style="padding:12px">הטקסטים גדולים מדי להשוואה בדפדפן.</p>';return}
+  // pair adjacent -/+ for inline highlight
+  const rows=[];for(let i=0;i<d.length;i++){if(d[i][0]==='-'){let j=i;while(j<d.length&&d[j][0]==='-')j++;let k2=j;while(k2<d.length&&d[k2][0]==='+')k2++;const dels=d.slice(i,j),adds=d.slice(j,k2);
+      dels.forEach((x,q)=>{const pair=adds[q];if(pair){const[l,r]=inline(x[1],pair[2]);rows.push(['-',x[3],null,l]);x.pr=r}else rows.push(['-',x[3],null,esc(x[1])])});
+      adds.forEach((y,q)=>rows.push(['+',null,y[4],dels[q]?dels[q].pr:esc(y[2])]));i=k2-1}else rows.push([d[i][0],d[i][3],d[i][4],esc(d[i][0]==='+'?d[i][2]:d[i][1])])}
+  const ch=rows.map(r=>r[0]!=='=');const show=rows.map((_,i)=>!$('ctx').checked||ch.slice(Math.max(0,i-3),i+4).some(Boolean));
+  let html='',skip=0;rows.forEach((r,i)=>{if(!show[i]){skip++;return}if(skip){html+=`<div class="fold">⋯ ${skip} שורות זהות ⋯</div>`;skip=0}
+    html+=`<div class="ln ${r[0]==='+'?'add':r[0]==='-'?'del':''}"><span class="n">${r[1]!=null?r[1]+1:''}</span><span class="n">${r[2]!=null?r[2]+1:''}</span><span>${r[0]==='='?' ':r[0]}</span><span>${r[3]||' '}</span></div>`});if(skip)html+=`<div class="fold">⋯ ${skip} שורות זהות ⋯</div>`;
+  $('out').innerHTML=html;const a=rows.filter(r=>r[0]==='+').length,m=rows.filter(r=>r[0]==='-').length;$('st').innerHTML=a||m?`<span style="color:#58d68d">+${a}</span> · <span style="color:#ff4d6d">−${m}</span>`:'✔ זהים'}
+['a','b'].forEach(k=>$(k).oninput=run);['ws','cs','ctx'].forEach(k=>$(k).onchange=run);
+$('swap').onclick=()=>{const t=$('a').value;$('a').value=$('b').value;$('b').value=t;run()};
+$('a').value='function total(items) {\n  let sum = 0;\n  for (const i of items) {\n    sum += i.price;\n  }\n  return sum;\n}\n\nconst VAT = 0.17;';
+$('b').value='function total(items, vat = VAT) {\n  let sum = 0;\n  for (const i of items) {\n    sum += i.price * i.qty;\n  }\n  return sum * (1 + vat);\n}\n\nconst VAT = 0.18;';
+run();
+</script>
+</div>
+</body>
+</html>

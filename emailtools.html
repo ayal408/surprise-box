@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>כלי אימייל</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#4cc9f0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+textarea{width:100%;min-height:180px;font-family:Consolas,monospace;font-size:.88rem;direction:ltr;text-align:left}
+.ok{color:#90e0a0}.bad{color:#ff8fab}.fix{color:#ffd166}
+.res{max-height:340px;overflow:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>📬 ארגז כלים לכתובות מייל</h1>
+<p class="sub">שולפים כתובות מייל מכל טקסט, בודקים שהן תקינות, מסירים כפילויות, מתקנים שגיאות כתיב נפוצות (gmial.com) ובונים קישור mailto מוכן. מתאים לרשימות לקוחות ולדיוור.</p>
+<div class="grid2">
+  <div class="panel"><h2>1. הדבקת טקסט או רשימה</h2><textarea id="in" spellcheck="false"></textarea>
+    <div class="row" style="margin-top:8px"><label class="inline"><input type="checkbox" id="fixt" checked> לתקן שגיאות בדומיין</label><label class="inline"><input type="checkbox" id="low" checked> אותיות קטנות</label><label class="inline"><input type="checkbox" id="role"> לסנן כתובות כלליות (info@, noreply@)</label></div></div>
+  <div class="panel"><h2>2. תוצאה</h2><div class="stats" id="st"></div>
+    <div class="row" style="margin-top:10px"><label class="inline">מפריד <select id="sep"><option value="\n">שורה חדשה</option><option value=", ">פסיק</option><option value="; ">נקודה־פסיק (אאוטלוק)</option></select></label><button class="pri" id="cp">📋 העתקת התקינות</button><button id="csv">⬇ CSV</button></div>
+    <textarea id="out" readonly style="min-height:120px;margin-top:8px"></textarea></div>
+</div>
+<div class="panel res"><table><thead><tr><th>כתובת</th><th>סטטוס</th><th>דומיין</th></tr></thead><tbody id="tb"></tbody></table></div>
+<div class="panel">
+  <h2>🔗 בונה קישור mailto</h2>
+  <div class="grid2">
+    <div><label>אל<input id="mt" style="direction:ltr" value="office@example.co.il"></label><label style="margin-top:6px">עותק (CC)<input id="mc" style="direction:ltr"></label><label style="margin-top:6px">עותק מוסתר (BCC)<input id="mb" style="direction:ltr"></label></div>
+    <div><label>נושא<input id="ms" value="פנייה מהאתר"></label><label style="margin-top:6px">תוכן<textarea id="mbody" style="min-height:80px;direction:rtl;text-align:right;font-family:inherit">שלום, אשמח לקבל פרטים נוספים.</textarea></label></div>
+  </div>
+  <input id="mout" readonly style="width:100%;margin-top:8px;direction:ltr;font-family:Consolas,monospace;font-size:.85rem">
+  <div class="row" style="margin-top:8px"><button id="mcp">📋 העתקת הקישור</button><button id="mhtml">‹/› העתקת כפתור HTML</button><a id="mtest" class="tag" href="#">🧪 בדיקה</a></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const FIX={'gmial.com':'gmail.com','gmai.com':'gmail.com','gmal.com':'gmail.com','gmail.co':'gmail.com','gamil.com':'gmail.com','gmail.co.il':'gmail.com','gmaill.com':'gmail.com','hotmial.com':'hotmail.com','hotmai.com':'hotmail.com','hotmail.co':'hotmail.com','yaho.com':'yahoo.com','yahooo.com':'yahoo.com','outlok.com':'outlook.com','outloo.com':'outlook.com','walla.co':'walla.co.il','wala.co.il':'walla.co.il','netvision.net':'netvision.net.il','bezeqint.com':'bezeqint.net','icloud.co':'icloud.com'};
+const ROLE=/^(info|noreply|no-reply|admin|office|support|sales|contact|webmaster|mailer-daemon|postmaster)@/i;
+const RE=/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi;
+const valid=e=>/^[a-z0-9](?:[a-z0-9._%+-]{0,62}[a-z0-9])?@(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i.test(e)&&!/\.\./.test(e);
+let R=[];
+function run(){const raw=$('in').value.match(RE)||[],seen=new Map();R=[];
+  raw.forEach(e0=>{let e=e0.replace(/^[.]+|[.]+$/g,'');if($('low').checked)e=e.toLowerCase();let st='ok',note='';const[u,d]=e.split('@');
+    if($('fixt').checked&&FIX[d.toLowerCase()]){e=u+'@'+FIX[d.toLowerCase()];st='fix';note='תוקן מ־'+d}
+    if(!valid(e)){st='bad';note='מבנה לא תקין'}else if($('role').checked&&ROLE.test(e)){st='role';note='כתובת כללית'}
+    const k=e.toLowerCase();if(seen.has(k)){seen.get(k).dup++;return}const o={e,st,note,d:e.split('@')[1],dup:0};seen.set(k,o);R.push(o)});
+  const good=R.filter(r=>r.st==='ok'||r.st==='fix');const dups=R.reduce((s,r)=>s+r.dup,0);
+  $('st').innerHTML=[['נמצאו',raw.length],['ייחודיות',R.length],['כפולות שהוסרו',dups],['תקינות',good.length],['תוקנו',R.filter(r=>r.st==='fix').length],['לא תקינות',R.filter(r=>r.st==='bad').length]].map(([a,b])=>`<div class="stat"><small>${a}</small><b>${b}</b></div>`).join('');
+  $('out').value=good.map(r=>r.e).join($('sep').value.replace('\\n','\n'));
+  $('tb').innerHTML=R.map(r=>`<tr><td class="num">${r.e.replace(/</g,'&lt;')}</td><td class="${r.st==='ok'?'ok':r.st==='fix'?'fix':'bad'}">${r.st==='ok'?'✔ תקין':r.st==='fix'?'✎ '+r.note:'✘ '+r.note}${r.dup?` <span class="muted">(${r.dup+1} פעמים)</span>`:''}</td><td class="num muted">${r.d}</td></tr>`).join('')||'<tr><td colspan="3" class="muted">לא נמצאו כתובות</td></tr>'}
+function mailto(){const enc=encodeURIComponent,p=[];if($('mc').value)p.push('cc='+enc($('mc').value));if($('mb').value)p.push('bcc='+enc($('mb').value));if($('ms').value)p.push('subject='+enc($('ms').value));if($('mbody').value)p.push('body='+enc($('mbody').value));
+  const u='mailto:'+$('mt').value.trim()+(p.length?'?'+p.join('&'):'');$('mout').value=u;$('mtest').href=u;return u}
+['in'].forEach(k=>$(k).oninput=run);['fixt','low','role','sep'].forEach(k=>$(k).onchange=run);['mt','mc','mb','ms','mbody'].forEach(k=>$(k).oninput=mailto);
+$('cp').onclick=()=>{navigator.clipboard.writeText($('out').value);$('cp').textContent='✓ הועתק';setTimeout(()=>$('cp').textContent='📋 העתקת התקינות',1400)};
+$('csv').onclick=()=>{const c='\ufeffemail,status,domain\n'+R.map(r=>[r.e,r.st==='ok'?'תקין':r.st==='fix'?'תוקן':r.note,r.d].join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));a.download='emails.csv';a.click()};
+$('mcp').onclick=()=>{navigator.clipboard.writeText(mailto());$('mcp').textContent='✓';setTimeout(()=>$('mcp').textContent='📋 העתקת הקישור',1200)};
+$('mhtml').onclick=()=>{navigator.clipboard.writeText(`<a href="${mailto().replace(/"/g,'&quot;')}" style="display:inline-block;background:#4cc9f0;color:#fff;padding:10px 18px;border-radius:10px;text-decoration:none;font-family:Arial">✉️ שלחו לנו מייל</a>`);$('mhtml').textContent='✓';setTimeout(()=>$('mhtml').textContent='‹/› העתקת כפתור HTML',1200)};
+$('in').value='רשימת לקוחות:\nדנה כהן <Dana.Cohen@Gmial.com>, יוסי לוי yossi@walla.co.il\nmichal@company.co.il; info@company.co.il\nכפול: dana.cohen@gmail.com\nשגוי: avi@@mail..com , rina@hotmial.com\nnoreply@service.com';
+run();mailto();
+</script>
+</div>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>תבניות מייל</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffd166}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.list{display:flex;flex-direction:column;gap:6px;max-height:70vh;overflow:auto}
+.list button{text-align:right;font-weight:600}
+#body{width:100%;min-height:300px;line-height:1.7}
+.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>📨 תבניות מייל מוכנות</h1>
+<p class="sub">מיילים מקצועיים בעברית שממלאים בשניות: תזכורת תשלום, בקשת מסמכים מלקוח, זימון לפגישה, מעקב אחרי הצעה, התנצלות ועוד. ממלאים את השדות, בוחרים טון ושולחים.</p>
+<div class="grid2" style="grid-template-columns:minmax(200px,280px) 1fr">
+  <div class="panel"><input id="q" placeholder="🔍 חיפוש תבנית" style="width:100%;margin-bottom:8px"><div class="list" id="list"></div></div>
+  <div class="panel">
+    <h2 id="tt"></h2>
+    <div class="fields" id="fields"></div>
+    <div class="row" style="margin-top:10px"><span class="muted">טון:</span><button class="tone on" data-t="0">רשמי</button><button class="tone" data-t="1">חם ואישי</button><button class="tone" data-t="2">קצר ולעניין</button></div>
+    <label style="margin-top:10px">נמען<input id="to" placeholder="name@example.com" style="direction:ltr"></label>
+    <label style="margin-top:8px">נושא<input id="subj"></label>
+    <label style="margin-top:8px">תוכן<textarea id="body"></textarea></label>
+    <div class="row" style="margin-top:8px"><button class="pri" id="send">📧 פתיחה בתוכנת המייל</button><button id="gm">Gmail</button><button id="ol">Outlook</button><button id="cp">📋 העתקה</button></div>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);let cur=0,tone=0,vals={};
+const OPEN=['שלום {שם},','היי {שם}, מה שלומך?','{שם} שלום,'],CLOSE=['בברכה,\n{השולח}','תודה רבה ויום נפלא,\n{השולח}','תודה,\n{השולח}'];
+const T=[
+ {n:'💰 תזכורת תשלום עדינה',s:'תזכורת: חשבונית מס׳ {מספר חשבונית}',f:['שם','מספר חשבונית','סכום','תאריך פירעון','השולח'],b:['ברצוני להזכיר כי חשבונית מס׳ {מספר חשבונית} על סך {סכום} ₪, שמועד פירעונה היה {תאריך פירעון}, טרם שולמה.\nנודה להסדרת התשלום בימים הקרובים. אם התשלום כבר בוצע, נא להתעלם מהודעה זו.','רק רציתי להזכיר בעדינות שחשבונית {מספר חשבונית} ({סכום} ₪) עדיין פתוחה אצלנו, עם מועד פירעון {תאריך פירעון}.\nאם יש משהו שמעכב, או שצריך עותק נוסף, אשמח לעזור.','חשבונית {מספר חשבונית} על סך {סכום} ₪ (פירעון: {תאריך פירעון}) טרם שולמה. נודה לתשלום בהקדם.']},
+ {n:'⚠️ תזכורת תשלום שנייה',s:'תזכורת שנייה – חוב פתוח על סך {סכום} ₪',f:['שם','סכום','מספר חשבונית','תאריך אחרון','השולח'],b:['בהמשך לפנייתנו הקודמת, חשבונית מס׳ {מספר חשבונית} על סך {סכום} ₪ עדיין לא שולמה.\nנבקש להסדיר את התשלום עד {תאריך אחרון}. לאחר מועד זה ניאלץ לשקול צעדים נוספים לגביית החוב.\nלשאלות או לתיאום הסדר תשלומים, ניתן לפנות אליי ישירות.','אני חוזר/ת אליך לגבי חשבונית {מספר חשבונית} ({סכום} ₪), שעדיין פתוחה.\nחשוב לנו להמשיך לעבוד יחד בנעימים, ולכן אשמח אם נסגור את זה עד {תאריך אחרון}. אם נוח יותר לפרוס לתשלומים, רק תגיד/י.','חשבונית {מספר חשבונית} ({סכום} ₪) עדיין לא שולמה. נא להסדיר עד {תאריך אחרון}.']},
+ {n:'📂 בקשת מסמכים מלקוח',s:'מסמכים נדרשים לחודש {חודש}',f:['שם','חודש','תאריך אחרון','השולח'],b:['לצורך הכנת הדיווחים לחודש {חודש}, נבקש להעביר עד {תאריך אחרון} את המסמכים הבאים:\n• חשבוניות הכנסה והוצאה\n• דפי בנק ופירוט כרטיסי אשראי\n• קבלות על תשלומים\n• כל מסמך חריג (חוזים, הלוואות, רכישת ציוד)\nניתן לשלוח במייל חוזר, בוואטסאפ או להעלות לתיקייה המשותפת.','מתקרבים לדיווח של {חודש} 🙂\nאשמח אם תשלח/י עד {תאריך אחרון} את החשבוניות, דפי הבנק והאשראי, וכל דבר מיוחד שהיה החודש.\nאפשר פשוט לצלם ולשלוח בוואטסאפ.','נא להעביר עד {תאריך אחרון}: חשבוניות, דפי בנק ואשראי לחודש {חודש}.']},
+ {n:'📅 זימון לפגישה',s:'פגישה: {נושא}',f:['שם','נושא','תאריך','שעה','מקום','השולח'],b:['אבקש לתאם פגישה בנושא {נושא}.\nמועד מוצע: {תאריך} בשעה {שעה}, ב{מקום}.\nאם המועד אינו מתאים, אשמח שתציע/י מועד חלופי.','בא לך שנשב על {נושא}? חשבתי על {תאריך} ב־{שעה}, ב{מקום}.\nאם זה לא מסתדר, נמצא זמן אחר.','פגישה בנושא {נושא}: {תאריך}, {שעה}, {מקום}. נא לאשר.']},
+ {n:'🔁 מעקב אחרי הצעת מחיר',s:'בהמשך להצעת המחיר ששלחנו',f:['שם','נושא ההצעה','תאריך ההצעה','השולח'],b:['בהמשך להצעת המחיר בנושא {נושא ההצעה} שנשלחה אליך ב־{תאריך ההצעה}, רציתי לבדוק אם יש שאלות או הבהרות שאוכל לעזור בהן.\nנשמח להתקדם ולהתחיל לעבוד יחד.','רציתי לבדוק מה שלומך ואם יצא לך לעבור על ההצעה ל{נושא ההצעה} מ־{תאריך ההצעה}.\nאם משהו לא ברור, או שצריך להתאים משהו, אני פה.','מה לגבי ההצעה ל{נושא ההצעה} מ־{תאריך ההצעה}? נשמח לתשובה.']},
+ {n:'🙏 תודה ללקוח',s:'תודה על שיתוף הפעולה',f:['שם','פרויקט','השולח'],b:['ברצוני להודות לך על שיתוף הפעולה בפרויקט {פרויקט}.\nהיה לנו לעונג לעבוד איתך, ונשמח לעמוד לרשותך גם בעתיד.','רק רציתי להגיד תודה ענקית על {פרויקט}! היה כיף לעבוד יחד.\nאם תצטרך/י משהו בעתיד, אתה/את יודע/ת איפה למצוא אותנו.','תודה על {פרויקט}. נשמח לעבוד שוב.']},
+ {n:'😔 התנצלות על עיכוב',s:'עדכון לגבי {נושא}',f:['שם','נושא','מועד חדש','השולח'],b:['אני מבקש/ת להתנצל על העיכוב בנושא {נושא}.\nאנו פועלים להשלמת הטיפול, והמועד המעודכן הוא {מועד חדש}. אעדכן אם יחול שינוי.','סליחה על העיכוב עם {נושא}, לא כך תכננו.\nאנחנו על זה, ואני מעריך/ה שזה יהיה מוכן עד {מועד חדש}. אעדכן אותך בדרך.','יש עיכוב ב{נושא}. מועד חדש: {מועד חדש}. מתנצלים.']},
+ {n:'🏖️ הודעת היעדרות',s:'אני מחוץ למשרד עד {תאריך חזרה}',f:['תאריך חזרה','איש קשר חלופי','טלפון חלופי','השולח'],b:['תודה על פנייתך. אני מחוץ למשרד עד {תאריך חזרה}, עם גישה מוגבלת למייל.\nבעניינים דחופים ניתן לפנות אל {איש קשר חלופי} בטלפון {טלפון חלופי}.\nאחזור אליך עם שובי.','היי! אני בחופשה עד {תאריך חזרה} 🌴\nאם זה דחוף, {איש קשר חלופי} ישמח/תשמח לעזור: {טלפון חלופי}.\nאחרת, אחזור אליך כשאחזור.','מחוץ למשרד עד {תאריך חזרה}. דחוף: {איש קשר חלופי}, {טלפון חלופי}.'],noOpen:1},
+ {n:'👋 היכרות עם לקוח חדש',s:'ברוכים הבאים!',f:['שם','שם איש הקשר','טלפון','השולח'],b:['שמחים שבחרת לעבוד איתנו.\nאיש הקשר שלך אצלנו הוא {שם איש הקשר}, וניתן להשיגו בטלפון {טלפון}.\nבימים הקרובים נשלח רשימת מסמכים ראשונית כדי שנוכל להתחיל בעבודה.','איזה כיף שהצטרפת! 🎉\n{שם איש הקשר} ילווה אותך מעכשיו, והטלפון שלו/ה הוא {טלפון}. בקרוב נשלח את מה שצריך כדי להתחיל.','ברוכים הבאים. איש קשר: {שם איש הקשר}, {טלפון}. רשימת מסמכים תישלח בקרוב.']},
+ {n:'📊 שליחת דוח ללקוח',s:'{סוג הדוח} – {תקופה}',f:['שם','סוג הדוח','תקופה','השולח'],b:['מצורף {סוג הדוח} לתקופה {תקופה}.\nנשמח לעבור יחד על הנתונים ולענות על כל שאלה.','צירפתי את {סוג הדוח} של {תקופה}. יש כמה נקודות שכדאי לדבר עליהן, אשמח לשיחה קצרה כשנוח לך.','מצורף {סוג הדוח} – {תקופה}.']},
+];
+const fill=s=>s.replace(/\{([^}]+)\}/g,(m,k)=>vals[k]||`[${k}]`);
+function list(){const q=$('q').value.trim();$('list').innerHTML=T.map((t,i)=>!q||t.n.includes(q)||t.s.includes(q)?`<button class="${i===cur?'on':''}" data-i="${i}">${t.n}</button>`:'').join('')}
+function pick(i){cur=i;const t=T[i];$('tt').textContent=t.n;$('fields').innerHTML=t.f.map(k=>`<label>${k}<input data-f="${k}" value="${(vals[k]||'').replace(/"/g,'&quot;')}"></label>`).join('');list();gen()}
+function gen(){const t=T[cur];$('subj').value=fill(t.s);$('body').value=fill((t.noOpen?'':OPEN[tone]+'\n\n')+t.b[tone]+'\n\n'+CLOSE[tone])}
+$('list').onclick=e=>{const i=e.target.dataset.i;if(i!==undefined)pick(+i)};
+$('fields').oninput=e=>{const k=e.target.dataset.f;if(k){vals[k]=e.target.value;try{localStorage.setItem('emailtpl',JSON.stringify(vals))}catch{}gen()}};
+document.querySelectorAll('.tone').forEach(b=>b.onclick=()=>{tone=+b.dataset.t;document.querySelectorAll('.tone').forEach(x=>x.classList.toggle('on',x===b));gen()});
+$('q').oninput=list;
+const enc=encodeURIComponent;
+$('send').onclick=()=>location.href=`mailto:${enc($('to').value)}?subject=${enc($('subj').value)}&body=${enc($('body').value)}`;
+$('gm').onclick=()=>open(`https://mail.google.com/mail/?view=cm&fs=1&to=${enc($('to').value)}&su=${enc($('subj').value)}&body=${enc($('body').value)}`,'_blank');
+$('ol').onclick=()=>open(`https://outlook.office.com/mail/deeplink/compose?to=${enc($('to').value)}&subject=${enc($('subj').value)}&body=${enc($('body').value)}`,'_blank');
+$('cp').onclick=()=>{navigator.clipboard.writeText('נושא: '+$('subj').value+'\n\n'+$('body').value);$('cp').textContent='✓ הועתק';setTimeout(()=>$('cp').textContent='📋 העתקה',1400)};
+try{vals=JSON.parse(localStorage.getItem('emailtpl'))||{}}catch{}
+pick(0);
+</script>
+</div>
+</body>
+</html>

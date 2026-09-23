@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחולל חתימה למייל</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff8fab}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.pv{background:#fff;color:#222;border-radius:14px;padding:22px;min-height:180px;overflow:auto}
+.tpl{display:flex;flex-wrap:wrap;gap:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>✉️ מחולל חתימה למייל</h1>
+<p class="sub">חתימה מעוצבת לג׳ימייל, לאאוטלוק ולאפל מייל: שם, תפקיד, לוגו, טלפון, קישורים ורשתות חברתיות. בוחרים עיצוב ומעתיקים בלחיצה.</p>
+<div class="grid2">
+  <div class="panel">
+    <div class="row"><label style="flex:1">שם מלא<input id="name" value="ישראל ישראלי"></label><label style="flex:1">תפקיד<input id="role" value="מנהל חשבונות"></label></div>
+    <div class="row" style="margin-top:8px"><label style="flex:1">חברה<input id="co" value="ישראלי ושות׳ – הנהלת חשבונות"></label></div>
+    <div class="row" style="margin-top:8px"><label style="flex:1">טלפון<input id="ph" value="050-1234567" style="direction:ltr"></label><label style="flex:1">טלפון משרד<input id="ph2" value="" style="direction:ltr"></label></div>
+    <div class="row" style="margin-top:8px"><label style="flex:1">אימייל<input id="em" value="israel@example.co.il" style="direction:ltr"></label><label style="flex:1">אתר<input id="web" value="www.example.co.il" style="direction:ltr"></label></div>
+    <label style="margin-top:8px">כתובת<input id="addr" value="רחוב הרצל 1, תל אביב"></label>
+    <label style="margin-top:8px">כתובת תמונה / לוגו (URL)<input id="logo" placeholder="https://..." style="direction:ltr"></label>
+    <div class="row" style="margin-top:8px"><label style="flex:1">וואטסאפ (מספר)<input id="wa" value="0501234567" style="direction:ltr"></label><label style="flex:1">לינקדאין (URL)<input id="li" style="direction:ltr"></label><label style="flex:1">פייסבוק (URL)<input id="fb" style="direction:ltr"></label></div>
+    <label style="margin-top:8px">שורה נוספת (משפט, הצהרה, שעות פעילות)<input id="extra" value="שעות פעילות: א׳–ה׳ 8:30–17:00"></label>
+    <div class="row" style="margin-top:8px"><label>צבע<input type="color" id="col" value="#7c5cff"></label><label class="inline"><input type="checkbox" id="rtl" checked> עברית (מימין לשמאל)</label><label class="inline"><input type="checkbox" id="eco"> שורת "חשבו על הסביבה"</label></div>
+  </div>
+  <div class="panel">
+    <h2>עיצוב</h2>
+    <div class="tpl" id="tpl"><button class="on" data-t="classic">קלאסי</button><button data-t="line">עם פס צבע</button><button data-t="card">כרטיס</button><button data-t="minimal">מינימלי</button></div>
+    <h2 style="margin-top:14px">תצוגה מקדימה</h2>
+    <div class="pv" id="pv"></div>
+    <div class="row" style="margin-top:10px"><button class="pri" id="copy">📋 העתקת החתימה</button><button id="copyh">‹/› העתקת HTML</button></div>
+    <p class="hint" style="margin-top:10px"><b>ג׳ימייל:</b> הגדרות ← כל ההגדרות ← חתימה ← חדשה ← מדביקים.<br><b>אאוטלוק:</b> הגדרות ← חשבון ← חתימות ← מדביקים.<br><b>אפל מייל:</b> העדפות ← חתימות ← מדביקים, ומבטלים את "התאם תמיד לגופן ברירת המחדל".</p>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);let T='classic';const K=['name','role','co','ph','ph2','em','web','addr','logo','wa','li','fb','extra','col'];
+const e=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const url=u=>!u?'':/^https?:\/\//.test(u)?u:'https://'+u;
+function sig(){const v=Object.fromEntries(K.map(k=>[k,$(k).value.trim()])),c=v.col,dir=$('rtl').checked?'rtl':'ltr',al=dir==='rtl'?'right':'left',F='font-family:Arial,Helvetica,sans-serif;';
+  const links=[v.ph&&`📱 <a href="tel:${e(v.ph.replace(/[^\d+]/g,''))}" style="color:#333;text-decoration:none">${e(v.ph)}</a>`,v.ph2&&`☎️ <a href="tel:${e(v.ph2.replace(/[^\d+]/g,''))}" style="color:#333;text-decoration:none">${e(v.ph2)}</a>`,v.em&&`✉️ <a href="mailto:${e(v.em)}" style="color:#333;text-decoration:none">${e(v.em)}</a>`,v.web&&`🌐 <a href="${e(url(v.web))}" style="color:${c};text-decoration:none">${e(v.web)}</a>`].filter(Boolean);
+  const soc=[v.wa&&`<a href="https://wa.me/972${e(v.wa.replace(/\D/g,'').replace(/^0/,''))}" style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;padding:3px 9px;border-radius:12px;font-size:12px;margin-${dir==='rtl'?'left':'right'}:4px">WhatsApp</a>`,v.li&&`<a href="${e(url(v.li))}" style="display:inline-block;background:#0A66C2;color:#fff;text-decoration:none;padding:3px 9px;border-radius:12px;font-size:12px;margin-${dir==='rtl'?'left':'right'}:4px">LinkedIn</a>`,v.fb&&`<a href="${e(url(v.fb))}" style="display:inline-block;background:#1877F2;color:#fff;text-decoration:none;padding:3px 9px;border-radius:12px;font-size:12px">Facebook</a>`].filter(Boolean).join('');
+  const logo=v.logo?`<img src="${e(v.logo)}" alt="" width="80" style="width:80px;height:auto;border-radius:${T==='card'?'50%':'8px'};display:block">`:'';
+  const nameB=`<div style="font-size:17px;font-weight:bold;color:${T==='minimal'?'#222':c}">${e(v.name)}</div>`+(v.role||v.co?`<div style="font-size:13px;color:#555">${e(v.role)}${v.role&&v.co?' | ':''}${e(v.co)}</div>`:'');
+  const info=`<div style="font-size:13px;color:#333;line-height:1.7;margin-top:6px">${links.join(T==='minimal'?' &nbsp;·&nbsp; ':'<br>')}${v.addr?`<br>📍 ${e(v.addr)}`:''}</div>`+(soc?`<div style="margin-top:8px">${soc}</div>`:'')+(v.extra?`<div style="font-size:12px;color:#777;margin-top:6px">${e(v.extra)}</div>`:'')+($('eco').checked?`<div style="font-size:11px;color:#2e7d32;margin-top:6px">🌱 נא לחשוב על הסביבה לפני הדפסת מייל זה</div>`:'');
+  let body;if(T==='line')body=`<table cellpadding="0" cellspacing="0" style="${F}"><tr>${logo?`<td style="vertical-align:top;padding-${dir==='rtl'?'left':'right'}:12px">${logo}</td>`:''}<td style="border-${dir==='rtl'?'right':'left'}:4px solid ${c};padding-${dir==='rtl'?'right':'left'}:12px;vertical-align:top">${nameB}${info}</td></tr></table>`;
+  else if(T==='card')body=`<table cellpadding="0" cellspacing="0" style="${F}border:1px solid #e5e5ea;border-radius:12px;background:#fafaff"><tr><td style="background:${c};height:6px;border-radius:12px 12px 0 0" colspan="2"></td></tr><tr>${logo?`<td style="padding:14px;vertical-align:top">${logo}</td>`:''}<td style="padding:14px;vertical-align:top">${nameB}${info}</td></tr></table>`;
+  else if(T==='minimal')body=`<div style="${F}">${nameB}${info}</div>`;
+  else body=`<table cellpadding="0" cellspacing="0" style="${F}"><tr>${logo?`<td style="vertical-align:top;padding-${dir==='rtl'?'left':'right'}:14px">${logo}</td>`:''}<td style="vertical-align:top">${nameB}<div style="height:2px;background:${c};width:60px;margin:6px 0"></div>${info}</td></tr></table>`;
+  return`<div dir="${dir}" style="text-align:${al};${F}">${body}</div>`}
+function render(){$('pv').innerHTML=sig();try{localStorage.setItem('sig',JSON.stringify({T,v:K.map(k=>$(k).value),rtl:$('rtl').checked,eco:$('eco').checked}))}catch{}}
+document.querySelectorAll('#tpl button').forEach(b=>b.onclick=()=>{T=b.dataset.t;document.querySelectorAll('#tpl button').forEach(x=>x.classList.toggle('on',x===b));render()});
+document.querySelectorAll('input').forEach(i=>i.oninput=render);
+$('copy').onclick=async()=>{const h=sig();try{await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([h],{type:'text/html'}),'text/plain':new Blob([$('pv').innerText],{type:'text/plain'})})])}catch{const r=document.createRange();r.selectNode($('pv'));getSelection().removeAllRanges();getSelection().addRange(r);document.execCommand('copy');getSelection().removeAllRanges()}$('copy').textContent='✓ הועתק, עכשיו מדביקים';setTimeout(()=>$('copy').textContent='📋 העתקת החתימה',2000)};
+$('copyh').onclick=()=>{navigator.clipboard.writeText(sig());$('copyh').textContent='✓ הועתק';setTimeout(()=>$('copyh').textContent='‹/› העתקת HTML',1400)};
+try{const s=JSON.parse(localStorage.getItem('sig'));if(s){T=s.T;K.forEach((k,i)=>$(k).value=s.v[i]??'');$('rtl').checked=s.rtl;$('eco').checked=s.eco;document.querySelectorAll('#tpl button').forEach(x=>x.classList.toggle('on',x.dataset.t===T))}}catch{}
+render();
+</script>
+</div>
+</body>
+</html>

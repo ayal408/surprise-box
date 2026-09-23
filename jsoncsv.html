@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ממיר JSON ו־CSV</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#c77dff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1200px!important}
+textarea{width:100%;min-height:220px;font-family:Consolas,monospace;font-size:.86rem;direction:ltr;text-align:left;white-space:pre;overflow:auto}
+.tbl{overflow:auto;max-height:420px;border:1px solid var(--line);border-radius:12px}
+.tbl th{cursor:pointer;position:sticky;top:0;background:#1d1840;white-space:nowrap}
+.tbl td{white-space:nowrap;max-width:280px;overflow:hidden;text-overflow:ellipsis}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🔄 ממיר JSON ↔ CSV ↔ טבלה</h1>
+<p class="sub">ממירים בין JSON, CSV ו־SQL, ורואים את הנתונים כטבלה שאפשר למיין. תומך בעברית, בשדות מקוננים ובהעתקה מאקסל.</p>
+<div class="grid2">
+  <div class="panel"><div class="row" style="justify-content:space-between"><h2 style="margin:0">קלט</h2><select id="inf"><option value="auto">זיהוי אוטומטי</option><option value="json">JSON</option><option value="csv">CSV / אקסל</option></select></div><textarea id="in" spellcheck="false"></textarea></div>
+  <div class="panel"><div class="row" style="justify-content:space-between"><h2 style="margin:0">פלט</h2><div class="row"><select id="outf"><option value="csv">CSV</option><option value="json">JSON</option><option value="tsv">TSV (לאקסל)</option><option value="sql">SQL INSERT</option><option value="md">טבלת Markdown</option></select><button id="cp">📋</button><button id="dl">⬇</button></div></div><textarea id="out" spellcheck="false" readonly></textarea></div>
+</div>
+<div class="panel row"><label class="inline">מפריד CSV <select id="sep"><option value=",">פסיק</option><option value=";">נקודה־פסיק</option><option value="&#9;">טאב</option></select></label><label class="inline"><input type="checkbox" id="flat" checked> לשטח אובייקטים מקוננים (a.b.c)</label><label class="inline">שם טבלה ל־SQL <input id="tn" value="items" style="width:110px;direction:ltr"></label><span id="st" class="muted" style="margin-inline-start:auto"></span></div>
+<div class="panel"><h2>👁️ תצוגה כטבלה</h2><div class="tbl"><table id="tbl"></table></div></div>
+<script>
+const $=id=>document.getElementById(id);let rows=[],cols=[],sortK=null,sortD=1;
+function flatten(o,p='',r={}){for(const[k,v]of Object.entries(o)){const key=p?p+'.'+k:k;if(v&&typeof v==='object'&&!Array.isArray(v)&&$('flat').checked)flatten(v,key,r);else r[key]=Array.isArray(v)||(v&&typeof v==='object')?JSON.stringify(v):v}return r}
+function unflatten(o){const r={};for(const[k,v]of Object.entries(o)){const ps=k.split('.');let c=r;ps.slice(0,-1).forEach(p=>c=c[p]=c[p]||{});c[ps.at(-1)]=v}return r}
+function csvParse(t,sep){const out=[];let row=[],f='',q=false;for(let i=0;i<t.length;i++){const c=t[i];if(q){if(c==='"'&&t[i+1]==='"'){f+='"';i++}else if(c==='"')q=false;else f+=c}else if(c==='"')q=true;else if(c===sep){row.push(f);f=''}else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;row.push(f);out.push(row);row=[];f=''}else f+=c}if(f||row.length){row.push(f);out.push(row)}return out.filter(r=>r.some(x=>x!==''))}
+const typed=v=>v===''?'':/^-?\d+(\.\d+)?$/.test(v)&&!/^0\d/.test(v)?+v:v==='true'?true:v==='false'?false:v==='null'?null:v;
+function parse(){const t=$('in').value.trim();let fmt=$('inf').value;if(fmt==='auto')fmt=/^[\[{]/.test(t)?'json':'csv';
+  if(fmt==='json'){let d=JSON.parse(t);if(!Array.isArray(d))d=Array.isArray(Object.values(d)[0])?Object.values(d)[0]:[d];rows=d.map(o=>o&&typeof o==='object'?flatten(o):{value:o})}
+  else{let sep=$('sep').value;if(t.split('\n')[0].includes('\t'))sep='\t';else if(!t.split('\n')[0].includes(sep)&&t.split('\n')[0].includes(';'))sep=';';const a=csvParse(t,sep),h=a.shift()||[];rows=a.map(r=>Object.fromEntries(h.map((k,i)=>[k.trim(),typed((r[i]??'').trim())])))}
+  cols=[...new Set(rows.flatMap(Object.keys))];return fmt}
+const q=(v,sep)=>{v=v==null?'':String(v);return/[",\n\r;\t]/.test(v)||v.includes(sep)?'"'+v.replace(/"/g,'""')+'"':v};
+const sqlv=v=>v===''||v==null?'NULL':typeof v==='number'||typeof v==='boolean'?String(v):"'"+String(v).replace(/'/g,"''")+"'";
+function out(){const f=$('outf').value,sep=$('sep').value;
+  if(f==='json')return JSON.stringify(rows.map(r=>$('flat').checked?unflatten(r):r),null,2);
+  if(f==='csv'||f==='tsv'){const s=f==='tsv'?'\t':sep;return[cols.map(c=>q(c,s)).join(s),...rows.map(r=>cols.map(c=>q(r[c],s)).join(s))].join('\n')}
+  if(f==='sql'){const t=$('tn').value||'items',cs=cols.map(c=>'"'+c.replace(/"/g,'')+'"').join(', ');return rows.map(r=>`INSERT INTO ${t} (${cs}) VALUES (${cols.map(c=>sqlv(r[c])).join(', ')});`).join('\n')}
+  if(f==='md')return['| '+cols.join(' | ')+' |','| '+cols.map(()=>'---').join(' | ')+' |',...rows.map(r=>'| '+cols.map(c=>String(r[c]??'').replace(/\|/g,'\\|')).join(' | ')+' |')].join('\n')}
+function table(){const R=sortK?[...rows].sort((a,b)=>{const x=a[sortK],y=b[sortK];return(typeof x==='number'&&typeof y==='number'?x-y:String(x??'').localeCompare(String(y??''),'he'))*sortD}):rows;
+  const e=s=>String(s??'').replace(/</g,'&lt;');$('tbl').innerHTML=`<thead><tr><th>#</th>${cols.map(c=>`<th data-k="${e(c)}">${e(c)}${c===sortK?(sortD>0?' ▲':' ▼'):''}</th>`).join('')}</tr></thead><tbody>${R.slice(0,500).map((r,i)=>`<tr><td class="muted">${i+1}</td>${cols.map(c=>`<td title="${e(r[c])}">${e(r[c])}</td>`).join('')}</tr>`).join('')}</tbody>`}
+function run(){try{const fmt=parse();$('out').value=out();$('st').textContent=`זוהה ${fmt.toUpperCase()} · ${rows.length} שורות · ${cols.length} עמודות`;$('in').style.outline='';table()}catch(e){$('st').textContent='❌ '+e.message;$('in').style.outline='2px solid #ff4d6d'}}
+$('tbl').onclick=e=>{const k=e.target.dataset.k;if(k===undefined)return;sortD=sortK===k?-sortD:1;sortK=k;table()};
+['in'].forEach(k=>$(k).oninput=run);['inf','outf','sep','flat','tn'].forEach(k=>$(k).oninput=run);
+$('cp').onclick=()=>{navigator.clipboard.writeText($('out').value);$('cp').textContent='✓';setTimeout(()=>$('cp').textContent='📋',1000)};
+$('dl').onclick=()=>{const f=$('outf').value,ext={csv:'csv',json:'json',tsv:'tsv',sql:'sql',md:'md'}[f];const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([(f==='csv'||f==='tsv'?'﻿':'')+$('out').value],{type:'text/plain;charset=utf-8'}));a.download='data.'+ext;a.click()};
+$('in').value=JSON.stringify([{id:1,name:'דנה כהן',city:'ירושלים',contact:{email:'dana@example.com',phone:'050-1234567'},balance:1250.5},{id:2,name:'יוסי לוי',city:'בני ברק',contact:{email:'yossi@example.com',phone:'052-7654321'},balance:-320},{id:3,name:'Acme Ltd',city:'תל אביב',contact:{email:'info@acme.co.il',phone:''},balance:9800}],null,2);
+run();
+</script>
+</div>
+</body>
+</html>

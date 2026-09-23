@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מטריצת החלטות</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#90e0a0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1200px!important}
+.mx{overflow:auto}.mx table{min-width:560px}
+.mx input{width:100%;text-align:center;padding:6px}
+.mx input.name{text-align:right;font-weight:700}
+.mx th{vertical-align:bottom}
+.bar{height:12px;border-radius:6px;background:var(--acc)}
+.win td{background:rgba(144,224,160,.12)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🧭 מטריצת החלטות משוקללת</h1>
+<p class="sub">בוחרים בין כמה אפשרויות (ספק, מועמד, מערכת, דירה) לפי קריטריונים עם משקלות. נותנים ציון מ־1 עד 10, והטבלה מחשבת מנצח ובודקת כמה הבחירה רגישה לשינוי במשקלות.</p>
+<div class="panel row"><input id="title" placeholder="מה מחליטים?" style="flex:1;font-size:1.1rem;font-weight:700"><button id="addo">+ אפשרות</button><button id="addc">+ קריטריון</button><button id="reset">איפוס לדוגמה</button></div>
+<div class="panel mx"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div>
+<div class="grid2">
+  <div class="panel"><h2>🏆 דירוג</h2><div id="rank"></div></div>
+  <div class="panel"><h2>🔬 בדיקת רגישות</h2><p class="hint" id="sens" style="line-height:1.8"></p></div>
+</div>
+<div class="row"><button id="cp">📋 העתקת סיכום</button></div>
+<script>
+const $=id=>document.getElementById(id);const esc=s=>String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const DEF={t:'בחירת תוכנת הנהלת חשבונות',o:['חשבשבת','ריווחית','פריוריטי'],c:[{n:'מחיר',w:30},{n:'קלות שימוש',w:25},{n:'תמיכה בעברית',w:15},{n:'חיבור לבנק',w:15},{n:'דוחות',w:15}],s:[[6,8,4],[5,9,6],[9,9,8],[7,8,8],[8,7,9]]};
+let D;try{D=JSON.parse(localStorage.getItem('decision'))}catch{}if(!D)D=JSON.parse(JSON.stringify(DEF));
+const save=()=>{try{localStorage.setItem('decision',JSON.stringify(D))}catch{}};
+const score=(W)=>D.o.map((_,oi)=>D.c.reduce((s,c,ci)=>s+(W?W[ci]:c.w)*(+D.s[ci]?.[oi]||0),0)/Math.max(1,(W||D.c.map(c=>c.w)).reduce((a,b)=>a+(+b||0),0)));
+function grid(){$('title').value=D.t;$('th').innerHTML=`<tr><th>קריטריון</th><th style="width:90px">משקל %</th>${D.o.map((o,oi)=>`<th><input class="name" data-o="${oi}" value="${esc(o)}"><button data-ox="${oi}" style="padding:0 6px;font-size:.75rem;margin-top:3px">✕</button></th>`).join('')}</tr>`;
+  $('tb').innerHTML=D.c.map((c,ci)=>`<tr><td><input class="name" data-c="${ci}" value="${esc(c.n)}"></td><td><input type="number" min="0" data-w="${ci}" value="${c.w}"></td>${D.o.map((_,oi)=>`<td><input type="number" min="1" max="10" data-s="${ci}|${oi}" value="${D.s[ci]?.[oi]??''}"></td>`).join('')}<td><button data-cx="${ci}" style="padding:2px 6px">✕</button></td></tr>`).join('')+`<tr id="totrow"></tr>`;calc()}
+function calc(){const sc=score(),mx=Math.max(...sc),tw=D.c.reduce((s,c)=>s+(+c.w||0),0);
+  $('totrow').innerHTML=`<td><b>ציון משוקלל</b></td><td class="num ${tw!==100?'':'muted'}" style="${tw!==100?'color:#ffb703':''}">${tw}%</td>${sc.map(v=>`<td class="num" style="font-weight:800;color:${v===mx?'#90e0a0':'inherit'}">${v.toFixed(2)}</td>`).join('')}`;
+  const R=D.o.map((o,i)=>[o,sc[i]]).sort((a,b)=>b[1]-a[1]);$('rank').innerHTML=R.map(([o,v],i)=>`<div style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><b>${i===0?'🏆 ':i+1+'. '}${esc(o)}</b><span class="num">${v.toFixed(2)}</span></div><div class="bar" style="width:${v*10}%;opacity:${i?0.5:1}"></div></div>`).join('');
+  // sensitivity: +/-10 points per criterion
+  const win=R[0]?.[0];const flips=[];D.c.forEach((c,ci)=>{[-10,10].forEach(dw=>{const W=D.c.map(x=>+x.w||0);W[ci]=Math.max(0,W[ci]+dw);const s2=score(W),w2=D.o[s2.indexOf(Math.max(...s2))];if(w2!==win)flips.push(`אם המשקל של "${c.n}" ${dw>0?'יעלה':'ירד'} ב־10, המנצח יתחלף ל"${w2}"`)})});
+  $('sens').innerHTML=R.length<2?'':flips.length?'⚠️ ההחלטה רגישה:<br>'+flips.map(esc).join('<br>'):`✅ ההחלטה יציבה: גם שינוי של 10 נקודות במשקל של כל קריטריון לא משנה את המנצח (${esc(win)}). הפער מהמקום השני: ${(R[0][1]-R[1][1]).toFixed(2)}.`;save()}
+document.addEventListener('input',e=>{const d=e.target.dataset,v=e.target.value;if(d.o!==undefined)D.o[d.o]=v;else if(d.c!==undefined)D.c[d.c].n=v;else if(d.w!==undefined)D.c[d.w].w=+v;else if(d.s){const[ci,oi]=d.s.split('|');(D.s[ci]=D.s[ci]||[])[oi]=Math.max(0,Math.min(10,+v))}else if(e.target.id==='title')D.t=v;else return;calc()});
+document.addEventListener('click',e=>{const d=e.target.dataset;if(d.ox!==undefined){D.o.splice(+d.ox,1);D.s.forEach(r=>r.splice(+d.ox,1));grid()}else if(d.cx!==undefined){D.c.splice(+d.cx,1);D.s.splice(+d.cx,1);grid()}});
+$('addo').onclick=()=>{D.o.push('אפשרות '+(D.o.length+1));D.s.forEach(r=>r.push(5));grid()};
+$('addc').onclick=()=>{D.c.push({n:'קריטריון',w:10});D.s.push(D.o.map(()=>5));grid()};
+$('reset').onclick=()=>{D=JSON.parse(JSON.stringify(DEF));grid()};
+$('cp').onclick=()=>{const sc=score();navigator.clipboard.writeText(`${D.t}\n\n${D.o.map((o,i)=>[o,sc[i]]).sort((a,b)=>b[1]-a[1]).map(([o,v],i)=>`${i+1}. ${o} – ${v.toFixed(2)}`).join('\n')}\n\nקריטריונים: ${D.c.map(c=>c.n+' ('+c.w+'%)').join(', ')}`);$('cp').textContent='✓ הועתק';setTimeout(()=>$('cp').textContent='📋 העתקת סיכום',1400)};
+grid();
+</script>
+</div>
+</body>
+</html>
