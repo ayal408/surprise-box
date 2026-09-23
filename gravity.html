@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ארגז חול של כבידה</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffb703}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1200px!important}
+.stage{position:relative;height:68vh;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#05030f;touch-action:none}
+canvas{position:absolute;inset:0;width:100%;height:100%}
+.hud{position:absolute;top:10px;right:12px;font-size:.85rem;color:var(--muted);pointer-events:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🪐 ארגז חול של כבידה</h1>
+<p class="sub">גוררים עם העכבר או האצבע כדי לשגר כוכב לכת: כיוון הגרירה ואורכה קובעים את המהירות. אפשר לראות מסלולים יציבים, התנגשויות וכוכבים שעפים לחלל, או לבחור מצבים מוכנים.</p>
+<div class="panel row">
+  <button class="pre" data-p="sun">☀️ שמש וכוכבי לכת</button><button class="pre" data-p="binary">⭐⭐ כוכב כפול</button><button class="pre" data-p="eight">∞ שלושה גופים (שמיניה)</button><button class="pre" data-p="chaos">🌀 כאוס</button><button class="pre" data-p="empty">⬜ ריק</button>
+  <span style="flex:1"></span>
+  <label class="inline">מסה לשיגור <select id="ms"><option value="1">🪨 אסטרואיד</option><option value="10" selected>🌍 כוכב לכת</option><option value="200">🟠 ענק גזים</option><option value="3000">☀️ כוכב</option></select></label>
+  <label class="inline">מהירות <input type="range" id="sp" min="1" max="8" value="4" style="width:80px"></label>
+  <label class="inline"><input type="checkbox" id="tr" checked> שובל</label>
+  <label class="inline"><input type="checkbox" id="mg" checked> מיזוג בהתנגשות</label>
+  <button id="pause">⏸</button><button id="clr">🗑</button>
+</div>
+<div class="stage" id="st"><canvas id="cv"></canvas><div class="hud" id="hud"></div></div>
+<script>
+const $=id=>document.getElementById(id),cv=$('cv'),x=cv.getContext('2d'),st=$('st');
+const G=1;let B=[],paused=false,drag=null,W=0,H=0,cam={x:0,y:0};
+const col=m=>m>=1000?'#ffd166':m>=100?'#ff9f68':m>=5?'#4cc9f0':'#b8b3d6';
+const rad=m=>Math.max(2,Math.cbrt(m)*2.2);
+function size(){const d=devicePixelRatio||1;W=st.clientWidth;H=st.clientHeight;cv.width=W*d;cv.height=H*d;x.setTransform(d,0,0,d,0,0);x.fillStyle='#05030f';x.fillRect(0,0,W,H)}
+function body(px,py,vx,vy,m){return{x:px,y:py,vx,vy,m,t:[]}}
+function preset(p){B=[];x.fillStyle='#05030f';x.fillRect(0,0,W,H);
+  if(p==='sun'){B.push(body(0,0,0,0,3000));[[70,2],[120,10],[180,12],[260,200],[340,8]].forEach(([r,m],i)=>{const v=Math.sqrt(G*3000/r),a=i*1.3;B.push(body(Math.cos(a)*r,Math.sin(a)*r,-Math.sin(a)*v,Math.cos(a)*v,m))})}
+  if(p==='binary'){const v=Math.sqrt(G*1500/(4*80));B.push(body(-80,0,0,-v,1500),body(80,0,0,v,1500));const r=300,vv=Math.sqrt(G*3000/r);B.push(body(r,0,0,vv,5),body(-r-40,0,0,-Math.sqrt(G*3000/(r+40)),5))}
+  if(p==='eight'){const s=140,v=Math.sqrt(G*1000/s);const P=[[-0.97000436,0.24308753],[0.97000436,-0.24308753],[0,0]],V=[[0.4662036850,0.4323657300],[0.4662036850,0.4323657300],[-0.93240737,-0.86473146]];P.forEach((q,i)=>B.push(body(q[0]*s,q[1]*s,V[i][0]*v,V[i][1]*v,1000)))}
+  if(p==='chaos'){for(let i=0;i<40;i++){const a=Math.random()*7,r=60+Math.random()*260;B.push(body(Math.cos(a)*r,Math.sin(a)*r,(Math.random()-.5)*3,(Math.random()-.5)*3,1+Math.random()*60))}}}
+function step(dt){const n=B.length,ax=new Float64Array(n),ay=new Float64Array(n);
+  for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){const a=B[i],b=B[j],dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy+25,inv=1/Math.sqrt(d2),f=G/d2*inv;ax[i]+=dx*f*b.m;ay[i]+=dy*f*b.m;ax[j]-=dx*f*a.m;ay[j]-=dy*f*a.m}
+  B.forEach((b,i)=>{b.vx+=ax[i]*dt;b.vy+=ay[i]*dt;b.x+=b.vx*dt;b.y+=b.vy*dt});
+  if($('mg').checked)for(let i=0;i<B.length;i++)for(let j=i+1;j<B.length;j++){const a=B[i],b=B[j];if(Math.hypot(a.x-b.x,a.y-b.y)<(rad(a.m)+rad(b.m))*.7){const m=a.m+b.m;a.vx=(a.vx*a.m+b.vx*b.m)/m;a.vy=(a.vy*a.m+b.vy*b.m)/m;a.x=(a.x*a.m+b.x*b.m)/m;a.y=(a.y*a.m+b.y*b.m)/m;a.m=m;B.splice(j,1);j--}}
+  B=B.filter(b=>Math.abs(b.x)<6000&&Math.abs(b.y)<6000)}
+function frame(){if(!paused){const sp=+$('sp').value;for(let k=0;k<sp*2;k++)step(.05)}
+  let tm=0,cx=0,cy=0;B.forEach(b=>{tm+=b.m;cx+=b.x*b.m;cy+=b.y*b.m});if(tm){cam.x+=(cx/tm-cam.x)*.05;cam.y+=(cy/tm-cam.y)*.05}
+  const ox=W/2-cam.x,oy=H/2-cam.y;
+  if($('tr').checked){x.fillStyle='rgba(5,3,15,.12)';x.fillRect(0,0,W,H)}else{x.fillStyle='#05030f';x.fillRect(0,0,W,H)}
+  B.forEach(b=>{const r=rad(b.m),c=col(b.m);if(b.m>=1000){const g=x.createRadialGradient(b.x+ox,b.y+oy,0,b.x+ox,b.y+oy,r*3);g.addColorStop(0,'rgba(255,209,102,.5)');g.addColorStop(1,'transparent');x.fillStyle=g;x.beginPath();x.arc(b.x+ox,b.y+oy,r*3,0,7);x.fill()}
+    x.fillStyle=c;x.beginPath();x.arc(b.x+ox,b.y+oy,r,0,7);x.fill()});
+  if(drag&&drag.b){x.strokeStyle='#fff';x.setLineDash([5,5]);x.beginPath();x.moveTo(drag.a.x,drag.a.y);x.lineTo(drag.b.x,drag.b.y);x.stroke();x.setLineDash([]);x.fillStyle=col(+$('ms').value);x.beginPath();x.arc(drag.a.x,drag.a.y,rad(+$('ms').value),0,7);x.fill()}
+  $('hud').textContent=`${B.length} גופים`;requestAnimationFrame(frame)}
+const pt=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+cv.addEventListener('pointerdown',e=>{drag={a:pt(e)};cv.setPointerCapture(e.pointerId)});
+cv.addEventListener('pointermove',e=>{if(drag)drag.b=pt(e)});
+cv.addEventListener('pointerup',e=>{if(!drag)return;const b=pt(e),ox=W/2-cam.x,oy=H/2-cam.y;const vx=(drag.a.x-b.x)*.04,vy=(drag.a.y-b.y)*.04;
+  let bvx=0,bvy=0;const near=B.reduce((best,q)=>q.m>(best?best.m:0)?q:best,null);if(near){bvx=near.vx;bvy=near.vy}
+  B.push(body(drag.a.x-ox,drag.a.y-oy,vx+bvx,vy+bvy,+$('ms').value));drag=null});
+document.querySelectorAll('.pre').forEach(b=>b.onclick=()=>preset(b.dataset.p));
+$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'▶':'⏸'};$('clr').onclick=()=>preset('empty');
+addEventListener('resize',size);size();preset('sun');frame();
+</script>
+</div>
+</body>
+</html>

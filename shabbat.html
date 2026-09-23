@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הכנות לשבת וחג</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffd166}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.it{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.04);margin-bottom:5px;cursor:pointer;user-select:none}
+.it .ck{width:24px;height:24px;border-radius:7px;border:2px solid var(--acc);flex:none;display:flex;align-items:center;justify-content:center;color:#140f2b;font-weight:800}
+.it.done{opacity:.45}.it.done .nm{text-decoration:line-through}.it.done .ck{background:var(--acc)}
+.it .nm{flex:1}
+.it select{padding:3px 6px;font-size:.8rem}
+.it button{padding:1px 7px;font-size:.8rem}
+.sec h3{margin:12px 0 6px;color:var(--muted);font-size:.95rem}
+.prog{height:10px;border-radius:9px;background:rgba(255,255,255,.08);overflow:hidden}
+.prog div{height:100%;background:var(--acc);transition:width .3s}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🍷 רשימת הכנות לשבת ולחג</h1>
+<p class="sub">רשימות מוכנות לערב שבת, לערב חג, לפסח ולסוכות. מסמנים מה נעשה, מחלקים בין בני הבית ומתחילים מחדש בכל שבוע בלחיצה.</p>
+<div class="panel row" id="tabs"></div>
+<div class="panel">
+  <div class="row" style="justify-content:space-between"><b id="cnt"></b><div class="row"><button id="reset">↺ התחלה מחדש</button><button id="share">📤 וואטסאפ</button></div></div>
+  <div class="prog" style="margin:10px 0"><div id="bar"></div></div>
+  <div id="list"></div>
+  <form class="row" id="f" style="margin-top:10px"><input id="nm" placeholder="+ משימה חדשה" style="flex:1" required><select id="sec"></select><button class="pri">הוספה</button></form>
+</div>
+<div class="panel"><h2>👨‍👩‍👧‍👦 בני הבית</h2><div class="row"><input id="ppl" style="flex:1" placeholder="שמות מופרדים בפסיק"></div><p class="hint" style="margin-top:6px">השמות יופיעו ליד כל משימה כדי לחלק אחריות.</p></div>
+<script>
+const $=id=>document.getElementById(id);
+const PRE={
+ shabbat:['🍷 ערב שבת',{'מטבח ואוכל':['חלות','יין / מיץ ענבים לקידוש','דגים','מרק','עוף / בשר','תוספות','סלטים','קינוח','צ׳ולנט על האש','פלטה / מיחם חמים'],'בית':['ניקיון הבית','סידור השולחן ומפה','נרות שבת ופמוטים','נייר טואלט חתוך','טיימרים לחשמל','כיבוי אור במקרר','מגבות ומפיות'],'הכנה אישית':['מקלחת','בגדי שבת','גיהוץ','נעליים מצוחצחות','ריקון כיסים','עירוב בדוק'],'לפני הכניסה':['הפרשת חלה','מעשרות','ניתוק טלפונים','הדלקת נרות']}],
+ yomtov:['🌟 ערב חג',{'לפני':['עירוב תבשילין (כשחל ביום שישי)','נר נשמה 24 שעות','אש דולקת להדלקה ביום השני','נרות','בגדי חג'],'אוכל':['חלות לשתי סעודות בכל יום','יין לקידוש','סעודות מתוכננות','כלים חד־פעמיים'],'בית':['ניקיון','סידור שולחן','טיימרים']}],
+ pesach:['🧹 פסח',{'ניקיון':['חדרי ילדים','סלון וספות','ארונות בגדים (כיסים)','רכב','תיקים ומעילים','מטבח: ארונות','מטבח: תנור וכיריים','מקרר ומקפיא','שיש וכיור'],'לפני החג':['מכירת חמץ','בדיקת חמץ','ביעור חמץ','הכשרת כלים','החלפת כלים לפסח','כיסוי שיש'],'ליל הסדר':['מצות שמורות','יין ד׳ כוסות','מרור','כרפס','חרוסת','זרוע','ביצה','הגדות לכולם','כריות להסבה','אפיקומן ומתנות']}],
+ sukkot:['🌿 סוכות',{'סוכה':['הקמת הסוכה','סכך','קישוטים','תאורה','שולחן וכיסאות','כיסוי לגשם'],'ארבעת המינים':['אתרוג','לולב','הדסים','ערבות','קופסה לאתרוג'],'חג':['שמיני עצרת ושמחת תורה','סעודות בסוכה','מצעים לשינה בסוכה']}]};
+let S;try{S=JSON.parse(localStorage.getItem('shabbat-prep'))}catch{}
+if(!S){S={cur:'shabbat',ppl:'אבא, אמא, ילדים',lists:{}};for(const[k,[t,secs]]of Object.entries(PRE))S.lists[k]=Object.entries(secs).flatMap(([s,items])=>items.map(n=>({n,s,d:false,w:''})))}
+const save=()=>{try{localStorage.setItem('shabbat-prep',JSON.stringify(S))}catch{}};
+const esc=s=>String(s).replace(/</g,'&lt;');
+function render(){const L=S.lists[S.cur];$('tabs').innerHTML=Object.entries(PRE).map(([k,[t]])=>`<button class="${k===S.cur?'on':''}" data-t="${k}">${t}</button>`).join('');
+  const secs=[...new Set(L.map(x=>x.s))],ppl=S.ppl.split(',').map(s=>s.trim()).filter(Boolean);
+  $('list').innerHTML=secs.map(s=>`<div class="sec"><h3>${esc(s)}</h3>${L.map((x,i)=>[x,i]).filter(([x])=>x.s===s).map(([x,i])=>`<div class="it ${x.d?'done':''}" data-i="${i}"><span class="ck">${x.d?'✓':''}</span><span class="nm">${esc(x.n)}</span>${ppl.length?`<select data-w="${i}"><option value="">מי?</option>${ppl.map(p=>`<option ${x.w===p?'selected':''}>${esc(p)}</option>`).join('')}</select>`:''}<button data-x="${i}">✕</button></div>`).join('')}</div>`).join('');
+  const d=L.filter(x=>x.d).length;$('cnt').textContent=d===L.length&&L.length?'✨ הכל מוכן! שבת שלום':`${d} מתוך ${L.length} מוכנים`;$('bar').style.width=L.length?d/L.length*100+'%':'0';
+  $('sec').innerHTML=secs.map(s=>`<option>${esc(s)}</option>`).join('')+'<option value="__new">+ קטגוריה חדשה</option>';$('ppl').value=S.ppl;save()}
+$('tabs').onclick=e=>{const t=e.target.dataset.t;if(t){S.cur=t;render()}};
+$('list').onclick=e=>{if(e.target.tagName==='SELECT'||e.target.tagName==='OPTION')return;const L=S.lists[S.cur],x=e.target.dataset.x;if(x!==undefined){L.splice(+x,1);render();return}const it=e.target.closest('.it');if(it){L[it.dataset.i].d=!L[it.dataset.i].d;render()}};
+$('list').onchange=e=>{const w=e.target.dataset.w;if(w!==undefined){S.lists[S.cur][w].w=e.target.value;save()}};
+$('f').onsubmit=e=>{e.preventDefault();let s=$('sec').value;if(s==='__new')s=prompt('שם הקטגוריה:')||'שונות';S.lists[S.cur].push({n:$('nm').value,s,d:false,w:''});$('nm').value='';render()};
+$('reset').onclick=()=>{S.lists[S.cur].forEach(x=>x.d=false);render()};
+$('ppl').oninput=e=>{S.ppl=e.target.value;save()};$('ppl').onchange=render;
+$('share').onclick=()=>{const L=S.lists[S.cur].filter(x=>!x.d);const t=PRE[S.cur][0]+' – מה נשאר:\n'+L.map(x=>`• ${x.n}${x.w?' ('+x.w+')':''}`).join('\n');open('https://wa.me/?text='+encodeURIComponent(t),'_blank')};
+render();
+</script>
+</div>
+</body>
+</html>

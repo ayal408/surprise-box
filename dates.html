@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחשבון תאריכים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#8ab6ff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>📅 מחשבון תאריכים</h1>
+<p class="sub">הפרש בין תאריכים, ימי עבודה, הוספת ימים, גיל מדויק ותאריך עברי.</p>
+<div class="grid2">
+  <div class="panel">
+    <h2>הפרש בין תאריכים</h2>
+    <div class="row"><label style="flex:1">מתאריך<input type="date" id="a"></label><label style="flex:1">עד תאריך<input type="date" id="b"></label></div>
+    <label class="inline" style="margin-top:8px"><input type="checkbox" id="incl"> לכלול את יום הסיום</label>
+    <div class="stats" style="margin-top:12px">
+      <div class="stat"><small>ימים</small><b id="days"></b></div>
+      <div class="stat"><small>שבועות</small><b id="weeks"></b></div>
+      <div class="stat"><small>ימי עבודה (א׳–ה׳)</small><b id="work"></b></div>
+    </div>
+    <p id="ymd" style="margin:10px 0 0;text-align:center"></p>
+  </div>
+  <div class="panel">
+    <h2>הוספה או הפחתה</h2>
+    <label>תאריך התחלה<input type="date" id="s"></label>
+    <div class="row" style="margin-top:8px"><input type="number" id="n" value="30" style="width:90px"><select id="u"><option value="d">ימים</option><option value="w">ימי עבודה</option><option value="W">שבועות</option><option value="m">חודשים</option><option value="y">שנים</option></select><select id="dir"><option value="1">קדימה</option><option value="-1">אחורה</option></select></div>
+    <div class="stat" style="margin-top:12px"><small>התוצאה</small><b id="res" style="font-size:1.2rem"></b><div class="muted" id="resh"></div></div>
+    <p class="hint" style="margin-top:8px">ימי עבודה: ראשון עד חמישי. החישוב לא מדלג על חגים.</p>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel">
+    <h2>גיל מדויק</h2>
+    <label>תאריך לידה<input type="date" id="bd"></label>
+    <p id="age" style="font-size:1.3rem;margin:12px 0 4px;font-weight:700;color:var(--acc)"></p>
+    <p id="age2" class="muted" style="margin:0;line-height:1.7"></p>
+  </div>
+  <div class="panel">
+    <h2>תאריך עברי</h2>
+    <label>תאריך לועזי<input type="date" id="g"></label>
+    <p id="heb" style="font-size:1.4rem;margin:12px 0 4px;font-weight:700;color:var(--acc)"></p>
+    <p id="dow" class="muted" style="margin:0"></p>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);const DAY=864e5;
+const iso=d=>new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const P=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const fmt=d=>d.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const heb=d=>{try{return new Intl.DateTimeFormat('he-u-ca-hebrew',{day:'numeric',month:'long',year:'numeric'}).format(d)}catch{return''}};
+function ymd(a,b){if(b<a)[a,b]=[b,a];let y=b.getFullYear()-a.getFullYear(),m=b.getMonth()-a.getMonth(),d=b.getDate()-a.getDate();if(d<0){m--;d+=new Date(b.getFullYear(),b.getMonth(),0).getDate()}if(m<0){y--;m+=12}return[y,m,d]}
+const say=([y,m,d])=>[y&&`${y} שנים`,m&&`${m} חודשים`,(d||!(y||m))&&`${d} ימים`].filter(Boolean).join(', ');
+function diff(){if(!$('a').value||!$('b').value)return;let a=P($('a').value),b=P($('b').value);let n=Math.round((b-a)/DAY);const sg=n<0?-1:1;n=Math.abs(n)+($('incl').checked?1:0);
+  let w=0;const lo=a<b?a:b;for(let i=0;i<n;i++){const d=new Date(lo.getFullYear(),lo.getMonth(),lo.getDate()+i).getDay();if(d<5)w++}
+  $('days').textContent=(sg*n).toLocaleString();$('weeks').textContent=(n/7).toFixed(1);$('work').textContent=w.toLocaleString();$('ymd').textContent=say(ymd(a,b))}
+function add(){if(!$('s').value)return;const d=P($('s').value),n=(+$('n').value||0)*+$('dir').value,u=$('u').value;let r=new Date(d);
+  if(u==='d')r.setDate(r.getDate()+n);else if(u==='W')r.setDate(r.getDate()+7*n);else if(u==='m')r.setMonth(r.getMonth()+n);else if(u==='y')r.setFullYear(r.getFullYear()+n);
+  else{let k=Math.abs(n);const s=Math.sign(n)||1;while(k>0){r.setDate(r.getDate()+s);if(r.getDay()<5)k--}}
+  $('res').textContent=fmt(r);$('resh').textContent=heb(r)}
+function age(){if(!$('bd').value)return;const b=P($('bd').value),now=new Date();now.setHours(0,0,0,0);const a=ymd(b,now);$('age').textContent=say(a);
+  const days=Math.round((now-b)/DAY);let nx=new Date(now.getFullYear(),b.getMonth(),b.getDate());if(nx<now)nx.setFullYear(nx.getFullYear()+1);const left=Math.round((nx-now)/DAY);
+  $('age2').innerHTML=`${days.toLocaleString()} ימים · ${(days*24).toLocaleString()} שעות · בערך ${(days*24*60*70).toLocaleString()} פעימות לב<br>${left?`🎂 עוד ${left} ימים ליום ההולדת (${nx.toLocaleDateString('he-IL',{weekday:'long'})})`:'🎉 יום הולדת שמח!'}<br>נולדת ביום ${b.toLocaleDateString('he-IL',{weekday:'long'})}, ${heb(b)}`}
+function hb(){if(!$('g').value)return;const d=P($('g').value);$('heb').textContent=heb(d);$('dow').textContent=fmt(d)}
+const t=new Date();$('a').value=iso(t);$('b').value=iso(new Date(t.getFullYear(),11,31));$('s').value=iso(t);$('g').value=iso(t);
+try{$('bd').value=localStorage.getItem('dates-bd')||''}catch{}
+['a','b','incl'].forEach(k=>$(k).oninput=diff);['s','n','u','dir'].forEach(k=>$(k).oninput=add);$('g').oninput=hb;
+$('bd').oninput=()=>{try{localStorage.setItem('dates-bd',$('bd').value)}catch{}age()};
+diff();add();age();hb();
+</script>
+</div>
+</body>
+</html>

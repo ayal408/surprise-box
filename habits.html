@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעקב הרגלים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#90e0a0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.hab{display:grid;grid-template-columns:minmax(120px,1fr) repeat(7,38px) 70px 30px;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.hab .n{font-weight:600;display:flex;gap:6px;align-items:center}
+.day{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:transform .1s}
+.day.done{background:var(--c,var(--acc));border-color:transparent;color:#140f2b}
+.day.today{outline:2px solid var(--ink);outline-offset:1px}
+.day:active{transform:scale(.9)}
+.hd{color:var(--muted);font-size:.78rem;text-align:center}
+.streak{text-align:center;font-weight:700}
+.heat{display:grid;grid-template-rows:repeat(7,14px);grid-auto-flow:column;grid-auto-columns:14px;gap:3px;direction:ltr;overflow-x:auto;padding-bottom:4px}
+.heat div{border-radius:3px;background:rgba(255,255,255,.07)}
+.x{background:none;border:0;color:var(--muted);padding:2px;cursor:pointer}
+@media(max-width:600px){.hab{grid-template-columns:1fr repeat(7,30px) 44px 24px;gap:4px}.day{width:30px;height:30px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🌱 מעקב הרגלים</h1>
+<p class="sub">מסמנים כל יום מה עשיתם, ורואים רצפים, אחוזי הצלחה ומפת חום של 12 שבועות.</p>
+<div class="panel">
+  <div class="row" style="justify-content:space-between;margin-bottom:8px"><button id="prev">→ שבוע קודם</button><b id="range"></b><button id="next">שבוע הבא ←</button></div>
+  <div class="hab" style="border:0"><span></span><span class="hd" id="h0"></span><span class="hd" id="h1"></span><span class="hd" id="h2"></span><span class="hd" id="h3"></span><span class="hd" id="h4"></span><span class="hd" id="h5"></span><span class="hd" id="h6"></span><span class="hd">רצף 🔥</span><span></span></div>
+  <div id="list"></div>
+  <form class="row" id="f" style="margin-top:12px"><input id="ic" value="💧" style="width:56px;text-align:center"><input id="nm" placeholder="הרגל חדש (לשתות 8 כוסות, לקרוא 20 דקות...)" style="flex:1" required><input type="color" id="cl" value="#90e0a0"><button class="pri">הוספה</button></form>
+</div>
+<div class="stats" id="stats"></div>
+<div class="panel"><h2>מפת חום, 12 שבועות אחרונים</h2><div class="heat" id="heat"></div><p class="hint" style="margin-top:6px">כמה שהצבע חזק יותר, כך יותר הרגלים הושלמו באותו יום.</p></div>
+<script>
+const $=id=>document.getElementById(id);const DAY=864e5;
+const key=d=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+const today=new Date();today.setHours(0,0,0,0);
+let H,off=0;try{H=JSON.parse(localStorage.getItem('habits'))}catch{}
+if(!H)H=[{n:'לשתות 8 כוסות מים',i:'💧',c:'#4cc9f0',d:{}},{n:'הליכה של 30 דקות',i:'🚶',c:'#90e0a0',d:{}},{n:'לקרוא 20 דקות',i:'📚',c:'#ffb703',d:{}}];
+const save=()=>{try{localStorage.setItem('habits',JSON.stringify(H))}catch{}};
+function streak(h){let s=0,d=new Date(today);if(!h.d[key(d)])d=new Date(d-DAY);while(h.d[key(d)]){s++;d=new Date(d.getFullYear(),d.getMonth(),d.getDate()-1)}return s}
+function best(h){const ks=Object.keys(h.d).map(k=>{const[y,m,dd]=k.split('-');return new Date(y,m-1,dd).getTime()}).sort((a,b)=>a-b);let b=0,c=0,p=null;ks.forEach(t=>{c=p!==null&&Math.round((t-p)/DAY)===1?c+1:1;b=Math.max(b,c);p=t});return b}
+function days(){const s=new Date(today);s.setDate(s.getDate()-s.getDay()+off*7);return[...Array(7)].map((_,i)=>new Date(s.getFullYear(),s.getMonth(),s.getDate()+i))}
+function render(){const ds=days();ds.forEach((d,i)=>$('h'+i).innerHTML='אבגדהוש'[i]+'׳<br>'+d.getDate()+'/'+(d.getMonth()+1));
+  $('range').textContent=off===0?'השבוע':off===-1?'שבוע שעבר':ds[0].toLocaleDateString('he-IL')+' – '+ds[6].toLocaleDateString('he-IL');
+  $('list').innerHTML=H.map((h,j)=>`<div class="hab" style="--c:${h.c}"><span class="n">${h.i} ${h.n.replace(/</g,'&lt;')}</span>${ds.map(d=>`<div class="day ${h.d[key(d)]?'done':''} ${+d===+today?'today':''}" data-h="${j}" data-k="${key(d)}" ${d>today?'style="opacity:.3;pointer-events:none"':''}>${h.d[key(d)]?'✓':''}</div>`).join('')}<span class="streak">${streak(h)}</span><button class="x" data-x="${j}" title="מחיקה">✕</button></div>`).join('');
+  const tot=H.length,done=H.filter(h=>h.d[key(today)]).length;
+  let w=0,wp=0;ds.forEach(d=>{if(d<=today){wp+=tot;w+=H.filter(h=>h.d[key(d)]).length}});
+  $('stats').innerHTML=[['היום',`${done}/${tot}`],['השבוע',wp?Math.round(w/wp*100)+'%':'—'],['הרצף הכי ארוך',Math.max(0,...H.map(best))+' ימים'],['סה״כ סימונים',H.reduce((s,h)=>s+Object.keys(h.d).length,0)]].map(([a,b])=>`<div class="stat"><small>${a}</small><b>${b}</b></div>`).join('');
+  const start=new Date(today);start.setDate(start.getDate()-start.getDay()-77);let hm='';for(let i=0;i<84;i++){const d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i);const n=H.filter(h=>h.d[key(d)]).length,r=tot?n/tot:0;hm+=`<div title="${d.toLocaleDateString('he-IL')}: ${n}" style="${d>today?'opacity:.2':''};${r?`background:rgba(144,224,160,${.2+r*.8})`:''}"></div>`}$('heat').innerHTML=hm}
+$('list').onclick=e=>{const d=e.target.closest('.day');if(d){const h=H[d.dataset.h];h.d[d.dataset.k]?delete h.d[d.dataset.k]:h.d[d.dataset.k]=1;save();render();return}
+  const x=e.target.dataset.x;if(x!==undefined&&confirm('למחוק את ההרגל וכל ההיסטוריה שלו?')){H.splice(+x,1);save();render()}};
+$('f').onsubmit=e=>{e.preventDefault();H.push({n:$('nm').value,i:$('ic').value||'⭐',c:$('cl').value,d:{}});$('nm').value='';save();render()};
+$('prev').onclick=()=>{off--;render()};$('next').onclick=()=>{if(off<0){off++;render()}};
+render();
+</script>
+</div>
+</body>
+</html>

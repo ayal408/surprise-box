@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחשבון חיסכון</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#58d68d}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+canvas{width:100%;height:280px;display:block}
+.lg{display:flex;gap:14px;font-size:.85rem;margin-top:6px}
+.lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>📈 מחשבון חיסכון וריבית דריבית</h1>
+<p class="sub">כמה יצטבר עם הפקדה חודשית קבועה, תשואה ודמי ניהול, ואיך נראה ההפרש בין הפקדות לרווחים. אפשר גם לחשב כמה צריך לחסוך כדי להגיע ליעד.</p>
+<div class="grid2">
+  <div class="panel">
+    <label>סכום התחלתי (₪)<input id="p0" type="number" value="20000" step="1000"></label>
+    <label style="margin-top:8px">הפקדה חודשית (₪)<input id="pm" type="number" value="1500" step="100"></label>
+    <label style="margin-top:8px">תשואה שנתית צפויה (%)<input id="r" type="number" value="6" step="0.25"></label>
+    <label style="margin-top:8px">דמי ניהול מצבירה (% בשנה)<input id="fee" type="number" value="0.5" step="0.05"></label>
+    <label style="margin-top:8px">מספר שנים<input id="y" type="range" min="1" max="40" value="20"></label>
+    <div class="muted" style="text-align:center"><b id="yv" style="color:var(--ink)"></b> שנים</div>
+    <label style="margin-top:8px">אינפלציה שנתית להצגה בערכים של היום (%)<input id="inf" type="number" value="2.5" step="0.25"></label>
+    <label class="inline" style="margin-top:8px"><input type="checkbox" id="tax" checked> לנכות 25% מס רווחי הון על הרווח הנומינלי</label>
+  </div>
+  <div class="panel">
+    <div class="stats">
+      <div class="stat"><small>צבירה בסוף התקופה</small><b id="fv"></b></div>
+      <div class="stat"><small>סה״כ הפקדות</small><b id="dep"></b></div>
+      <div class="stat"><small>רווח</small><b id="gain"></b></div>
+      <div class="stat"><small>בערכים של היום</small><b id="real"></b></div>
+    </div>
+    <canvas id="cv"></canvas>
+    <div class="lg"><span><i style="background:#4cc9f0"></i>הפקדות</span><span><i style="background:#58d68d"></i>רווחים</span><span><i style="background:#ff8fab"></i>דמי ניהול ששולמו</span></div>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel">
+    <h2>🎯 כמה לחסוך כדי להגיע ליעד?</h2>
+    <div class="row"><label style="flex:1">יעד (₪)<input id="goal" type="number" value="500000" step="10000"></label><label style="flex:1">בעוד (שנים)<input id="gy" type="number" value="15"></label></div>
+    <p id="need" style="font-size:1.15rem;margin:12px 0 0;line-height:1.7"></p>
+  </div>
+  <div class="panel">
+    <h2>📋 לפי שנים</h2>
+    <div style="max-height:260px;overflow:auto"><table><thead><tr><th>שנה</th><th class="num">הפקדות</th><th class="num">צבירה</th><th class="num">רווח</th></tr></thead><tbody id="tbl"></tbody></table></div>
+  </div>
+</div>
+<p class="hint">חישוב חודשי עם ריבית דריבית. התשואה בפועל משתנה משנה לשנה, ותשואות עבר לא מבטיחות תשואות בעתיד. זו לא ייעוץ השקעות.</p>
+<script>
+const $=id=>document.getElementById(id);
+const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');
+function sim(p0,pm,r,fee,years){const mr=Math.pow(1+r/100,1/12)-1,mf=fee/100/12;let b=p0,d=p0,fees=0;const rows=[];for(let m=1;m<=years*12;m++){b=b*(1+mr);const fe=b*mf;b-=fe;fees+=fe;b+=pm;d+=pm;if(m%12===0)rows.push({y:m/12,b,d,fees})}return rows}
+function calc(){const p0=+$('p0').value||0,pm=+$('pm').value||0,r=+$('r').value||0,fee=+$('fee').value||0,Y=+$('y').value;$('yv').textContent=Y;
+  const rows=sim(p0,pm,r,fee,Y),L=rows[rows.length-1];let fv=L.b;const g=fv-L.d;if($('tax').checked&&g>0)fv-=g*.25;
+  $('fv').textContent=f(fv);$('dep').textContent=f(L.d);$('gain').textContent=f(fv-L.d);$('real').textContent=f(fv/Math.pow(1+(+$('inf').value||0)/100,Y));
+  $('tbl').innerHTML=rows.map(x=>`<tr><td>${x.y}</td><td class="num">${f(x.d)}</td><td class="num">${f(x.b)}</td><td class="num">${f(x.b-x.d)}</td></tr>`).join('');
+  draw(rows);goal()}
+function draw(rows){const cv=$('cv'),d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;cv.width=W*d;cv.height=H*d;const x=cv.getContext('2d');x.scale(d,d);x.clearRect(0,0,W,H);
+  const mx=Math.max(...rows.map(r=>r.b+r.fees))*1.05,n=rows.length,bw=(W-50)/n,pad=46;x.font='11px Segoe UI';x.fillStyle='#a9a3c9';x.strokeStyle='rgba(255,255,255,.08)';
+  for(let i=0;i<=4;i++){const y=H-20-(H-30)*i/4;x.beginPath();x.moveTo(pad,y);x.lineTo(W,y);x.stroke();x.textAlign='right';x.fillText(Math.round(mx*i/4/1000).toLocaleString()+'K',pad-4,y+4)}
+  rows.forEach((r,i)=>{const X=pad+i*bw+bw*.15,w=bw*.7,sc=v=>v/mx*(H-30);let y=H-20;const seg=[[r.d,'#4cc9f0'],[Math.max(0,r.b-r.d),'#58d68d'],[r.fees,'#ff8fab']];
+    seg.forEach(([v,c])=>{const h=sc(v);x.fillStyle=c;x.fillRect(X,y-h,w,h);y-=h});if(n<=20||i%5===4){x.fillStyle='#a9a3c9';x.textAlign='center';x.fillText(r.y,X+w/2,H-6)}})}
+function goal(){const G=+$('goal').value||0,Y=+$('gy').value||1,p0=+$('p0').value||0,r=+$('r').value||0,fee=+$('fee').value||0;
+  let lo=0,hi=G;for(let i=0;i<60;i++){const m=(lo+hi)/2,rows=sim(p0,m,r,fee,Y);rows[rows.length-1].b<G?lo=m:hi=m}
+  $('need').innerHTML=sim(p0,0,r,fee,Y).at(-1).b>=G?`🎉 הסכום ההתחלתי לבדו יגיע ליעד תוך ${Y} שנים.`:`צריך להפקיד <b style="color:var(--acc)">${f(hi)}</b> בחודש במשך ${Y} שנים<br><span class="muted">(לפני מס, עם ${r}% תשואה ו־${fee}% דמי ניהול)</span>`}
+document.querySelectorAll('input').forEach(i=>i.oninput=calc);addEventListener('resize',calc);
+calc();
+</script>
+</div>
+</body>
+</html>

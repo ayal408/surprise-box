@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחשבון שכר נטו</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#7ee0b0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.bar{display:flex;height:34px;border-radius:10px;overflow:hidden;margin-top:10px}
+.bar div{display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#140f2b;font-weight:700;white-space:nowrap;overflow:hidden}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:.85rem}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>💰 מחשבון שכר נטו</h1>
+<p class="sub">מברוטו לנטו לפי מדרגות המס בישראל, נקודות זיכוי, ביטוח לאומי, מס בריאות ופנסיה.</p>
+<div class="grid2">
+  <div class="panel">
+    <h2>נתונים</h2>
+    <div class="row" style="flex-direction:column;align-items:stretch">
+      <label>שכר ברוטו חודשי (₪)<input id="gross" type="number" value="15000" min="0" step="100"></label>
+      <label>נקודות זיכוי<input id="pts" type="number" value="2.25" step="0.25" min="0"></label>
+      <div class="row" style="gap:6px">
+        <button class="p" data-p="2.25">גבר 2.25</button><button class="p" data-p="2.75">אישה 2.75</button><button class="p" data-a="1">+ ילד</button>
+      </div>
+      <label>הפרשת עובד לפנסיה (%)<input id="pen" type="number" value="6" step="0.5" min="0"></label>
+      <label>קרן השתלמות, חלק עובד (%)<input id="kh" type="number" value="0" step="0.5" min="0"></label>
+      <label>שווי רכב / הטבות שנזקפות לשכר (₪)<input id="perk" type="number" value="0" min="0"></label>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>התוצאה</h2>
+    <div class="stats">
+      <div class="stat"><small>נטו בחודש</small><b id="net"></b></div>
+      <div class="stat"><small>נטו בשנה</small><b id="nety"></b></div>
+      <div class="stat"><small>מס שולי</small><b id="marg"></b></div>
+      <div class="stat"><small>מס אפקטיבי</small><b id="eff"></b></div>
+    </div>
+    <div class="bar" id="bar"></div>
+    <div class="legend" id="legend"></div>
+    <table style="margin-top:12px"><tbody id="tbl"></tbody></table>
+  </div>
+</div>
+<div class="panel">
+  <h2>פירוט לפי מדרגות מס</h2>
+  <table><thead><tr><th>מדרגה</th><th>שיעור</th><th class="num">הכנסה במדרגה</th><th class="num">מס</th></tr></thead><tbody id="br"></tbody></table>
+  <p class="hint" style="margin-top:10px">מבוסס על המדרגות, שווי נקודת זיכוי (242 ₪) ותקרות ביטוח לאומי שהוקפאו לשנים 2025–2027. זיכוי על הפרשה לפנסיה מחושב עד תקרה משוערת. ההערכה לא לוקחת בחשבון הטבות מיוחדות (יישוב מזכה, תואר, שחרור מצבא ועוד). לתוצאה המדויקת יש לבדוק את תלוש השכר.</p>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const BR=[[7010,.10],[10060,.14],[16150,.20],[22440,.31],[46690,.35],[60130,.47],[Infinity,.50]];
+const PT=242,BL_LOW=7522,BL_MAX=50695;
+const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');
+function calc(){const g=+$('gross').value||0,perk=+$('perk').value||0,taxable=g+perk;
+  let prev=0,tax=0,marg=0;const rows=[];BR.forEach(([top,r],i)=>{const part=Math.max(0,Math.min(taxable,top)-prev);if(part>0){tax+=part*r;marg=r}rows.push([prev,top,r,part,part*r]);prev=top});
+  const penE=g*(+$('pen').value||0)/100,khE=g*(+$('kh').value||0)/100;
+  const penCredit=Math.min(penE,Math.min(g,9700)*.07)*.35;
+  const credit=(+$('pts').value||0)*PT+penCredit;const incomeTax=Math.max(0,tax-credit);
+  const base=Math.min(taxable,BL_MAX),low=Math.min(base,BL_LOW),high=Math.max(0,base-BL_LOW);
+  const bl=low*.0104+high*.07,health=low*.0323+high*.0517;
+  const net=g-incomeTax-bl-health-penE-khE;
+  $('net').textContent=f(net);$('nety').textContent=f(net*12);$('marg').textContent=Math.round(marg*100)+'%';$('eff').textContent=g?(incomeTax/g*100).toFixed(1)+'%':'0%';
+  const parts=[['נטו',net,'#7ee0b0'],['מס הכנסה',incomeTax,'#ff8fab'],['ביטוח לאומי',bl,'#ffb703'],['מס בריאות',health,'#c77dff'],['פנסיה',penE,'#4cc9f0'],['השתלמות',khE,'#90e0a0']].filter(p=>p[1]>0.5);
+  $('bar').innerHTML=parts.map(([n,v,c])=>`<div style="flex:${v};background:${c}" title="${n}">${v/g>.09?Math.round(v/g*100)+'%':''}</div>`).join('');
+  $('legend').innerHTML=parts.map(([n,v,c])=>`<span><i style="background:${c}"></i>${n}</span>`).join('');
+  $('tbl').innerHTML=[['ברוטו',g],['זקיפת הטבות',perk],['מס לפני זיכויים',tax],['זיכויים',-credit],['מס הכנסה לתשלום',incomeTax],['ביטוח לאומי',bl],['מס בריאות',health],['פנסיה (עובד)',penE],['קרן השתלמות (עובד)',khE]].filter(r=>r[1]).map(([n,v])=>`<tr><td>${n}</td><td class="num">${f(v)}</td></tr>`).join('')+`<tr><td><b>נטו לתשלום</b></td><td class="num"><b>${f(net)}</b></td></tr>`;
+  $('br').innerHTML=rows.map(([a,b,r,p,t])=>`<tr style="${p?'':'opacity:.4'}"><td class="num">${a.toLocaleString()}–${b===Infinity?'∞':b.toLocaleString()}</td><td>${r*100}%</td><td class="num">${f(p)}</td><td class="num">${f(t)}</td></tr>`).join('');
+  try{localStorage.setItem('salary',JSON.stringify(['gross','pts','pen','kh','perk'].map(k=>$(k).value)))}catch{}}
+try{const s=JSON.parse(localStorage.getItem('salary'));if(s)['gross','pts','pen','kh','perk'].forEach((k,i)=>$(k).value=s[i])}catch{}
+document.querySelectorAll('input').forEach(i=>i.oninput=calc);
+document.querySelectorAll('button.p').forEach(b=>b.onclick=()=>{$('pts').value=b.dataset.a?(+$('pts').value+1):b.dataset.p;calc()});
+calc();
+</script>
+</div>
+</body>
+</html>

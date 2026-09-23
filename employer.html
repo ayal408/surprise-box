@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>עלות מעביד</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff9f68}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.bar{display:flex;height:30px;border-radius:9px;overflow:hidden;margin-top:10px}
+.bar div{display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#140f2b;overflow:hidden;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🏢 מחשבון עלות מעביד</h1>
+<p class="sub">כמה עובד באמת עולה לעסק: ביטוח לאומי מעסיק, פנסיה, פיצויים, קרן השתלמות, הבראה ונסיעות, בחודש ובשנה.</p>
+<div class="grid2">
+  <div class="panel">
+    <label>שכר ברוטו חודשי (₪)<input id="g" type="number" value="12000" step="100"></label>
+    <div class="row" style="margin-top:8px"><label style="flex:1">פנסיה מעסיק (%)<input id="pen" type="number" value="6.5" step="0.5"></label><label style="flex:1">פיצויים (%)<input id="sev" type="number" value="6" step="0.33"></label></div>
+    <div class="row" style="margin-top:8px"><label style="flex:1">קרן השתלמות מעסיק (%)<input id="kh" type="number" value="0" step="0.5"></label><label style="flex:1">נסיעות לחודש (₪)<input id="tr" type="number" value="300"></label></div>
+    <div class="row" style="margin-top:8px"><label style="flex:1">ימי הבראה בשנה<input id="hb" type="number" value="6"></label><label style="flex:1">הטבות נוספות לחודש (₪)<input id="oth" type="number" value="0"></label></div>
+    <div class="row" style="margin-top:10px"><button class="q" data-q="min">שכר מינימום</button><button class="q" data-q="avg">שכר ממוצע</button><button class="q" data-q="high">שכר גבוה</button></div>
+  </div>
+  <div class="panel">
+    <div class="stats"><div class="stat"><small>עלות חודשית</small><b id="m"></b></div><div class="stat"><small>עלות שנתית</small><b id="y"></b></div><div class="stat"><small>תוספת על הברוטו</small><b id="pct"></b></div><div class="stat"><small>עלות לשעה (182 ש׳)</small><b id="h"></b></div></div>
+    <div class="bar" id="bar"></div>
+    <table style="margin-top:10px"><tbody id="tbl"></tbody></table>
+  </div>
+</div>
+<p class="hint">ביטוח לאומי מעסיק: 4.51% עד 7,522 ₪ ו־7.6% מעל, עד התקרה (50,695 ₪). ההפקדה לפנסיה ולפיצויים מחושבת על כל הברוטו, ובקרן השתלמות עד התקרה המוטבת (15,712 ₪). הבראה מחושבת לפי 418 ₪ ליום, בפריסה חודשית. הערכה בלבד, לא כוללת ביטוח אובדן כושר עבודה, מס שכר או ימי חופשה ומחלה.</p>
+<script>
+const $=id=>document.getElementById(id);
+const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');
+const Q={min:[6247.67,6.5,6,0,300,5],avg:[13316,6.5,8.33,0,300,6],high:[30000,6.5,8.33,7.5,500,7]};
+function calc(){const g=+$('g').value||0,base=Math.min(g,50695),bl=Math.min(base,7522)*.0451+Math.max(0,base-7522)*.076,pen=g*(+$('pen').value||0)/100,sv=g*(+$('sev').value||0)/100,kh=Math.min(g,15712)*(+$('kh').value||0)/100,tr=+$('tr').value||0,hb=(+$('hb').value||0)*418/12,oth=+$('oth').value||0;
+  const P=[['ברוטו',g,'#4cc9f0'],['ביטוח לאומי מעסיק',bl,'#ffb703'],['פנסיה',pen,'#90e0a0'],['פיצויים',sv,'#7cf2c4'],['קרן השתלמות',kh,'#c49bff'],['נסיעות',tr,'#ff8fab'],['הבראה (חודשי)',hb,'#ff9f68'],['הטבות נוספות',oth,'#9bd1ff']].filter(p=>p[1]>0);
+  const tot=P.reduce((s,p)=>s+p[1],0);$('m').textContent=f(tot);$('y').textContent=f(tot*12);$('pct').textContent=g?'+'+((tot/g-1)*100).toFixed(1)+'%':'—';$('h').textContent=f(tot/182);
+  $('bar').innerHTML=P.map(([n,v,c])=>`<div style="flex:${v};background:${c}" title="${n}: ${f(v)}">${v/tot>.08?n:''}</div>`).join('');
+  $('tbl').innerHTML=P.map(([n,v,c])=>`<tr><td><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${c};margin-inline-end:6px"></span>${n}</td><td class="num">${f(v)}</td><td class="num muted">${f(v*12)}</td></tr>`).join('')+`<tr><td><b>סה״כ</b></td><td class="num"><b>${f(tot)}</b></td><td class="num"><b>${f(tot*12)}</b></td></tr>`}
+document.querySelectorAll('input').forEach(i=>i.oninput=calc);
+document.querySelectorAll('.q').forEach(b=>b.onclick=()=>{['g','pen','sev','kh','tr','hb'].forEach((k,i)=>$(k).value=Q[b.dataset.q][i]);calc()});
+calc();
+</script>
+</div>
+</body>
+</html>

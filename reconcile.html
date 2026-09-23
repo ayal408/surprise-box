@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>התאמת סכומים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#7cf2c4}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+textarea{width:100%;min-height:200px;font-family:Consolas,monospace;font-size:.9rem;direction:ltr;text-align:left}
+.m td{color:#90e0a0}
+.u td{color:#ff8fab}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🔗 התאמת סכומים (התאמת בנק מהירה)</h1>
+<p class="sub">מדביקים שתי רשימות, למשל דף בנק מול כרטסת בהנהלת החשבונות, והכלי מתאים סכומים זהים ומציג מה נשאר בלי התאמה. אפשר גם לחפש צירוף של כמה תנועות שמגיע לסכום מסוים.</p>
+<div class="grid2">
+  <div class="panel"><h2>📄 רשימה א׳ (בנק)</h2><textarea id="a" placeholder="שורה לכל תנועה. אפשר להדביק מאקסל: תאריך, תיאור, סכום"></textarea></div>
+  <div class="panel"><h2>📒 רשימה ב׳ (ספרים)</h2><textarea id="b"></textarea></div>
+</div>
+<div class="panel row">
+  <label class="inline">סבילות ₪ <input id="tol" type="number" value="0" step="0.01" style="width:90px"></label>
+  <label class="inline"><input type="checkbox" id="abs"> להתעלם מסימן (+/−)</label>
+  <label class="inline">הפרש ימים מרבי <input id="days" type="number" value="" placeholder="∞" style="width:70px"></label>
+  <button class="pri" id="go">🔗 התאמה</button>
+  <button id="csv">⬇ CSV</button>
+</div>
+<div class="stats" id="st"></div>
+<div class="grid2">
+  <div class="panel"><h2>❌ לא הותאמו ברשימה א׳</h2><table><tbody id="ua"></tbody></table></div>
+  <div class="panel"><h2>❌ לא הותאמו ברשימה ב׳</h2><table><tbody id="ub"></tbody></table></div>
+</div>
+<div class="panel"><h2>✅ התאמות</h2><div style="max-height:320px;overflow:auto"><table><thead><tr><th>א׳</th><th>ב׳</th><th class="num">סכום</th></tr></thead><tbody id="mt"></tbody></table></div></div>
+<div class="panel">
+  <h2>🧩 איזה צירוף מגיע לסכום?</h2>
+  <div class="row"><input id="tg" type="number" step="0.01" placeholder="סכום יעד" style="width:160px"><select id="src"><option value="a">מתוך רשימה א׳ שלא הותאמה</option><option value="b">מתוך רשימה ב׳ שלא הותאמה</option></select><button id="sub">חיפוש</button></div>
+  <div id="subr" style="margin-top:8px;line-height:1.8"></div>
+</div>
+<p class="hint">הכלי מזהה בכל שורה את המספר האחרון כסכום ותאריך בפורמט 31/12/2026 אם יש. הכל רץ בדפדפן, והנתונים לא נשלחים לשום מקום.</p>
+<script>
+const $=id=>document.getElementById(id);
+const f=v=>(v<0?'−':'')+'₪'+Math.abs(v).toLocaleString('he-IL',{minimumFractionDigits:2,maximumFractionDigits:2});const esc=s=>String(s).replace(/</g,'&lt;');
+function parse(t){return t.split('\n').map((l,i)=>{l=l.trim();if(!l)return null;
+  const dm=/(\d{1,2})[\/.](\d{1,2})[\/.](\d{2,4})/.exec(l);const date=dm?new Date(+(dm[3].length===2?'20'+dm[3]:dm[3]),dm[2]-1,+dm[1]):null;
+  const rest=dm?l.replace(dm[0],' '):l;const nums=[...rest.matchAll(/\(?-?₪?\d[\d,]*(?:\.\d+)?\)?/g)].map(m=>m[0].trim());
+  const raw=nums.pop();if(!raw)return null;const neg=/-|\(/.test(raw);const v=+raw.replace(/[^\d.]/g,'')*(neg?-1:1);return isNaN(v)?null:{i,l,v,date}}).filter(Boolean)}
+let R=null;
+function run(){const A=parse($('a').value),B=parse($('b').value),tol=+$('tol').value||0,abs=$('abs').checked,dd=$('days').value===''?Infinity:+$('days').value;
+  const used=new Set(),M=[];const val=x=>abs?Math.abs(x.v):x.v;
+  A.forEach(a=>{let best=null,bd=Infinity;B.forEach((b,j)=>{if(used.has(j))return;if(Math.abs(val(a)-val(b))>tol+1e-9)return;const dt=a.date&&b.date?Math.abs(a.date-b.date)/864e5:0;if(dt>dd)return;if(dt<bd){bd=dt;best=j}});if(best!==null){used.add(best);M.push([a,B[best]]);a.m=1}});
+  const UA=A.filter(a=>!a.m),UB=B.filter((b,j)=>!used.has(j));R={A,B,M,UA,UB};
+  const sum=L=>L.reduce((s,x)=>s+x.v,0);
+  $('st').innerHTML=[['שורות א׳',A.length],['שורות ב׳',B.length],['הותאמו',M.length],['לא הותאמו א׳',`${UA.length} · ${f(sum(UA))}`],['לא הותאמו ב׳',`${UB.length} · ${f(sum(UB))}`],['הפרש סה״כ',f(sum(A)-sum(B))]].map(([a,b])=>`<div class="stat"><small>${a}</small><b style="font-size:1.05rem">${b}</b></div>`).join('');
+  const row=x=>`<tr class="u"><td>${esc(x.l)}</td></tr>`;$('ua').innerHTML=UA.map(row).join('')||'<tr><td class="muted">הכל הותאם ✓</td></tr>';$('ub').innerHTML=UB.map(row).join('')||'<tr><td class="muted">הכל הותאם ✓</td></tr>';
+  $('mt').innerHTML=M.map(([a,b])=>`<tr class="m"><td>${esc(a.l)}</td><td>${esc(b.l)}</td><td class="num">${f(a.v)}</td></tr>`).join('');
+  try{localStorage.setItem('recon',JSON.stringify([$('a').value,$('b').value]))}catch{}}
+$('go').onclick=run;
+$('sub').onclick=()=>{if(!R)run();const T=+$('tg').value,L=($('src').value==='a'?R.UA:R.UB).slice(0,40),tol=Math.max(+$('tol').value||0,.005);const out=[];
+  const rec=(i,s,pick)=>{if(out.length>=5)return;if(Math.abs(s-T)<=tol&&pick.length){out.push([...pick]);return}if(i>=L.length||pick.length>=6)return;pick.push(L[i]);rec(i+1,s+L[i].v,pick);pick.pop();rec(i+1,s,pick)};rec(0,0,[]);
+  $('subr').innerHTML=out.length?out.map((c,k)=>`<div><b>אפשרות ${k+1}:</b> ${c.map(x=>esc(x.l)).join(' <b>+</b> ')}</div>`).join(''):'<span class="muted">לא נמצא צירוף של עד 6 תנועות שמגיע לסכום</span>'};
+$('csv').onclick=()=>{if(!R)run();const q=s=>'"'+String(s).replace(/"/g,'""')+'"';const c='﻿סטטוס,רשימה א,רשימה ב,סכום\n'+[...R.M.map(([a,b])=>['הותאם',q(a.l),q(b.l),a.v]),...R.UA.map(a=>['לא הותאם',q(a.l),'',a.v]),...R.UB.map(b=>['לא הותאם','',q(b.l),b.v])].map(r=>r.join(',')).join('\n');const l=document.createElement('a');l.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));l.download='התאמה.csv';l.click()};
+let s;try{s=JSON.parse(localStorage.getItem('recon'))}catch{}
+$('a').value=s?s[0]:'01/09/2026 העברה מכהן ובניו 4,680.00\n03/09/2026 הוראת קבע חשמל -412.50\n05/09/2026 שיק 1033 -2,500.00\n08/09/2026 הפקדה 1,170.00\n10/09/2026 עמלת בנק -18.90\n12/09/2026 כרטיס אשראי -3,245.10';
+$('b').value=s?s[1]:'02/09/2026 קבלה 881 כהן ובניו 4680\n03/09/2026 חברת החשמל -412.5\n04/09/2026 תשלום לספק - שיק 1033 -2500\n07/09/2026 קבלה 882 ד.א. יזמות 1170\n12/09/2026 ויזה ספטמבר -3245.10\n15/09/2026 קבלה 883 מסעדת הגפן 2340';
+run();
+</script>
+</div>
+</body>
+</html>

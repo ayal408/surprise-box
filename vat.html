@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחשבון מע״מ</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffd166}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🧮 מחשבון מע״מ</h1>
+<p class="sub">הוספה והפחתה של מע״מ, רשימת חשבוניות עם סיכום, וחישוב מקדמות.</p>
+<div class="grid2">
+  <div class="panel">
+    <h2>חישוב מהיר</h2>
+    <label>סכום (₪)<input id="amt" type="number" value="1000" step="0.01"></label>
+    <div class="row" style="margin:10px 0"><button class="m on" data-m="add">הסכום לפני מע״מ</button><button class="m" data-m="sub">הסכום כולל מע״מ</button></div>
+    <label>שיעור מע״מ (%)<input id="rate" type="number" value="18" step="0.5"></label>
+    <div class="stats" style="margin-top:12px">
+      <div class="stat"><small>לפני מע״מ</small><b id="net"></b></div>
+      <div class="stat"><small>מע״מ</small><b id="vat"></b></div>
+      <div class="stat"><small>כולל מע״מ</small><b id="tot"></b></div>
+    </div>
+    <div class="row" style="margin-top:10px"><button id="copy">📋 העתקה</button><span class="muted" id="words" style="font-size:.85rem"></span></div>
+  </div>
+  <div class="panel">
+    <h2>רשימת חשבוניות</h2>
+    <form class="row" id="f"><input id="d" placeholder="תיאור" style="flex:1"><input id="a" type="number" step="0.01" placeholder="סכום" required style="width:110px"><select id="k"><option value="inc">כולל</option><option value="exc">לפני</option></select><button class="pri">+</button></form>
+    <table style="margin-top:10px"><thead><tr><th>תיאור</th><th class="num">לפני</th><th class="num">מע״מ</th><th class="num">כולל</th><th></th></tr></thead><tbody id="list"></tbody><tfoot id="foot"></tfoot></table>
+    <div class="row" style="margin-top:10px"><button id="csv">⬇ CSV</button><button id="clr">נקה רשימה</button></div>
+  </div>
+</div>
+<div class="panel">
+  <h2>עוסק פטור או מורשה?</h2>
+  <div class="row"><label style="flex:1">מחזור שנתי צפוי (₪)<input id="turn" type="number" value="90000"></label></div>
+  <p id="osek" style="margin:10px 0 0;line-height:1.7"></p>
+  <p class="hint">תקרת עוסק פטור ל־2026 היא בערך 122,833 ₪ בשנה (מתעדכנת מדי שנה). בעלי מקצועות מסוימים (עורכי דין, רואי חשבון, רופאים ועוד) לא יכולים להיות עוסק פטור. לבירור סופי פנו לרשות המסים או לרואה חשבון.</p>
+</div>
+<script>
+const $=id=>document.getElementById(id);let mode='add',L=[];
+try{L=JSON.parse(localStorage.getItem('vat-list'))||[]}catch{}
+const f=v=>v.toLocaleString('he-IL',{minimumFractionDigits:2,maximumFractionDigits:2});
+const R=()=>(+$('rate').value||0)/100;
+const split=(a,inc)=>inc?[a/(1+R()),a-a/(1+R()),a]:[a,a*R(),a*(1+R())];
+function calc(){const [n,v,t]=split(+$('amt').value||0,mode==='sub');$('net').textContent=f(n);$('vat').textContent=f(v);$('tot').textContent=f(t);
+  $('words').textContent=`מע״מ מהווה ${(v/t*100||0).toFixed(2)}% מהסכום הכולל`;
+  const T=+$('turn').value||0,cap=122833;$('osek').innerHTML=T<=cap?`✅ מחזור של ₪${T.toLocaleString()} נמוך מהתקרה. אפשר להיות <b>עוסק פטור</b>: לא גובים מע״מ ולא מקזזים מע״מ על הוצאות.`:`⚠️ מחזור של ₪${T.toLocaleString()} גבוה מהתקרה. צריך להירשם כ<b>עוסק מורשה</b>: גובים ${$('rate').value}% מע״מ ומדווחים כל חודש או חודשיים. מע״מ משוער לגבייה בשנה: ₪${Math.round(T*R()).toLocaleString()} (לפני קיזוז תשומות).`}
+function list(){let s=[0,0,0];$('list').innerHTML=L.map((x,i)=>{const r=split(x.a,x.k==='inc');r.forEach((v,j)=>s[j]+=v);return`<tr><td>${x.d.replace(/</g,'&lt;')||'—'}</td>${r.map(v=>`<td class="num">${f(v)}</td>`).join('')}<td><button data-i="${i}" style="padding:2px 8px">✕</button></td></tr>`}).join('');
+  $('foot').innerHTML=L.length?`<tr><th>סה״כ</th>${s.map(v=>`<th class="num">${f(v)}</th>`).join('')}<th></th></tr>`:'';try{localStorage.setItem('vat-list',JSON.stringify(L))}catch{}}
+document.querySelectorAll('.m').forEach(b=>b.onclick=()=>{mode=b.dataset.m;document.querySelectorAll('.m').forEach(x=>x.classList.toggle('on',x===b));calc()});
+['amt','rate','turn'].forEach(k=>$(k).oninput=()=>{calc();list()});
+$('f').onsubmit=e=>{e.preventDefault();L.push({d:$('d').value,a:+$('a').value,k:$('k').value});$('d').value='';$('a').value='';$('d').focus();list()};
+$('list').onclick=e=>{const i=e.target.dataset.i;if(i!==undefined){L.splice(+i,1);list()}};
+$('clr').onclick=()=>{L=[];list()};
+$('copy').onclick=()=>{navigator.clipboard.writeText(`לפני מע״מ: ₪${$('net').textContent}\nמע״מ ${$('rate').value}%: ₪${$('vat').textContent}\nכולל מע״מ: ₪${$('tot').textContent}`);$('copy').textContent='✓ הועתק';setTimeout(()=>$('copy').textContent='📋 העתקה',1400)};
+$('csv').onclick=()=>{const c='﻿תיאור,לפני מע"מ,מע"מ,כולל\n'+L.map(x=>['"'+x.d.replace(/"/g,'""')+'"',...split(x.a,x.k==='inc').map(v=>v.toFixed(2))].join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));a.download='מעמ.csv';a.click()};
+calc();list();
+</script>
+</div>
+</body>
+</html>

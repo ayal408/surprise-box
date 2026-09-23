@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעבדת הטקסט</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#9b9bff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+#t{width:100%;min-height:220px;font-size:1.05rem;line-height:1.7}
+.ops{display:flex;flex-wrap:wrap;gap:6px}
+.ops button{font-size:.88rem;padding:7px 11px}
+.freq{display:flex;flex-wrap:wrap;gap:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🔤 מעבדת הטקסט</h1>
+<p class="sub">ספירת מילים ותווים, תיקון טקסט שהוקלד בשפה הלא נכונה (akuo → שלום), הסרת ניקוד, מילים נפוצות ועוד.</p>
+<div class="panel">
+  <textarea id="t" placeholder="הדביקו או הקלידו טקסט כאן..."></textarea>
+  <div class="stats" style="margin-top:10px" id="st"></div>
+</div>
+<div class="panel">
+  <h2>פעולות</h2>
+  <div class="ops">
+    <button data-o="he">⌨️ תיקון אנגלית → עברית (akuo→שלום)</button>
+    <button data-o="en">⌨️ תיקון עברית → אנגלית (ישךךם→hello)</button>
+    <button data-o="nikud">הסרת ניקוד</button>
+    <button data-o="spaces">ניקוי רווחים כפולים</button>
+    <button data-o="lines">הסרת שורות ריקות</button>
+    <button data-o="sort">מיון שורות א–ת</button>
+    <button data-o="uniq">הסרת שורות כפולות</button>
+    <button data-o="rev">היפוך סדר השורות</button>
+    <button data-o="upper">ABC גדולות</button>
+    <button data-o="lower">abc קטנות</button>
+    <button data-o="title">Title Case</button>
+    <button data-o="num">מספור שורות</button>
+    <button data-o="nums">שליפת מספרים</button>
+    <button data-o="emails">שליפת מיילים וקישורים</button>
+  </div>
+  <div class="row" style="margin-top:10px"><button id="undo">↶ ביטול</button><button id="copy" class="pri">📋 העתקה</button><button id="clr">🗑 ניקוי</button></div>
+  <div class="row" style="margin-top:12px"><input id="find" placeholder="חיפוש" style="flex:1"><input id="rep" placeholder="החלפה ב..." style="flex:1"><button id="doRep">החלפת הכל</button><span id="fc" class="muted"></span></div>
+</div>
+<div class="panel"><h2>מילים נפוצות</h2><div class="freq" id="freq"></div></div>
+<script>
+const $=id=>document.getElementById(id),T=$('t');let hist=[];
+const EN="qwertyuiop[]asdfghjkl;'zxcvbnm,./",HE="/'קראטוןםפ][שדגכעיחלךף,זסבהנמצתץ.";
+const map=(s,a,b)=>[...s].map(c=>{const i=a.indexOf(c.toLowerCase());return i<0?c:b[i]}).join('');
+function stats(){const s=T.value,w=(s.match(/[\p{L}\p{N}'"״׳-]+/gu)||[]);const sent=(s.match(/[.!?]+(\s|$)/g)||[]).length||(s.trim()?1:0);
+  const he=(s.match(/[֐-׿]/g)||[]).length,en=(s.match(/[a-z]/gi)||[]).length;
+  $('st').innerHTML=[['מילים',w.length],['תווים',s.length],['בלי רווחים',s.replace(/\s/g,'').length],['משפטים',sent],['שורות',s?s.split('\n').length:0],['זמן קריאה',Math.max(s.trim()?1:0,Math.round(w.length/200))+' דק׳'],['עברית / אנגלית',he+en?Math.round(he/(he+en)*100)+'% / '+Math.round(en/(he+en)*100)+'%':'—']].map(([a,b])=>`<div class="stat"><small>${a}</small><b>${b}</b></div>`).join('');
+  const stop=new Set('של את על עם זה זו לא כי גם אני הוא היא הם אם או מה יש כל אבל רק עוד כמו אל the a an and or of to in is it for on that this with'.split(' '));
+  const fr={};w.forEach(x=>{x=x.toLowerCase().replace(/^[ו]?ה?/,m=>m);if(x.length>1&&!stop.has(x))fr[x]=(fr[x]||0)+1});
+  $('freq').innerHTML=Object.entries(fr).sort((a,b)=>b[1]-a[1]).slice(0,24).map(([k,v])=>`<span class="tag">${k.replace(/</g,'&lt;')} <b>${v}</b></span>`).join('')||'<span class="muted">עוד אין מילים</span>';
+  findCount();try{localStorage.setItem('textlab',s)}catch{}}
+function set(v){hist.push(T.value);if(hist.length>50)hist.shift();T.value=v;stats()}
+const L=()=>T.value.split('\n');
+const OPS={he:s=>map(s,EN,HE),en:s=>map(s,HE,EN),nikud:s=>s.replace(/[֑-ׇ]/g,''),spaces:s=>s.replace(/[ \t]+/g,' ').replace(/ +\n/g,'\n').trim(),lines:s=>s.split('\n').filter(l=>l.trim()).join('\n'),
+  sort:s=>s.split('\n').sort((a,b)=>a.localeCompare(b,'he')).join('\n'),uniq:s=>[...new Set(s.split('\n'))].join('\n'),rev:s=>s.split('\n').reverse().join('\n'),upper:s=>s.toUpperCase(),lower:s=>s.toLowerCase(),
+  title:s=>s.toLowerCase().replace(/\b[a-z]/g,c=>c.toUpperCase()),num:s=>s.split('\n').map((l,i)=>`${i+1}. ${l}`).join('\n'),nums:s=>(s.match(/-?\d[\d,]*\.?\d*/g)||[]).join('\n'),emails:s=>(s.match(/[\w.+-]+@[\w-]+\.[\w.]+|https?:\/\/\S+/g)||[]).join('\n')};
+document.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{const s=T.selectionStart,e=T.selectionEnd,f=OPS[b.dataset.o];
+  if(e>s&&(b.dataset.o==='he'||b.dataset.o==='en'||b.dataset.o==='nikud'))set(T.value.slice(0,s)+f(T.value.slice(s,e))+T.value.slice(e));else set(f(T.value))});
+function findCount(){const q=$('find').value;$('fc').textContent=q?(T.value.split(q).length-1)+' מופעים':''}
+$('find').oninput=findCount;
+$('doRep').onclick=()=>{const q=$('find').value;if(q)set(T.value.split(q).join($('rep').value))};
+$('undo').onclick=()=>{if(hist.length){T.value=hist.pop();stats()}};
+$('copy').onclick=()=>{navigator.clipboard.writeText(T.value);$('copy').textContent='✓ הועתק';setTimeout(()=>$('copy').textContent='📋 העתקה',1400)};
+$('clr').onclick=()=>set('');
+T.oninput=stats;
+try{T.value=localStorage.getItem('textlab')||'akuo! nv akunl?\nנסו ללחוץ על "תיקון אנגלית → עברית".'}catch{}
+stats();
+</script>
+</div>
+</body>
+</html>

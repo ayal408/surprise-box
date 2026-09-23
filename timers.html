@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>שעון עצר וטיימרים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#4cc9f0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.sw{font-size:clamp(2.6rem,11vw,4.6rem);font-weight:800;text-align:center;direction:ltr;font-variant-numeric:tabular-nums;color:var(--acc);letter-spacing:1px}
+.sw small{font-size:.45em;color:var(--muted)}
+.tm{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px;border-radius:14px;background:rgba(255,255,255,.04);margin-top:8px;position:relative;overflow:hidden}
+.tm .fill{position:absolute;inset:0;background:rgba(76,201,240,.12);transform-origin:right;pointer-events:none}
+.tm .t{font-size:1.7rem;font-weight:800;direction:ltr;font-variant-numeric:tabular-nums}
+.tm.ring{animation:ring .6s infinite}
+@keyframes ring{50%{background:rgba(255,77,109,.35)}}
+.tm .n{font-weight:600}
+.pre{display:flex;flex-wrap:wrap;gap:6px}
+.pre button{padding:5px 10px;font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>⏱️ שעון עצר וטיימרים</h1>
+<p class="sub">שעון עצר עם הקפות, והרבה טיימרים במקביל (ביצים, כביסה, תנור) עם צליל והתראה.</p>
+<div class="grid2">
+  <div class="panel">
+    <h2>שעון עצר</h2>
+    <div class="sw" id="sw">00:00<small>.00</small></div>
+    <div class="row" style="justify-content:center;margin:10px 0"><button class="pri" id="ss">▶ התחלה</button><button id="lap">🏁 הקפה</button><button id="rs">↺ איפוס</button></div>
+    <table><thead><tr><th>#</th><th class="num">הקפה</th><th class="num">מצטבר</th></tr></thead><tbody id="laps"></tbody></table>
+  </div>
+  <div class="panel">
+    <h2>טיימרים</h2>
+    <form class="row" id="f"><input id="tn" placeholder="שם" style="flex:1;min-width:90px"><input id="mm" type="number" min="0" value="5" style="width:64px" title="דקות"><span>:</span><input id="ss2" type="number" min="0" max="59" value="0" style="width:64px" title="שניות"><button class="pri">+</button></form>
+    <div class="pre" style="margin-top:8px">
+      <button data-p="🥚 ביצה רכה|360">🥚 ביצה רכה 6′</button><button data-p="🥚 ביצה קשה|600">🥚 ביצה קשה 10′</button><button data-p="🍝 פסטה|540">🍝 פסטה 9′</button><button data-p="☕ תה|180">☕ תה 3′</button><button data-p="🧺 כביסה|3600">🧺 כביסה 60′</button><button data-p="🍪 עוגיות|720">🍪 עוגיות 12′</button><button data-p="🧘 מנוחה|300">🧘 הפסקה 5′</button>
+    </div>
+    <div id="tms"></div>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const p2=n=>String(n).padStart(2,'0');
+const fmt=ms=>{const t=Math.max(0,ms),h=t/3600000|0,m=t%3600000/60000|0,s=t%60000/1000|0;return(h?h+':'+p2(m):p2(m))+':'+p2(s)};
+let st=0,acc=0,run=false,laps=[];
+function swv(){return acc+(run?performance.now()-st:0)}
+function swDraw(){const v=swv();$('sw').innerHTML=fmt(v)+'<small>.'+p2(v%1000/10|0)+'</small>';if(run)requestAnimationFrame(swDraw)}
+$('ss').onclick=()=>{if(run){acc=swv();run=false;$('ss').textContent='▶ המשך'}else{st=performance.now();run=true;$('ss').textContent='⏸ עצירה';swDraw()}};
+$('rs').onclick=()=>{run=false;acc=0;laps=[];$('ss').textContent='▶ התחלה';$('laps').innerHTML='';swDraw()};
+$('lap').onclick=()=>{if(!run)return;const v=swv();laps.push(v);const ds=laps.map((x,i)=>x-(laps[i-1]||0)),mn=Math.min(...ds),mx=Math.max(...ds);
+  $('laps').innerHTML=laps.map((x,i)=>`<tr><td>${i+1}</td><td class="num" style="${laps.length>2&&ds[i]===mn?'color:#90e0a0':laps.length>2&&ds[i]===mx?'color:#ff8fab':''}">${fmt(ds[i])}.${p2(ds[i]%1000/10|0)}</td><td class="num">${fmt(x)}</td></tr>`).reverse().join('')};
+let T=[],AC;
+function beep(){try{AC=AC||new AudioContext();[0,.25,.5].forEach(d=>{const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=880;g.gain.setValueAtTime(.2,AC.currentTime+d);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d+.2);o.connect(g).connect(AC.destination);o.start(AC.currentTime+d);o.stop(AC.currentTime+d+.2)})}catch{}}
+function add(n,sec){if(sec<=0)return;if('Notification'in window&&Notification.permission==='default')Notification.requestPermission();T.push({id:Date.now()+Math.random(),n,total:sec*1000,end:Date.now()+sec*1000,left:sec*1000,run:true,done:false});draw()}
+function draw(){$('tms').innerHTML=T.map(t=>`<div class="tm ${t.done?'ring':''}" data-id="${t.id}"><div class="fill" style="transform:scaleX(${t.done?0:(t.run?t.end-Date.now():t.left)/t.total})"></div><span class="t">${fmt(t.done?0:(t.run?t.end-Date.now():t.left)+999)}</span><span class="n">${t.n.replace(/</g,'&lt;')}</span><span class="row" style="gap:4px">${t.done?'<button data-a="ok" class="pri">✓ הבנתי</button>':`<button data-a="pp">${t.run?'⏸':'▶'}</button><button data-a="plus">+1′</button>`}<button data-a="x">✕</button></span></div>`).join('')||'<p class="muted" style="text-align:center;margin-top:14px">אין טיימרים פעילים</p>'}
+setInterval(()=>{let ch=false;T.forEach(t=>{if(t.run&&!t.done&&Date.now()>=t.end){t.done=true;ch=true;beep();try{new Notification('⏰ '+t.n+' – הזמן נגמר!')}catch{}}});
+  if(T.some(t=>t.done)&&Date.now()%3000<260)beep();document.title=T.some(t=>t.done)?'⏰ הזמן נגמר!':(T.find(t=>t.run&&!t.done)?fmt(T.find(t=>t.run&&!t.done).end-Date.now()+999)+' · טיימרים':'שעון עצר וטיימרים');draw()},250);
+$('tms').onclick=e=>{const a=e.target.dataset.a;if(!a)return;const t=T.find(x=>x.id==e.target.closest('.tm').dataset.id);
+  if(a==='x'||a==='ok')T=T.filter(x=>x!==t);else if(a==='pp'){if(t.run){t.left=t.end-Date.now();t.run=false}else{t.end=Date.now()+t.left;t.run=true}}else if(a==='plus'){t.total+=60000;t.run?t.end+=60000:t.left+=60000}draw()};
+$('f').onsubmit=e=>{e.preventDefault();add($('tn').value||'טיימר',(+$('mm').value||0)*60+(+$('ss2').value||0));$('tn').value=''};
+document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const[n,s]=b.dataset.p.split('|');add(n,+s)});
+addEventListener('keydown',e=>{if(e.code==='Space'&&e.target===document.body){e.preventDefault();$('ss').click()}});
+draw();swDraw();
+</script>
+</div>
+</body>
+</html>

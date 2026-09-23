@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מטרונום וכוונן</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#c49bff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.bpm{font-size:4rem;font-weight:800;text-align:center;color:var(--acc);line-height:1;direction:ltr}
+.beats{display:flex;justify-content:center;gap:10px;margin:14px 0}
+.beats i{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.1);transition:transform .08s,background .08s}
+.beats i.acc{border:2px solid var(--acc)}
+.beats i.on{background:var(--acc);transform:scale(1.25)}
+.note{font-size:5rem;font-weight:800;text-align:center;line-height:1;direction:ltr}
+.meter{position:relative;height:40px;margin:14px 0;border-radius:10px;background:linear-gradient(90deg,#ff4d6d,#ffb703 40%,#58d68d 48% 52%,#ffb703 60%,#ff4d6d)}
+.meter i{position:absolute;top:-6px;width:4px;height:52px;background:#fff;border-radius:2px;left:50%;transition:left .1s}
+.strings{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.strings button{min-width:48px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🎼 מטרונום וכוונן</h1>
+<p class="sub">מטרונום עם משקלים, הדגשה ו־Tap Tempo, וכוונן לגיטרה ולכל כלי שמזהה את התו דרך המיקרופון.</p>
+<div class="grid2">
+  <div class="panel">
+    <h2>מטרונום</h2>
+    <div class="bpm" id="bpm">100</div>
+    <div class="muted" style="text-align:center" id="tname"></div>
+    <input type="range" id="rng" min="30" max="260" value="100" style="width:100%;margin-top:10px">
+    <div class="row" style="justify-content:center"><button data-d="-5">−5</button><button data-d="-1">−1</button><button class="pri" id="play" style="min-width:110px">▶ הפעלה</button><button data-d="1">+1</button><button data-d="5">+5</button></div>
+    <div class="beats" id="beats"></div>
+    <div class="row" style="justify-content:center">
+      <label class="inline">משקל <select id="sig"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option></select>/4</label>
+      <label class="inline">חלוקה <select id="sub"><option value="1">♩</option><option value="2">♫</option><option value="3">טריולה</option><option value="4">16</option></select></label>
+      <button id="tap">👆 Tap</button>
+    </div>
+    <p class="hint" style="text-align:center;margin-top:8px">רווח: הפעלה/עצירה · חצים: שינוי קצב · T: Tap</p>
+  </div>
+  <div class="panel">
+    <h2>כוונן</h2>
+    <div class="note" id="note">–</div>
+    <div class="muted" style="text-align:center;direction:ltr" id="freq">הפעילו את המיקרופון</div>
+    <div class="meter"><i id="needle"></i></div>
+    <div class="muted" style="text-align:center" id="cents"></div>
+    <div class="row" style="justify-content:center;margin-top:10px"><button class="pri" id="mic">🎤 הפעלת כוונן</button><label class="inline">A4 = <input id="a4" type="number" value="440" style="width:80px"> Hz</label></div>
+    <h2 style="margin-top:14px">צלילי ייחוס לגיטרה</h2>
+    <div class="strings" id="strs"></div>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);let AC,bpm=100,on=false,next=0,beat=0,timer,taps=[];
+const ac=()=>AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+const NAMES=[[40,'Grave'],[60,'Largo'],[76,'Adagio'],[108,'Andante'],[120,'Moderato'],[156,'Allegro'],[176,'Vivace'],[200,'Presto'],[999,'Prestissimo']];
+function setB(v){bpm=Math.max(30,Math.min(260,Math.round(v)));$('bpm').textContent=bpm;$('rng').value=bpm;$('tname').textContent=NAMES.find(n=>bpm<n[0])[1]}
+function beats(){const n=+$('sig').value;$('beats').innerHTML=[...Array(n)].map((_,i)=>`<i class="${i===0?'acc':''}"></i>`).join('')}
+function click(t,type){const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=type===2?1600:type===1?1000:700;g.gain.setValueAtTime(type===0?.15:.35,t);g.gain.exponentialRampToValueAtTime(.001,t+.05);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+.06)}
+function sched(){const sub=+$('sub').value,n=+$('sig').value;while(next<AC.currentTime+.12){const b=Math.floor(beat/sub),s=beat%sub;click(next,s?0:b%n===0?2:1);
+  if(!s){const idx=b%n,d=(next-AC.currentTime)*1000;setTimeout(()=>{[...$('beats').children].forEach((e,i)=>e.classList.toggle('on',i===idx))},Math.max(0,d))}
+  next+=60/bpm/sub;beat++}}
+$('play').onclick=()=>{ac();if(on){clearInterval(timer);on=false;$('play').textContent='▶ הפעלה';[...$('beats').children].forEach(e=>e.classList.remove('on'))}else{AC.resume();next=AC.currentTime+.05;beat=0;timer=setInterval(sched,25);on=true;$('play').textContent='⏸ עצירה'}};
+$('rng').oninput=e=>setB(+e.target.value);
+document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>setB(bpm+ +b.dataset.d));
+$('sig').onchange=()=>{beats();beat=0};$('sub').onchange=()=>beat=0;
+$('tap').onclick=()=>{const n=performance.now();taps=taps.filter(t=>n-t<2500);taps.push(n);if(taps.length>1){const d=(taps.at(-1)-taps[0])/(taps.length-1);setB(60000/d)}};
+addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;if(e.code==='Space'){e.preventDefault();$('play').click()}else if(e.key==='ArrowUp'||e.key==='ArrowRight')setB(bpm+1);else if(e.key==='ArrowDown'||e.key==='ArrowLeft')setB(bpm-1);else if(e.key.toLowerCase()==='t')$('tap').click()});
+// tuner
+const NN=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'],HEBN={C:'דו',D:'רה',E:'מי',F:'פה',G:'סול',A:'לה',B:'סי'};
+const A4=()=>+$('a4').value||440;
+function acf(buf,sr){let rms=0;for(const v of buf)rms+=v*v;rms=Math.sqrt(rms/buf.length);if(rms<.012)return-1;
+  let r1=0,r2=buf.length-1;const th=.2;for(let i=0;i<buf.length/2;i++)if(Math.abs(buf[i])<th){r1=i;break}for(let i=1;i<buf.length/2;i++)if(Math.abs(buf[buf.length-i])<th){r2=buf.length-i;break}
+  const b=buf.slice(r1,r2),N=b.length,c=new Float32Array(N);for(let i=0;i<N;i++)for(let j=0;j<N-i;j++)c[i]+=b[j]*b[j+i];
+  let d=0;while(d<N-1&&c[d]>c[d+1])d++;let mx=-1,mp=-1;for(let i=d;i<N;i++)if(c[i]>mx){mx=c[i];mp=i}if(mp<1||mp>=N-1)return-1;
+  const x1=c[mp-1],x2=c[mp],x3=c[mp+1],a=(x1+x3-2*x2)/2,bb=(x3-x1)/2;return sr/(a?mp-bb/(2*a):mp)}
+$('mic').onclick=async()=>{ac();try{const st=await navigator.mediaDevices.getUserMedia({audio:true});const src=AC.createMediaStreamSource(st),an=AC.createAnalyser();an.fftSize=2048;src.connect(an);const buf=new Float32Array(an.fftSize);$('mic').textContent='🎤 מאזין...';$('mic').disabled=true;
+  const loop=()=>{an.getFloatTimeDomainData(buf);const fr=acf(buf,AC.sampleRate);if(fr>50&&fr<2000){const n=12*Math.log2(fr/A4())+69,r=Math.round(n),c=Math.round((n-r)*100),nm=NN[(r%12+12)%12];
+    $('note').innerHTML=nm+'<sub style="font-size:.35em">'+(Math.floor(r/12)-1)+'</sub>';$('freq').textContent=fr.toFixed(1)+' Hz · '+(HEBN[nm[0]]||'')+(nm[1]?' דיאז':'');$('needle').style.left=`calc(${50+c}% - 2px)`;
+    $('cents').textContent=Math.abs(c)<=5?'✅ מכוון!':c>0?`גבוה ב־${c} סנט ↓`:`נמוך ב־${-c} סנט ↑`;$('note').style.color=Math.abs(c)<=5?'#58d68d':'var(--ink)'}requestAnimationFrame(loop)};loop()}catch{$('freq').textContent='אין גישה למיקרופון'}};
+const STR=[['E2',40],['A2',45],['D3',50],['G3',55],['B3',59],['E4',64]];
+$('strs').innerHTML=STR.map(([n,m])=>`<button data-m="${m}">${n}</button>`).join('');
+$('strs').onclick=e=>{const m=e.target.dataset.m;if(!m)return;ac();const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.value=A4()*Math.pow(2,(m-69)/12);g.gain.setValueAtTime(.3,t);g.gain.exponentialRampToValueAtTime(.001,t+2.2);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+2.3)};
+setB(100);beats();
+</script>
+</div>
+</body>
+</html>

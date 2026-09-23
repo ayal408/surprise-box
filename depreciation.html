@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחשבון פחת</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#9b9bff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>📉 מחשבון פחת</h1>
+<p class="sub">לוח פחת לרכוש קבוע בשיטת הקו הישר, לפי שיעורי הפחת המקובלים בתקנות, עם חישוב יחסי לשנה הראשונה ורשימת נכסים מסוכמת.</p>
+<div class="grid2">
+  <div class="panel">
+    <h2>נכס חדש</h2>
+    <label>תיאור<input id="d" value="מחשב נייד"></label>
+    <label style="margin-top:8px">סוג הנכס<select id="t"></select></label>
+    <div class="row" style="margin-top:8px"><label style="flex:1">עלות (₪, לפני מע״מ)<input id="c" type="number" value="6000"></label><label style="flex:1">שיעור פחת (%)<input id="r" type="number" step="0.5"></label></div>
+    <div class="row" style="margin-top:8px"><label style="flex:1">תאריך רכישה<input type="date" id="dt" value="2026-04-15"></label><label style="flex:1">ערך גרט (₪)<input id="sv" type="number" value="0"></label></div>
+    <label class="inline" style="margin-top:8px"><input type="checkbox" id="mon" checked> פחת יחסי לפי חודשים בשנה הראשונה</label>
+    <button class="pri" id="add" style="margin-top:10px">+ הוספה לרשימת הנכסים</button>
+  </div>
+  <div class="panel">
+    <h2 id="st">לוח פחת</h2>
+    <div style="max-height:340px;overflow:auto"><table><thead><tr><th>שנה</th><th class="num">פחת שנתי</th><th class="num">פחת נצבר</th><th class="num">עלות מופחתת</th></tr></thead><tbody id="tb"></tbody></table></div>
+  </div>
+</div>
+<div class="panel">
+  <h2>🗂️ רשימת נכסים · פחת לשנה <select id="yr" style="padding:4px 8px"></select></h2>
+  <table><thead><tr><th>נכס</th><th class="num">עלות</th><th class="num">שיעור</th><th class="num">פחת בשנה</th><th class="num">נצבר לסוף השנה</th><th class="num">עלות מופחתת</th><th></th></tr></thead><tbody id="al"></tbody><tfoot id="af"></tfoot></table>
+  <div class="row" style="margin-top:10px"><button id="csv">⬇ CSV</button></div>
+</div>
+<p class="hint">השיעורים לפי תקנות מס הכנסה (פחת) ותוספות נפוצות. רכב פרטי מוגבל בתקרה, ופחת על רכב פרטי מותר רק על החלק העסקי. שיעור מדויק לענף מסוים (פחת מואץ, תוספת משמרות) כדאי לבדוק מול התקנות.</p>
+<script>
+const $=id=>document.getElementById(id);
+const TY=[['מחשבים וציוד היקפי',33],['תוכנה',33],['טלפון נייד',15],['ריהוט וציוד משרדי',6],['ציוד משרדי אלקטרוני (מדפסות, מזגנים)',15],['רכב פרטי / מסחרי עד 3.5 טון',15],['משאית / רכב כבד',20],['מכונות וציוד תעשייתי',10],['שיפורים במושכר',10],['מבנה (לא מגורים)',4],['מבנה מגורים להשכרה',2],['כלי עבודה קטנים',20],['ציוד רפואי',10],['אחר – שיעור ידני',10]];
+$('t').innerHTML=TY.map((x,i)=>`<option value="${i}">${x[0]} (${x[1]}%)</option>`).join('');
+const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');
+let A;try{A=JSON.parse(localStorage.getItem('depr'))||[]}catch{A=[]}
+const save=()=>{try{localStorage.setItem('depr',JSON.stringify(A))}catch{}};
+function sched(a){const c=+a.c,r=+a.r/100,sv=+a.sv||0,base=c-sv,y0=+a.dt.slice(0,4),m0=+a.dt.slice(5,7);const out=[];let acc=0,y=y0;
+  while(acc<base-.5&&out.length<120){let dep=base*r;if(y===y0&&a.mon)dep*=(13-m0)/12;dep=Math.min(dep,base-acc);acc+=dep;out.push({y,dep,acc,nbv:c-acc});y++}return out}
+function cur(){return{d:$('d').value,t:+$('t').value,c:+$('c').value,r:+$('r').value,dt:$('dt').value,sv:+$('sv').value,mon:$('mon').checked}}
+function one(){const a=cur(),s=sched(a);$('st').textContent=`לוח פחת · ${a.d} · ${s.length} שנים`;$('tb').innerHTML=s.map(x=>`<tr><td>${x.y}</td><td class="num">${f(x.dep)}</td><td class="num">${f(x.acc)}</td><td class="num">${f(x.nbv)}</td></tr>`).join('')}
+function list(){const ys=new Set([new Date().getFullYear()]);A.forEach(a=>sched(a).forEach(x=>ys.add(x.y)));const cy=$('yr').value||new Date().getFullYear();$('yr').innerHTML=[...ys].sort().map(y=>`<option ${y==cy?'selected':''}>${y}</option>`).join('');const Y=+$('yr').value;
+  let T=[0,0,0,0];$('al').innerHTML=A.map((a,i)=>{const s=sched(a),row=s.find(x=>x.y===Y),prev=s.filter(x=>x.y<=Y).at(-1);const dep=row?row.dep:0,acc=prev?prev.acc:0,nbv=Y<+a.dt.slice(0,4)?0:a.c-acc;
+    if(Y>=+a.dt.slice(0,4)){T[0]+=+a.c;T[1]+=dep;T[2]+=acc;T[3]+=nbv}return`<tr><td>${a.d.replace(/</g,'&lt;')}<br><small class="muted">${a.dt.split('-').reverse().join('/')}</small></td><td class="num">${f(a.c)}</td><td class="num">${a.r}%</td><td class="num">${f(dep)}</td><td class="num">${f(acc)}</td><td class="num">${f(nbv)}</td><td><button data-x="${i}" style="padding:2px 8px">✕</button></td></tr>`}).join('')||'<tr><td colspan="7" class="muted">אין נכסים ברשימה</td></tr>';
+  $('af').innerHTML=A.length?`<tr><th>סה״כ</th>${T.map((v,i)=>`<th class="num">${f(v)}</th>${i===0?'<th></th>':''}`).join('')}<th></th></tr>`:'';save()}
+$('t').onchange=()=>{$('r').value=TY[+$('t').value][1];one()};
+['d','c','r','dt','sv','mon'].forEach(k=>$(k).oninput=one);
+$('add').onclick=()=>{A.push(cur());list()};
+$('al').onclick=e=>{const x=e.target.dataset.x;if(x!==undefined){A.splice(+x,1);list()}};
+$('yr').onchange=list;
+$('csv').onclick=()=>{const Y=+$('yr').value;const c='﻿נכס,תאריך רכישה,עלות,שיעור,פחת '+Y+',נצבר,עלות מופחתת\n'+A.map(a=>{const s=sched(a),row=s.find(x=>x.y===Y),prev=s.filter(x=>x.y<=Y).at(-1);return['"'+a.d.replace(/"/g,'""')+'"',a.dt,a.c,a.r,Math.round(row?row.dep:0),Math.round(prev?prev.acc:0),Math.round(a.c-(prev?prev.acc:0))].join(',')}).join('\n');const l=document.createElement('a');l.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));l.download='פחת-'+Y+'.csv';l.click()};
+$('r').value=TY[0][1];one();list();
+</script>
+</div>
+</body>
+</html>

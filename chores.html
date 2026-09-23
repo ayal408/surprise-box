@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>לוח תורנויות לילדים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffb703}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1100px!important}
+.grid{overflow-x:auto}
+table.g{min-width:640px}
+table.g th,table.g td{text-align:center;padding:6px 4px}
+table.g td:first-child,table.g th:first-child{text-align:right}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:999px;background:var(--c);color:#140f2b;font-weight:700;font-size:.85rem;cursor:pointer;user-select:none;white-space:nowrap}
+.chip.done{opacity:.55;text-decoration:line-through}
+.kid{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px;border-radius:12px;background:rgba(255,255,255,.04);margin-bottom:6px}
+.kid .av{width:40px;height:40px;border-radius:50%;background:var(--c);display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.prog{height:10px;border-radius:9px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:4px}
+.prog div{height:100%;background:var(--c)}
+.stars{font-weight:800;color:var(--acc);font-size:1.2rem}
+@media print{body{background:#fff;color:#000}.noprint,.back,.sub{display:none}.chip{border:1px solid #000}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>⭐ לוח תורנויות וכוכבים לילדים</h1>
+<p class="sub">מחלקים את מטלות הבית בין הילדים בסבב הוגן, מסמנים מה בוצע, צוברים כוכבים ומגיעים לפרס. מתאים גם למשפחה גדולה.</p>
+<div class="grid2 noprint">
+  <div class="panel">
+    <h2>👧👦 ילדים</h2>
+    <div id="kids"></div>
+    <form class="row" id="fk"><input id="kn" placeholder="שם" required style="flex:1"><input id="ke" value="😊" style="width:56px;text-align:center"><button class="pri">+</button></form>
+    <label style="margin-top:10px">🎁 יעד כוכבים לפרס<input id="goal" type="number" value="30" min="1"></label>
+  </div>
+  <div class="panel">
+    <h2>🧹 מטלות</h2>
+    <div id="chores" class="row" style="gap:6px"></div>
+    <form class="row" id="fc" style="margin-top:8px"><input id="cn" placeholder="מטלה חדשה" required style="flex:1"><select id="cs"><option value="1">⭐</option><option value="2">⭐⭐</option><option value="3">⭐⭐⭐</option></select><button class="pri">+</button></form>
+    <div class="row" style="margin-top:10px"><button id="rot">🔄 סבב חדש לשבוע</button><button id="clr">↺ ניקוי סימונים</button><button onclick="print()">🖨️ הדפסה</button></div>
+  </div>
+</div>
+<div class="panel grid">
+  <h2 id="wk">📅 השבוע</h2>
+  <table class="g"><thead id="gh"></thead><tbody id="gb"></tbody></table>
+  <p class="hint noprint" style="margin-top:6px">לחיצה על מטלה מסמנת אותה כבוצעה והילד מקבל כוכבים. לחיצה נוספת מבטלת.</p>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const COL=['#ff8fab','#4cc9f0','#90e0a0','#ffd166','#c49bff','#ff9f68','#7cf2c4','#f78c6b','#9bd1ff','#e0a0ff'];
+const DAYS=['ראשון','שני','שלישי','רביעי','חמישי','שישי'];
+let S;try{S=JSON.parse(localStorage.getItem('chores'))}catch{}
+if(!S)S={kids:[{n:'שרה',e:'👧',s:0},{n:'יוסי',e:'👦',s:0},{n:'רחלי',e:'👧',s:0},{n:'מוישי',e:'🧒',s:0}],chores:[{n:'סידור נעליים',v:1},{n:'עריכת שולחן',v:1},{n:'פינוי שולחן',v:1},{n:'שטיפת כלים',v:2},{n:'קיפול כביסה',v:2},{n:'טאטוא',v:2},{n:'הוצאת זבל',v:1},{n:'סידור חדר',v:1}],plan:null,done:{},goal:30,off:0};
+const save=()=>{try{localStorage.setItem('chores',JSON.stringify(S))}catch{}};
+function plan(){const P={};let k=S.off||0;DAYS.forEach((_,d)=>{S.chores.forEach((c,ci)=>{P[d+'-'+ci]=S.kids.length?(k++)%S.kids.length:-1})});S.plan=P}
+function render(){if(!S.plan)plan();$('goal').value=S.goal;
+  $('kids').innerHTML=S.kids.map((k,i)=>`<div class="kid" style="--c:${COL[i%COL.length]}"><span class="av">${k.e}</span><div><b>${k.n.replace(/</g,'&lt;')}</b><div class="prog"><div style="width:${Math.min(100,k.s/S.goal*100)}%"></div></div></div><div style="text-align:center"><span class="stars">${k.s}⭐</span>${k.s>=S.goal?`<br><button data-r="${i}" style="padding:2px 8px;font-size:.8rem">🎁 מימוש</button>`:''}<br><button data-x="${i}" style="padding:1px 6px;font-size:.75rem">✕</button></div></div>`).join('');
+  $('chores').innerHTML=S.chores.map((c,i)=>`<span class="tag">${c.n} ${'⭐'.repeat(c.v)} <button data-cx="${i}" style="padding:0 4px;border:0;background:none">✕</button></span>`).join('');
+  $('gh').innerHTML=`<tr><th>מטלה</th>${DAYS.map(d=>`<th>${d}</th>`).join('')}</tr>`;
+  $('gb').innerHTML=S.chores.map((c,ci)=>`<tr><td>${c.n} <small>${'⭐'.repeat(c.v)}</small></td>${DAYS.map((_,d)=>{const k=S.plan[d+'-'+ci];const kid=S.kids[k];if(!kid)return'<td>—</td>';const key=d+'-'+ci;
+    return`<td><span class="chip ${S.done[key]?'done':''}" data-k="${key}" data-kid="${k}" data-v="${c.v}" style="--c:${COL[k%COL.length]}">${S.done[key]?'✓ ':''}${kid.e} ${kid.n.replace(/</g,'&lt;')}</span></td>`}).join('')}</tr>`).join('');save()}
+$('gb').onclick=e=>{const c=e.target.closest('.chip');if(!c)return;const k=c.dataset.k,kid=S.kids[+c.dataset.kid],v=+c.dataset.v;if(S.done[k]){delete S.done[k];kid.s=Math.max(0,kid.s-v)}else{S.done[k]=1;kid.s+=v;try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.frequency.value=880;g.gain.setValueAtTime(.1,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.25);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+.25)}catch{}}render()};
+$('kids').onclick=e=>{const x=e.target.dataset.x,r=e.target.dataset.r;if(r!==undefined){S.kids[+r].s-=S.goal;alert('🎉 כל הכבוד! מגיע לך פרס');render()}else if(x!==undefined&&confirm('להסיר את הילד/ה מהלוח?')){S.kids.splice(+x,1);plan();S.done={};render()}};
+$('chores').onclick=e=>{const x=e.target.dataset.cx;if(x!==undefined){S.chores.splice(+x,1);plan();S.done={};render()}};
+$('fk').onsubmit=e=>{e.preventDefault();S.kids.push({n:$('kn').value,e:$('ke').value||'😊',s:0});$('kn').value='';plan();S.done={};render()};
+$('fc').onsubmit=e=>{e.preventDefault();S.chores.push({n:$('cn').value,v:+$('cs').value});$('cn').value='';plan();render()};
+$('rot').onclick=()=>{S.off=(S.off||0)+1;plan();S.done={};render()};
+$('clr').onclick=()=>{S.done={};render()};
+$('goal').oninput=e=>{S.goal=Math.max(1,+e.target.value||1);render()};
+render();
+</script>
+</div>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>עוזר הקלדה בעברית</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#f78c6b}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+#t{width:100%;min-height:150px;font-size:1.35rem;line-height:1.8;font-family:"David","Frank Ruhl Libre","Segoe UI",serif}
+.kb{display:flex;flex-direction:column;gap:6px;direction:rtl;user-select:none}
+.kr{display:flex;gap:5px;justify-content:center}
+.k{min-width:44px;height:48px;border-radius:10px;background:#2a2352;border:1px solid var(--line);box-shadow:0 3px 0 rgba(0,0,0,.4);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:1.25rem;font-weight:600;position:relative;padding:0 6px}
+.k small{position:absolute;top:2px;left:5px;font-size:.62rem;color:var(--muted);font-weight:400}
+.k:active{transform:translateY(3px);box-shadow:none}
+.k.w{flex:1;max-width:280px;font-size:.95rem}
+.k.fn{font-size:.9rem;background:#352c66}
+.nk{display:flex;flex-wrap:wrap;gap:5px}
+.nk button{min-width:52px;font-size:1.4rem;padding:4px 8px;line-height:1.3}
+.nk button small{display:block;font-size:.6rem;color:var(--muted)}
+.mode{display:flex;gap:6px;flex-wrap:wrap}
+#mic.rec{background:#ff4d6d;color:#fff;animation:pl 1s infinite}
+@keyframes pl{50%{opacity:.6}}
+.words{font-size:1.2rem;line-height:1.7;font-weight:600;color:var(--acc);min-height:1.7em}
+@media(max-width:600px){.k{min-width:26px;height:42px;font-size:1rem;padding:0 2px}.k small{display:none}.kr{gap:3px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>✍️ עוזר הקלדה בעברית</h1>
+<p class="sub">מקלידים עברית גם בלי מקלדת עברית: מקלדת על המסך, הקלדה פונטית באותיות לועזיות, ניקוד, הכתבה בקול, תיקון שפה ומספרים במילים לצ׳קים.</p>
+<div class="panel">
+  <div class="mode" style="margin-bottom:10px">
+    <button class="md on" data-m="direct">⌨️ ישיר (לפי פריסת מקלדת)</button>
+    <button class="md" data-m="phon">🔤 פונטי (shalom → שלום)</button>
+    <button class="md" data-m="off">✋ כבוי</button>
+    <label class="inline" style="margin-inline-start:auto"><input type="checkbox" id="finals" checked> אותיות סופיות אוטומטיות</label>
+  </div>
+  <textarea id="t" dir="rtl" placeholder="התחילו להקליד כאן. במצב פונטי: shalom olam → שלום עולם"></textarea>
+  <div class="row" style="margin-top:8px">
+    <button class="pri" id="copy">📋 העתקה</button>
+    <button id="mic">🎤 הכתבה</button>
+    <button id="fix">🔁 תיקון שפה (akuo → שלום)</button>
+    <button id="strip">הסרת ניקוד</button>
+    <button id="undo">↶ ביטול</button>
+    <button id="clr">🗑</button>
+    <span class="muted" id="wc" style="margin-inline-start:auto"></span>
+  </div>
+</div>
+<div class="panel">
+  <div class="kb" id="kb"></div>
+</div>
+<div class="grid2">
+  <div class="panel">
+    <h2>ניקוד וסימנים</h2>
+    <div class="nk" id="nk"></div>
+    <p class="hint" style="margin-top:8px">מקלידים אות ואז לוחצים על סימן הניקוד. הוא יתווסף מתחת לאות האחרונה.</p>
+  </div>
+  <div class="panel">
+    <h2>מספר במילים (לצ׳קים)</h2>
+    <div class="row"><input id="num" type="number" value="1850" step="0.01" style="flex:1"><select id="gen"><option value="f">נקבה (שקלים: אחת, שתיים)</option><option value="m">זכר (אחד, שניים)</option></select></div>
+    <p class="words" id="words"></p>
+    <button id="ins">⬆ הכנסה לטקסט</button>
+  </div>
+</div>
+<div class="panel">
+  <h2>מקרא הקלדה פונטית</h2>
+  <p class="hint" id="legend"></p>
+</div>
+<script>
+const $=id=>document.getElementById(id),T=$('t');let mode='direct',hist=[];
+const EN="qwertyuiop[]asdfghjkl;'zxcvbnm,./",HE="/'קראטוןםפ][שדגכעיחלךף,זסבהנמצתץ.";
+const FIN={'כ':'ך','מ':'ם','נ':'ן','פ':'ף','צ':'ץ'},UNF=Object.fromEntries(Object.entries(FIN).map(([a,b])=>[b,a]));
+const PH=[['sh','ש'],['ch','ח'],['kh','ח'],['ts','צ'],['tz','צ'],['th','ת'],['ph','פ'],['a','א'],['b','ב'],['v','ו'],['g','ג'],['d','ד'],['h','ה'],['w','ו'],['o','ו'],['u','ו'],['z','ז'],['x','ח'],['t','ט'],['y','י'],['i','י'],['e','ע'],['k','כ'],['l','ל'],['m','מ'],['n','נ'],['s','ס'],['f','פ'],['p','פ'],['c','צ'],['q','ק'],['r','ר'],['j','ג׳']];
+function phon(word){let w=word.toLowerCase(),o='';
+  // leading vowel a/e/i/o/u → א / ע handled simply: initial vowel gets א, then the vowel letter if o/u/i
+  if(/^[aeiou]/.test(w)){o='א';if(/^[ou]/.test(w)){o+='ו';w=w.slice(1)}else if(w[0]==='i'){o+='י';w=w.slice(1)}else w=w.slice(1);if(w[0]==='e'||w[0]==='a')w=w.slice(1)}
+  while(w.length){const p=PH.find(([k])=>w.startsWith(k));if(!p){o+=w[0];w=w.slice(1);continue}
+    let h=p[1];if((p[0]==='a'||p[0]==='e')&&w.length>1)h='';if(p[0]==='a'&&w.length===1)h='ה';if(p[0]==='e'&&w.length===1)h='ה';
+    o+=h;w=w.slice(p[0].length)}
+  return o}
+function finals(s){return s.replace(/[כמנפצ](?=$|[\s.,!?;:)"'״׳\-])/g,c=>FIN[c]).replace(/[ךםןףץ](?=[א-ת])/g,c=>UNF[c])}
+function ins(txt,back=0){const s=T.selectionStart,e=T.selectionEnd;T.setRangeText(txt,s-back,e,'end');after()}
+function after(){if($('finals').checked){const p=T.selectionStart,v=finals(T.value);if(v!==T.value){T.value=v;T.setSelectionRange(p,p)}}
+  const w=(T.value.match(/\S+/g)||[]).length;$('wc').textContent=`${w} מילים · ${T.value.length} תווים`;try{localStorage.setItem('hebkeys',T.value)}catch{}}
+let snap=0;function push(){const n=Date.now();if(n-snap>1200){hist.push(T.value);if(hist.length>80)hist.shift()}snap=n}
+T.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;push();
+  if(mode==='direct'&&e.key.length===1){const i=EN.indexOf(e.key.toLowerCase());if(i>=0&&/[a-z;',./\[\]]/i.test(e.key)){e.preventDefault();ins(HE[i])}}
+  if(mode==='phon'&&(e.key===' '||e.key==='Enter'||/^[.,!?]$/.test(e.key))){const s=T.selectionStart,before=T.value.slice(0,s),m=/[a-zA-Z]+$/.exec(before);if(m){e.preventDefault();ins(phon(m[0])+(e.key==='Enter'?'\n':e.key),m[0].length)}}});
+T.addEventListener('input',after);
+document.querySelectorAll('.md').forEach(b=>b.onclick=()=>{mode=b.dataset.m;document.querySelectorAll('.md').forEach(x=>x.classList.toggle('on',x===b));T.focus()});
+const ROWS=[["1","2","3","4","5","6","7","8","9","0","-"],["/","'","ק","ר","א","ט","ו","ן","ם","פ"],["ש","ד","ג","כ","ע","י","ח","ל","ך","ף",","],["ז","ס","ב","ה","נ","מ","צ","ת","ץ","."]];
+const hint=c=>{const i=HE.indexOf(c);return i>=0?EN[i]:''};
+$('kb').innerHTML=ROWS.map(r=>`<div class="kr">${r.map(c=>`<div class="k" data-k="${c}"><small>${hint(c)}</small>${c}</div>`).join('')}</div>`).join('')+
+ `<div class="kr"><div class="k fn" data-k="BS">⌫</div><div class="k fn" data-k="״">״</div><div class="k fn" data-k="׳">׳</div><div class="k w" data-k=" ">רווח</div><div class="k fn" data-k="₪">₪</div><div class="k fn" data-k="־">־</div><div class="k fn" data-k="NL">⏎</div></div>`;
+$('kb').addEventListener('pointerdown',e=>{const k=e.target.closest('.k');if(!k)return;e.preventDefault();push();const v=k.dataset.k;
+  if(v==='BS'){const s=T.selectionStart,e2=T.selectionEnd;if(s===e2&&s>0)T.setRangeText('',s-1,s,'end');else T.setRangeText('',s,e2,'end');after()}else ins(v==='NL'?'\n':v);T.focus()});
+const NK=[['ָ','קמץ'],['ַ','פתח'],['ֶ','סגול'],['ֵ','צירה'],['ִ','חיריק'],['ֹ','חולם'],['ֻ','קובוץ'],['ְ','שווא'],['ּ','דגש'],['ׁ','שין ימנית'],['ׂ','שין שמאלית'],['ֲ','חטף פתח'],['ֱ','חטף סגול'],['ֳ','חטף קמץ']];
+$('nk').innerHTML=NK.map(([c,n])=>`<button data-n="${c}" title="${n}">ב${c}<small>${n}</small></button>`).join('')+['״','׳','₪','־','–','“','”'].map(c=>`<button data-n="${c}">${c}<small>&nbsp;</small></button>`).join('');
+$('nk').onclick=e=>{const b=e.target.closest('button');if(!b)return;push();ins(b.dataset.n);T.focus()};
+$('copy').onclick=()=>{navigator.clipboard.writeText(T.value);$('copy').textContent='✓ הועתק';setTimeout(()=>$('copy').textContent='📋 העתקה',1400)};
+$('fix').onclick=()=>{push();const s=T.selectionStart,e=T.selectionEnd,f=x=>[...x].map(c=>{const i=EN.indexOf(c.toLowerCase());return i<0?c:HE[i]}).join('');
+  T.value=e>s?T.value.slice(0,s)+f(T.value.slice(s,e))+T.value.slice(e):f(T.value);after()};
+$('strip').onclick=()=>{push();T.value=T.value.replace(/[֑-ׇ]/g,'');after()};
+$('undo').onclick=()=>{if(hist.length){T.value=hist.pop();after()}};
+$('clr').onclick=()=>{push();T.value='';after()};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null;
+$('mic').onclick=()=>{if(!SR){alert('הדפדפן לא תומך בהכתבה. נסו בכרום או באדג׳.');return}
+  if(rec){rec.stop();return}rec=new SR();rec.lang='he-IL';rec.interimResults=false;rec.continuous=true;
+  rec.onresult=e=>{push();for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)ins((T.value&&!/\s$/.test(T.value)?' ':'')+e.results[i][0].transcript.trim())};
+  rec.onend=()=>{rec=null;$('mic').classList.remove('rec');$('mic').textContent='🎤 הכתבה'};rec.start();$('mic').classList.add('rec');$('mic').textContent='⏺ מקשיב... (לחיצה לעצירה)'};
+// number to Hebrew words
+const U={f:['','אחת','שתיים','שלוש','ארבע','חמש','שש','שבע','שמונה','תשע'],m:['','אחד','שניים','שלושה','ארבעה','חמישה','שישה','שבעה','שמונה','תשעה']};
+const TEEN={f:['עשר','אחת עשרה','שתים עשרה','שלוש עשרה','ארבע עשרה','חמש עשרה','שש עשרה','שבע עשרה','שמונה עשרה','תשע עשרה'],m:['עשרה','אחד עשר','שנים עשר','שלושה עשר','ארבעה עשר','חמישה עשר','שישה עשר','שבעה עשר','שמונה עשר','תשעה עשר']};
+const TENS=['','','עשרים','שלושים','ארבעים','חמישים','שישים','שבעים','שמונים','תשעים'];
+const HUN=['','מאה','מאתיים','שלוש מאות','ארבע מאות','חמש מאות','שש מאות','שבע מאות','שמונה מאות','תשע מאות'];
+const THO=['','אלף','אלפיים','שלושת אלפים','ארבעת אלפים','חמשת אלפים','ששת אלפים','שבעת אלפים','שמונת אלפים','תשעת אלפים','עשרת אלפים'];
+const join=p=>p.length<2?p.join(''):p.slice(0,-1).join(' ')+' ו'+p[p.length-1];
+function u999(n,g){const p=[];const h=n/100|0,r=n%100;if(h)p.push(HUN[h]);if(r>=10&&r<20)p.push(TEEN[g][r-10]);else{const t=r/10|0,o=r%10;if(t)p.push(TENS[t]);if(o)p.push(U[g][o])}return p}
+function words(n,g){n=Math.floor(n);if(n===0)return'אפס';const p=[];const mil=n/1e6|0,th=n%1e6/1000|0,r=n%1000;
+  if(mil)p.push(mil===1?'מיליון':mil===2?'שני מיליון':join(u999(mil,'m'))+' מיליון');
+  if(th)p.push(th<=10?THO[th]:join(u999(th,'m'))+' אלף');
+  const rp=u999(r,g);return join([...p,...rp])}
+function num(){const v=+$('num').value||0,g=$('gen').value,sh=Math.floor(Math.abs(v)),ag=Math.round((Math.abs(v)-sh)*100);
+  let s=words(sh,g)+(g==='f'?' שקלים חדשים':'');if(ag)s+=` ו${words(ag,'f')} אגורות`;$('words').textContent=(v<0?'מינוס ':'')+s}
+$('num').oninput=num;$('gen').onchange=num;$('ins').onclick=()=>{push();ins($('words').textContent);T.focus()};
+$('legend').innerHTML=PH.map(([k,h])=>`<span class="tag">${k} → ${h}</span>`).join(' ')+'<br>במצב פונטי המילה מומרת כשמקישים רווח. a ו־e באמצע מילה נבלעות (כמו בכתיב), בסוף מילה הן הופכות לה׳. o, u ו־i הופכות לו׳ ולי׳.';
+try{T.value=localStorage.getItem('hebkeys')||''}catch{}
+after();num();
+</script>
+</div>
+</body>
+</html>

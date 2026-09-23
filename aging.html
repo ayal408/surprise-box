@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>גיול חובות ושוטף+</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff8fab}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.bk{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.bk .stat b{font-size:1.15rem}
+.late{color:#ff8fab;font-weight:700}
+.ok{color:#90e0a0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>⏳ גיול חובות ומחשבון שוטף+</h1>
+<p class="sub">מחשבים מועד פירעון לפי שוטף+30/60/90, ומנהלים רשימת חשבוניות פתוחות עם גיול לפי ימי איחור, סיכום לפי לקוח ותזכורת תשלום מוכנה.</p>
+<div class="grid2">
+  <div class="panel">
+    <h2>🧮 מחשבון שוטף+</h2>
+    <div class="row"><label style="flex:1">תאריך חשבונית<input type="date" id="qd"></label><label style="flex:1">תנאי תשלום<select id="qt"><option value="s0">שוטף</option><option value="s30" selected>שוטף+30</option><option value="s45">שוטף+45</option><option value="s60">שוטף+60</option><option value="s90">שוטף+90</option><option value="s120">שוטף+120</option><option value="n30">נטו 30</option><option value="n60">נטו 60</option></select></label></div>
+    <div class="stat" style="margin-top:10px"><small>מועד פירעון</small><b id="qr" style="font-size:1.2rem"></b><div class="muted" id="qn"></div></div>
+    <p class="hint" style="margin-top:8px">שוטף+X = מסוף החודש של החשבונית ועוד X ימים. נטו X = מתאריך החשבונית.</p>
+  </div>
+  <div class="panel">
+    <h2>➕ חשבונית פתוחה</h2>
+    <form id="f" style="display:flex;flex-direction:column;gap:8px">
+      <div class="row"><input id="cu" placeholder="לקוח" required style="flex:1" list="cl"><datalist id="cl"></datalist><input id="no" placeholder="מס׳ חשבונית" style="width:120px"></div>
+      <div class="row"><input type="date" id="dd" required><select id="tt"></select><input id="am" type="number" step="0.01" placeholder="סכום ₪" required style="width:120px"><button class="pri">הוספה</button></div>
+    </form>
+  </div>
+</div>
+<div class="panel">
+  <div class="bk" id="bk"></div>
+</div>
+<div class="panel">
+  <div class="row" style="justify-content:space-between"><h2 style="margin:0">📑 חשבוניות פתוחות</h2><div class="row"><select id="fc"><option value="">כל הלקוחות</option></select><label class="inline"><input type="checkbox" id="showPaid"> להציג שולמו</label><button id="csv">⬇ CSV</button></div></div>
+  <div style="overflow:auto;margin-top:8px"><table><thead><tr><th>לקוח</th><th>חשבונית</th><th>תאריך</th><th>תנאים</th><th>פירעון</th><th class="num">ימי איחור</th><th class="num">סכום</th><th></th></tr></thead><tbody id="tb"></tbody></table></div>
+</div>
+<div class="panel"><h2>👥 לפי לקוח</h2><table><thead><tr><th>לקוח</th><th class="num">פתוח</th><th class="num">באיחור</th><th class="num">איחור מרבי</th><th></th></tr></thead><tbody id="bc"></tbody></table></div>
+<script>
+const $=id=>document.getElementById(id);
+const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');const esc=s=>String(s||'').replace(/</g,'&lt;');
+const P=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const TN={s0:'שוטף',s30:'שוטף+30',s45:'שוטף+45',s60:'שוטף+60',s90:'שוטף+90',s120:'שוטף+120',n30:'נטו 30',n60:'נטו 60'};
+function due(ds,t){const d=P(ds),n=+t.slice(1);if(t[0]==='s'){const e=new Date(d.getFullYear(),d.getMonth()+1,0);return new Date(e.getFullYear(),e.getMonth(),e.getDate()+n)}return new Date(d.getFullYear(),d.getMonth(),d.getDate()+n)}
+const today=()=>{const t=new Date();t.setHours(0,0,0,0);return t};
+let L;try{L=JSON.parse(localStorage.getItem('aging'))}catch{}
+if(!L){const t=today(),o=n=>iso(new Date(t.getFullYear(),t.getMonth(),t.getDate()-n));L=[{id:1,cu:'כהן ובניו בע״מ',no:'1041',d:o(130),t:'s30',a:4680,p:false},{id:2,cu:'מסעדת הגפן',no:'1052',d:o(75),t:'s30',a:2340,p:false},{id:3,cu:'כהן ובניו בע״מ',no:'1060',d:o(40),t:'s60',a:9360,p:false},{id:4,cu:'ד.א. יזמות',no:'1063',d:o(20),t:'s30',a:1170,p:false}]}
+const save=()=>{try{localStorage.setItem('aging',JSON.stringify(L))}catch{}};
+const lateDays=x=>Math.round((today()-due(x.d,x.t))/864e5);
+function quick(){if(!$('qd').value)return;const d=due($('qd').value,$('qt').value);$('qr').textContent=d.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});const n=Math.round((d-today())/864e5);$('qn').textContent=n>0?`בעוד ${n} ימים`:n<0?`עבר לפני ${-n} ימים`:'היום';if(d.getDay()===6||d.getDay()===5)$('qn').textContent+=' · נופל בסוף שבוע'}
+function render(){const fc=$('fc').value,sp=$('showPaid').checked;const open=L.filter(x=>!x.p);
+  const B=[['טרם הגיע מועד',x=>lateDays(x)<=0],['1–30 ימים',x=>lateDays(x)>0&&lateDays(x)<=30],['31–60',x=>lateDays(x)>30&&lateDays(x)<=60],['61–90',x=>lateDays(x)>60&&lateDays(x)<=90],['מעל 90',x=>lateDays(x)>90]];
+  $('bk').innerHTML=B.map(([n,fn],i)=>{const v=open.filter(fn).reduce((s,x)=>s+x.a,0);return`<div class="stat"><small>${n}</small><b style="color:${i===0?'#90e0a0':i<2?'var(--ink)':'#ff8fab'}">${f(v)}</b></div>`}).join('');
+  const cs=[...new Set(L.map(x=>x.cu))];$('fc').innerHTML='<option value="">כל הלקוחות</option>'+cs.map(c=>`<option ${c===fc?'selected':''}>${esc(c)}</option>`).join('');$('cl').innerHTML=cs.map(c=>`<option value="${esc(c)}">`).join('');
+  const rows=L.filter(x=>(sp||!x.p)&&(!fc||x.cu===fc)).sort((a,b)=>lateDays(b)-lateDays(a));
+  $('tb').innerHTML=rows.map(x=>{const ld=lateDays(x);return`<tr style="${x.p?'opacity:.45':''}"><td>${esc(x.cu)}</td><td>${esc(x.no)}</td><td>${x.d.split('-').reverse().join('/')}</td><td>${TN[x.t]}</td><td>${due(x.d,x.t).toLocaleDateString('he-IL')}</td><td class="num ${ld>0&&!x.p?'late':'ok'}">${x.p?'שולם':ld>0?ld:'—'}</td><td class="num">${f(x.a)}</td><td style="white-space:nowrap"><button data-pay="${x.id}" style="padding:2px 8px">${x.p?'↺':'✓ שולם'}</button> <button data-x="${x.id}" style="padding:2px 8px">✕</button></td></tr>`}).join('')||'<tr><td colspan="8" class="muted">אין חשבוניות פתוחות 🎉</td></tr>';
+  $('bc').innerHTML=cs.map(c=>{const o=open.filter(x=>x.cu===c);if(!o.length)return'';const late=o.filter(x=>lateDays(x)>0);return`<tr><td>${esc(c)}</td><td class="num">${f(o.reduce((s,x)=>s+x.a,0))}</td><td class="num late">${late.length?f(late.reduce((s,x)=>s+x.a,0)):'—'}</td><td class="num">${late.length?Math.max(...late.map(lateDays))+' ימים':'—'}</td><td>${late.length?`<button data-rem="${esc(c)}" style="padding:2px 8px">✉️ תזכורת</button>`:''}</td></tr>`}).join('');save()}
+$('tt').innerHTML=Object.entries(TN).map(([k,v])=>`<option value="${k}" ${k==='s30'?'selected':''}>${v}</option>`).join('');
+$('f').onsubmit=e=>{e.preventDefault();L.push({id:Date.now(),cu:$('cu').value.trim(),no:$('no').value,d:$('dd').value,t:$('tt').value,a:+$('am').value,p:false});$('no').value='';$('am').value='';render()};
+document.body.addEventListener('click',e=>{const d=e.target.dataset;if(d.pay){const x=L.find(y=>y.id==d.pay);x.p=!x.p;render()}else if(d.x&&confirm('למחוק את החשבונית?')){L=L.filter(y=>y.id!=d.x);render()}
+  else if(d.rem){const late=L.filter(x=>!x.p&&x.cu===d.rem&&lateDays(x)>0);const t=`שלום רב,\n\nבבדיקת הספרים שלנו עולה כי החשבוניות הבאות טרם שולמו:\n\n${late.map(x=>`• חשבונית ${x.no} מתאריך ${x.d.split('-').reverse().join('/')} על סך ${f(x.a)} (מועד פירעון ${due(x.d,x.t).toLocaleDateString('he-IL')})`).join('\n')}\n\nסה״כ לתשלום: ${f(late.reduce((s,x)=>s+x.a,0))}\n\nנודה להסדרת התשלום בהקדם. אם התשלום כבר בוצע, נא להתעלם מהודעה זו.\n\nבברכה`;navigator.clipboard.writeText(t);e.target.textContent='✓ הועתק'}});
+$('fc').onchange=render;$('showPaid').onchange=render;
+$('csv').onclick=()=>{const c='﻿לקוח,חשבונית,תאריך,תנאים,פירעון,ימי איחור,סכום,שולם\n'+L.map(x=>['"'+x.cu.replace(/"/g,'""')+'"',x.no,x.d,TN[x.t],iso(due(x.d,x.t)),Math.max(0,lateDays(x)),x.a,x.p?'כן':'לא'].join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));a.download='גיול-חובות.csv';a.click()};
+$('qd').value=iso(new Date());$('dd').value=iso(new Date());$('qd').oninput=quick;$('qt').onchange=quick;
+quick();render();
+</script>
+</div>
+</body>
+</html>

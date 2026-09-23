@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחשבון ממוצע ציונים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffd166}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.cr{display:grid;grid-template-columns:1fr 90px 90px 36px;gap:6px;margin-bottom:6px;align-items:center}
+.big{font-size:3rem;font-weight:800;color:var(--acc);text-align:center;line-height:1.1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🎓 מחשבון ממוצע ציונים</h1>
+<p class="sub">ממוצע משוקלל לפי נקודות זכות או יחידות לימוד, כולל בונוס בגרות. אפשר גם לבדוק איזה ציון צריך בקורס הבא כדי להגיע ליעד.</p>
+<div class="panel">
+  <div class="row" style="margin-bottom:10px"><button class="md on" data-m="uni">🎓 אוניברסיטה (נ״ז)</button><button class="md" data-m="bag">📚 בגרות (יח״ל + בונוס)</button></div>
+  <div class="cr muted" style="font-size:.85rem"><span>קורס / מקצוע</span><span id="wlab">נ״ז</span><span>ציון</span><span></span></div>
+  <div id="rows"></div>
+  <div class="row"><button id="add">+ שורה</button><button id="clr">ניקוי</button></div>
+</div>
+<div class="grid2">
+  <div class="panel">
+    <div class="big" id="avg">—</div>
+    <div class="muted" style="text-align:center" id="avgl"></div>
+    <div class="stats" style="margin-top:12px"><div class="stat"><small>סה״כ משקל</small><b id="tw"></b></div><div class="stat"><small>ממוצע רגיל</small><b id="plain"></b></div><div class="stat"><small>ציון גבוה</small><b id="hi"></b></div></div>
+  </div>
+  <div class="panel">
+    <h2>🎯 כמה צריך בקורס הבא?</h2>
+    <div class="row"><label style="flex:1">ממוצע יעד<input id="goal" type="number" value="90"></label><label style="flex:1">משקל הקורס<input id="gw" type="number" value="4"></label></div>
+    <p id="need" style="font-size:1.1rem;margin:12px 0 0;line-height:1.7"></p>
+  </div>
+</div>
+<p class="hint" id="note"></p>
+<script>
+const $=id=>document.getElementById(id);let M='uni';
+let D;try{D=JSON.parse(localStorage.getItem('grades'))}catch{}
+if(!D)D={uni:[['מבוא לכלכלה',4,88],['סטטיסטיקה',5,79],['חשבונאות פיננסית',6,92],['אנגלית',2,95]],bag:[['מתמטיקה',5,90],['אנגלית',5,94],['לשון',2,85],['היסטוריה',2,88],['תנ״ך',2,80],['אזרחות',2,92],['ספרות',2,86]]};
+const save=()=>{try{localStorage.setItem('grades',JSON.stringify(D))}catch{}};
+const BON=(sub,units,g)=>{if(g<60||units<4)return 0;if(units===5)return /מתמטיקה/.test(sub)?35:25;return /מתמטיקה|אנגלית/.test(sub)?12.5:10};
+function eff(r){return M==='bag'?Math.min(r[2]+BON(r[0],+r[1],+r[2]),r[2]+35):+r[2]}
+function draw(){$('wlab').textContent=M==='uni'?'נ״ז':'יח״ל';$('rows').innerHTML=D[M].map((r,i)=>`<div class="cr"><input data-i="${i}" data-k="0" value="${String(r[0]).replace(/"/g,'&quot;')}"><input data-i="${i}" data-k="1" type="number" step="0.5" value="${r[1]}"><input data-i="${i}" data-k="2" type="number" min="0" max="100" value="${r[2]}"><button data-x="${i}" style="padding:6px">✕</button></div>`).join('');calc()}
+function calc(){const R=D[M].filter(r=>r[1]>0&&r[2]!=='');let sw=0,s=0,sp=0;R.forEach(r=>{sw+=+r[1];s+=eff(r)*r[1];sp+=+r[2]});const a=sw?s/sw:0;
+  $('avg').textContent=sw?a.toFixed(2):'—';$('avgl').textContent=M==='bag'?'ממוצע בגרות משוקלל כולל בונוסים':'ממוצע משוקלל';$('tw').textContent=sw;$('plain').textContent=R.length?(sp/R.length).toFixed(1):'—';$('hi').textContent=R.length?Math.max(...R.map(r=>+r[2])):'—';
+  const G=+$('goal').value||0,gw=+$('gw').value||1,n=(G*(sw+gw)-s)/gw;$('need').innerHTML=n<=0?'✅ כבר עברת את היעד, גם עם ציון 0 😉':n>(M==='bag'?135:100)?`😬 צריך <b>${n.toFixed(1)}</b>. אי אפשר להגיע ליעד בקורס אחד.`:`צריך לפחות <b style="color:var(--acc)">${Math.ceil(n*10)/10}</b> בקורס הבא`;
+  $('note').textContent=M==='bag'?'בונוס בגרות לפי הכללים המקובלים באוניברסיטאות: 5 יח״ל מתמטיקה +35, 5 יח״ל במקצוע אחר +25, 4 יח״ל מתמטיקה/אנגלית +12.5, 4 יח״ל אחר +10. ציון מתחת ל־60 לא מזכה בבונוס. יש מוסדות שמחשבים אחרת.':'ממוצע משוקלל = סכום (ציון × נ״ז) חלקי סכום נ״ז.';save()}
+$('rows').oninput=e=>{const{i,k}=e.target.dataset;if(i!==undefined){D[M][i][k]=k==='0'?e.target.value:e.target.value===''?'':+e.target.value;calc()}};
+$('rows').onclick=e=>{const x=e.target.dataset.x;if(x!==undefined){D[M].splice(+x,1);draw()}};
+$('add').onclick=()=>{D[M].push(['',M==='uni'?3:2,'']);draw();const ins=$('rows').querySelectorAll('input');ins[ins.length-3].focus()};
+$('clr').onclick=()=>{if(confirm('לנקות את כל השורות?')){D[M]=[];draw()}};
+document.querySelectorAll('.md').forEach(b=>b.onclick=()=>{M=b.dataset.m;document.querySelectorAll('.md').forEach(y=>y.classList.toggle('on',y===b));$('gw').value=M==='uni'?4:2;draw()});
+$('goal').oninput=calc;$('gw').oninput=calc;
+draw();
+</script>
+</div>
+</body>
+</html>

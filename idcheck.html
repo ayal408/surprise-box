@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>בודק מספרים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#90e0a0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.res{font-size:1.3rem;font-weight:800;margin-top:10px;min-height:1.6em}
+.good{color:#90e0a0}.bad{color:#ff8fab}
+textarea{width:100%;min-height:140px;font-family:Consolas,monospace;direction:ltr;text-align:left}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🔎 בודק ת״ז, ח.פ. ו־IBAN</h1>
+<p class="sub">בדיקת ספרת ביקורת לתעודת זהות, עוסק מורשה ומספר חברה, ובדיקת IBAN ישראלי עם פירוק לבנק, סניף וחשבון. אפשר גם לבדוק רשימה שלמה בבת אחת.</p>
+<div class="grid2">
+  <div class="panel">
+    <h2>🪪 ת״ז / עוסק מורשה / ח.פ.</h2>
+    <input id="id" inputmode="numeric" placeholder="למשל 123456782" style="width:100%;font-size:1.3rem;direction:ltr;text-align:left">
+    <div class="res" id="idr"></div>
+    <div class="muted" id="idx"></div>
+    <button id="gen" style="margin-top:10px">🎲 מספר תקין לבדיקות</button>
+  </div>
+  <div class="panel">
+    <h2>🏦 IBAN ישראלי</h2>
+    <input id="ib" placeholder="IL62 0108 0000 0009 9999 999" style="width:100%;font-size:1.1rem;direction:ltr;text-align:left">
+    <div class="res" id="ibr"></div>
+    <table id="ibt" style="margin-top:6px"></table>
+    <h2 style="margin-top:14px">בניית IBAN מפרטי חשבון</h2>
+    <div class="row"><input id="bk" placeholder="בנק" style="width:70px" inputmode="numeric"><input id="br" placeholder="סניף" style="width:80px" inputmode="numeric"><input id="ac" placeholder="חשבון" style="flex:1" inputmode="numeric"><button id="mk">בנייה</button></div>
+    <div class="res" id="mkr" style="direction:ltr;text-align:left;font-family:Consolas,monospace;font-size:1.1rem"></div>
+  </div>
+</div>
+<div class="panel">
+  <h2>📋 בדיקת רשימה</h2>
+  <textarea id="bulk" placeholder="מספר בכל שורה (ת״ז, ח.פ. או IBAN)">123456782
+514018932
+000000018
+IL620108000000099999999</textarea>
+  <table style="margin-top:8px"><tbody id="bres"></tbody></table>
+</div>
+<p class="hint">בדיקת ספרת ביקורת בודקת רק שהמספר בנוי נכון. היא לא מאשרת שהמספר שייך לאדם, לעוסק או לחשבון אמיתי. מספר חברה (ח.פ.) מתחיל בדרך כלל ב־51 או 52, ועמותה ב־58.</p>
+<script>
+const $=id=>document.getElementById(id);
+const BANKS={'04':'יהב','09':'הדואר','10':'לאומי','11':'דיסקונט','12':'הפועלים','13':'איגוד','14':'אוצר החייל','17':'מרכנתיל','18':'וואן זירו','20':'מזרחי טפחות','31':'הבינלאומי','46':'מסד','52':'פאג״י','54':'ירושלים','68':'דקסיה','99':'בנק ישראל'};
+function idOk(s){s=String(s).replace(/\D/g,'');if(!s||s.length>9)return false;s=s.padStart(9,'0');let t=0;for(let i=0;i<9;i++){let d=+s[i]*((i%2)+1);t+=d>9?d-9:d}return t%10===0}
+function idKind(s){s=s.replace(/\D/g,'').padStart(9,'0');return/^5[12]/.test(s)?'חברה בע״מ':/^58/.test(s)?'עמותה / מלכ״ר':/^55/.test(s)?'שותפות רשומה':/^57/.test(s)?'אגודה שיתופית':/^50/.test(s)?'גוף ממשלתי / רשות':'אדם פרטי / עוסק מורשה'}
+function ibanOk(s){s=s.replace(/\s/g,'').toUpperCase();if(!/^[A-Z]{2}\d{2}[A-Z0-9]+$/.test(s))return false;const r=(s.slice(4)+s.slice(0,4)).replace(/[A-Z]/g,c=>c.charCodeAt(0)-55);let m=0;for(const ch of r)m=(m*10+ +ch)%97;return m===1}
+function makeIban(b,br,ac){const bban=b.padStart(3,'0')+br.padStart(3,'0')+ac.padStart(13,'0');const r=(bban+'1821'+'00');let m=0;for(const ch of r)m=(m*10+ +ch)%97;const ck=String(98-m).padStart(2,'0');return'IL'+ck+bban}
+const grp=s=>s.replace(/(.{4})/g,'$1 ').trim();
+function checkId(){const v=$('id').value.trim();if(!v){$('idr').textContent='';$('idx').textContent='';return}const ok=idOk(v);$('idr').innerHTML=ok?'<span class="good">✔ ספרת הביקורת תקינה</span>':'<span class="bad">✘ המספר לא תקין</span>';
+  const s=v.replace(/\D/g,'');if(!ok&&s.length>=8){const base=s.padStart(9,'0').slice(0,8);for(let d=0;d<10;d++)if(idOk(base+d)){$('idx').textContent=`ספרת ביקורת נכונה עבור ${base}: ${d}`;break}}else $('idx').textContent=ok?'סוג משוער: '+idKind(v):''}
+function checkIban(){const v=$('ib').value.replace(/\s/g,'').toUpperCase();if(!v){$('ibr').textContent='';$('ibt').innerHTML='';return}const ok=ibanOk(v);$('ibr').innerHTML=ok?'<span class="good">✔ IBAN תקין</span>':'<span class="bad">✘ IBAN לא תקין</span>';
+  if(v.startsWith('IL')&&v.length===23){const b=v.slice(4,7),br=v.slice(7,10),ac=v.slice(10);$('ibt').innerHTML=[['בנק',`${+b} – ${BANKS[b.slice(1)]||'לא מוכר'}`],['סניף',+br],['חשבון',ac.replace(/^0+/,'')],['בפורמט קריא',grp(v)]].map(([a,c])=>`<tr><td>${a}</td><td class="num">${c}</td></tr>`).join('')}else $('ibt').innerHTML=v.startsWith('IL')?'<tr><td class="bad">IBAN ישראלי צריך להיות באורך 23 תווים</td></tr>':''}
+function bulk(){$('bres').innerHTML=$('bulk').value.split('\n').map(s=>s.trim()).filter(Boolean).map(s=>{const isIb=/^[a-z]{2}/i.test(s),ok=isIb?ibanOk(s):idOk(s);return`<tr><td class="num">${s.replace(/</g,'&lt;')}</td><td>${isIb?'IBAN':'ת״ז / ח.פ.'}</td><td class="${ok?'good':'bad'}">${ok?'✔ תקין':'✘ לא תקין'}</td></tr>`}).join('')}
+$('id').oninput=checkId;$('ib').oninput=checkIban;$('bulk').oninput=bulk;
+$('gen').onclick=()=>{const b=String(Math.random()*1e8|0).padStart(8,'0');for(let d=0;d<10;d++)if(idOk(b+d)){$('id').value=b+d;break}checkId()};
+$('mk').onclick=()=>{const b=$('bk').value.replace(/\D/g,''),br=$('br').value.replace(/\D/g,''),ac=$('ac').value.replace(/\D/g,'');if(!b||!br||!ac){$('mkr').textContent='נא למלא בנק, סניף וחשבון';return}const i=makeIban(b,br,ac);$('mkr').textContent=grp(i);$('ib').value=i;checkIban()};
+bulk();
+</script>
+</div>
+</body>
+</html>

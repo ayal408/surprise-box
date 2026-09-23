@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעשר כספים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#7ee0b0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.bal{font-size:2.2rem;font-weight:800;text-align:center}
+.prog{height:14px;border-radius:9px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px}
+.prog div{height:100%;background:var(--acc);transition:width .3s}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>💝 מחשבון מעשר כספים</h1>
+<p class="sub">רושמים הכנסות ותרומות, ורואים כמה מעשר או חומש צריך לתת וכמה כבר ניתן. הכל נשמר בדפדפן שלך בלבד.</p>
+<div class="panel">
+  <div class="row"><button class="pc on" data-p="10">מעשר 10%</button><button class="pc" data-p="20">חומש 20%</button><label class="inline">שנה <select id="yr"></select></label><label class="inline"><input type="checkbox" id="net"> לחשב מהנטו (אחרי מס)</label></div>
+  <div class="stats" style="margin-top:12px">
+    <div class="stat"><small>סה״כ הכנסות</small><b id="inc"></b></div>
+    <div class="stat"><small>חובת מעשר</small><b id="due"></b></div>
+    <div class="stat"><small>ניתן בפועל</small><b id="giv"></b></div>
+  </div>
+  <div class="bal" id="bal"></div>
+  <div class="prog"><div id="bar"></div></div>
+</div>
+<div class="grid2">
+  <div class="panel">
+    <h2>➕ הכנסה</h2>
+    <form id="fi" class="row" style="flex-direction:column;align-items:stretch">
+      <div class="row"><input id="id" type="date"><input id="ia" type="number" step="0.01" placeholder="ברוטו ₪" required style="flex:1"><input id="it" type="number" step="0.01" placeholder="מס שנוכה" style="width:110px" title="לחישוב מהנטו"></div>
+      <div class="row"><select id="ic"><option>משכורת</option><option>עסק / פרילנס</option><option>קצבת ילדים</option><option>מתנה</option><option>שכירות</option><option>אחר</option></select><input id="in" placeholder="הערה" style="flex:1"><button class="pri">הוספה</button></div>
+    </form>
+  </div>
+  <div class="panel">
+    <h2>🤲 תרומה / צדקה</h2>
+    <form id="fg" class="row" style="flex-direction:column;align-items:stretch">
+      <div class="row"><input id="gd" type="date"><input id="ga" type="number" step="0.01" placeholder="סכום ₪" required style="flex:1"></div>
+      <div class="row"><input id="gt" placeholder="למי? (ישיבה, גמ״ח, עני...)" style="flex:1" list="gtl"><datalist id="gtl"></datalist><label class="inline" title="לסעיף 46: זיכוי של 35% ממס הכנסה"><input type="checkbox" id="g46"> קבלה 46</label><button class="pri">הוספה</button></div>
+    </form>
+  </div>
+</div>
+<div class="panel">
+  <h2>📒 תנועות</h2>
+  <div style="max-height:360px;overflow:auto"><table><thead><tr><th>תאריך</th><th>סוג</th><th>פרטים</th><th class="num">סכום</th><th></th></tr></thead><tbody id="list"></tbody></table></div>
+  <div class="row" style="margin-top:10px"><button id="csv">⬇ ייצוא CSV</button><span class="muted" id="s46"></span></div>
+</div>
+<p class="hint">בשאלות מה נחשב הכנסה ולאילו מטרות אפשר לתת כספי מעשר, כדאי לשאול רב. תרומה למוסד מוכר לפי סעיף 46 מזכה ב־35% זיכוי ממס הכנסה (מעל סכום מינימלי שנתי).</p>
+<script>
+const $=id=>document.getElementById(id);let pct=10;
+let D;try{D=JSON.parse(localStorage.getItem('maaser'))}catch{}if(!D)D={i:[],g:[]};
+const save=()=>{try{localStorage.setItem('maaser',JSON.stringify(D))}catch{}};
+const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');const esc=s=>String(s||'').replace(/</g,'&lt;');
+const today=()=>new Date().toISOString().slice(0,10);
+function years(){const ys=new Set([new Date().getFullYear(),...D.i.map(x=>+x.d.slice(0,4)),...D.g.map(x=>+x.d.slice(0,4))]);const cur=$('yr').value;$('yr').innerHTML='<option value="">הכל</option>'+[...ys].sort((a,b)=>b-a).map(y=>`<option>${y}</option>`).join('');$('yr').value=cur||new Date().getFullYear()}
+function render(){const y=$('yr').value,inY=x=>!y||x.d.startsWith(y);const I=D.i.filter(inY),G=D.g.filter(inY);
+  const inc=I.reduce((s,x)=>s+x.a-($('net').checked?(x.t||0):0),0),due=inc*pct/100,giv=G.reduce((s,x)=>s+x.a,0),bal=due-giv;
+  $('inc').textContent=f(inc);$('due').textContent=f(due);$('giv').textContent=f(giv);
+  $('bal').innerHTML=bal>0.5?`נותר לתת: <span style="color:var(--acc)">${f(bal)}</span>`:bal<-0.5?`🎉 נתת ${f(-bal)} מעבר לחובה`:'✅ מאוזן';
+  $('bar').style.width=due?Math.min(100,giv/due*100)+'%':'0';
+  const rows=[...I.map(x=>({...x,k:'i'})),...G.map(x=>({...x,k:'g'}))].sort((a,b)=>b.d.localeCompare(a.d));
+  $('list').innerHTML=rows.map(x=>`<tr><td>${x.d.split('-').reverse().join('/')}</td><td>${x.k==='i'?'💼 '+esc(x.c):'🤲 תרומה'}</td><td>${esc(x.k==='i'?x.n:x.t)}${x.s46?' <span class="tag">46</span>':''}</td><td class="num" style="color:${x.k==='i'?'var(--ink)':'var(--acc)'}">${f(x.a)}</td><td><button data-k="${x.k}" data-id="${x.id}" style="padding:2px 8px">✕</button></td></tr>`).join('')||'<tr><td colspan="5" class="muted">אין תנועות</td></tr>';
+  const s46=G.filter(x=>x.s46).reduce((s,x)=>s+x.a,0);$('s46').textContent=s46?`תרומות עם קבלה 46: ${f(s46)} · זיכוי מס משוער: ${f(s46*.35)}`:'';
+  $('gtl').innerHTML=[...new Set(D.g.map(x=>x.t).filter(Boolean))].map(t=>`<option value="${esc(t)}">`).join('');save()}
+$('fi').onsubmit=e=>{e.preventDefault();D.i.push({id:Date.now(),d:$('id').value||today(),a:+$('ia').value,t:+$('it').value||0,c:$('ic').value,n:$('in').value});$('ia').value='';$('it').value='';$('in').value='';years();render()};
+$('fg').onsubmit=e=>{e.preventDefault();D.g.push({id:Date.now(),d:$('gd').value||today(),a:+$('ga').value,t:$('gt').value,s46:$('g46').checked});$('ga').value='';$('gt').value='';$('g46').checked=false;years();render()};
+$('list').onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b.dataset.k;D[k]=D[k].filter(x=>x.id!=b.dataset.id);render()};
+document.querySelectorAll('.pc').forEach(b=>b.onclick=()=>{pct=+b.dataset.p;document.querySelectorAll('.pc').forEach(x=>x.classList.toggle('on',x===b));render()});
+$('yr').onchange=render;$('net').onchange=render;
+$('csv').onclick=()=>{const c='﻿תאריך,סוג,פרטים,סכום,מס שנוכה\n'+[...D.i.map(x=>[x.d,'הכנסה - '+x.c,x.n,x.a,x.t]),...D.g.map(x=>[x.d,'תרומה'+(x.s46?' (46)':''),x.t,x.a,''])].map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));a.download='מעשרות.csv';a.click()};
+$('id').value=today();$('gd').value=today();years();render();
+</script>
+</div>
+</body>
+</html>

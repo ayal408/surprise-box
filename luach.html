@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>לוח שנה עברי</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#9bd1ff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .hd{text-align:center;color:var(--muted);font-size:.85rem;padding:4px 0}
+.cell{min-height:86px;border-radius:10px;background:rgba(255,255,255,.04);padding:5px 6px;display:flex;flex-direction:column;gap:2px;cursor:pointer;border:1px solid transparent}
+.cell.out{opacity:.3}
+.cell.today{border-color:var(--acc);background:rgba(155,209,255,.12)}
+.cell.sel{outline:2px solid var(--ink)}
+.cell.shab{background:rgba(255,209,102,.07)}
+.cell .hn{font-weight:800;font-size:1.05rem}
+.cell .gn{font-size:.72rem;color:var(--muted);align-self:flex-start;direction:ltr}
+.cell .top{display:flex;justify-content:space-between}
+.cell .ev{font-size:.7rem;line-height:1.25;color:var(--acc);font-weight:600}
+.cell .ev.fast{color:#ff8fab}
+.cell .ev.yt{color:#ffd166}
+.big{font-size:1.3rem;font-weight:800;color:var(--acc);line-height:1.5}
+@media(max-width:600px){.cell{min-height:64px;padding:3px}.cell .ev{font-size:.6rem}}
+@media print{body{background:#fff;color:#000}.panel{border-color:#999}.back,.sub,#side,.noprint{display:none}.cell{border:1px solid #ccc}.cell .ev{color:#000}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>📆 לוח שנה עברי</h1>
+<p class="sub">לוח חודשי עם תאריכים עבריים, חגים, צומות וראשי חודשים, ספירת העומר ודף היומי. מתאים להדפסה ולתלייה על המקרר.</p>
+<div class="panel row noprint" style="justify-content:space-between">
+  <button id="prev">→ חודש קודם</button><h2 id="mt" style="margin:0;text-align:center"></h2><button id="next">חודש הבא ←</button>
+</div>
+<div class="panel">
+  <div class="cal" id="cal"></div>
+  <div class="row noprint" style="margin-top:10px"><button id="today">היום</button><button onclick="print()">🖨️ הדפסה</button></div>
+</div>
+<div class="grid2" id="side">
+  <div class="panel"><h2 id="dtitle"></h2><div id="dinfo" style="line-height:1.8"></div></div>
+  <div class="panel"><h2>🌾 ספירת העומר</h2><div id="omer" style="line-height:1.8"></div></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const HM={Tishri:'תשרי',Heshvan:'חשוון',Kislev:'כסלו',Tevet:'טבת',Shevat:'שבט',Adar:'אדר','Adar I':'אדר א׳','Adar II':'אדר ב׳',Nisan:'ניסן',Iyar:'אייר',Sivan:'סיוון',Tamuz:'תמוז',Av:'אב',Elul:'אלול'};
+const HF=new Intl.DateTimeFormat('en-u-ca-hebrew',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});
+function gem(n){const o=['','א','ב','ג','ד','ה','ו','ז','ח','ט'],t=['','י','כ','ל','מ','נ','ס','ע','פ','צ'],h=['','ק','ר','ש','ת','תק','תר','תש','תת','תתק'];let s=h[n/100|0];const r=n%100;s+=r===15?'טו':r===16?'טז':t[r/10|0]+o[r%10];return s.length>1?s.slice(0,-1)+'״'+s.slice(-1):s+'׳'}
+const cache={};function hd(d){const k=d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();if(cache[k])return cache[k];const p=HF.formatToParts(new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))),g=t=>p.find(x=>x.type===t).value;return cache[k]={d:+g('day'),m:g('month'),y:+g('year')}}
+const add=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
+const hstr=h=>`${gem(h.d)} ${HM[h.m]} ${gem(h.y%1000)}`;
+const leap=y=>((7*y+1)%19)<7;
+function events(d){const h=hd(d),dow=d.getDay(),E=[],m=h.m,D=h.d;const A=leap(h.y)?'Adar II':'Adar';
+  const Y=(t)=>E.push([t,'yt']),F=(t)=>E.push([t,'fast']),N=(t)=>E.push([t,'']);
+  if(D===1&&m!=='Tishri'||D===30)N('ראש חודש');
+  if(m==='Tishri'){if(D===1||D===2)Y('ראש השנה');if((D===3&&dow!==6)||(D===4&&dow===0))F('צום גדליה');if(D===9)N('ערב יום כיפור');if(D===10)Y('יום כיפור');if(D===14)N('ערב סוכות');if(D===15)Y('סוכות');if(D>=16&&D<=20)N('חול המועד סוכות');if(D===21)N('הושענא רבה');if(D===22)Y('שמיני עצרת ושמחת תורה')}
+  if(m==='Elul'&&D===29)N('ערב ראש השנה');
+  const han=hanukkah(d);if(han)N(`חנוכה – נר ${gem(han)}`);
+  if(m==='Tevet'&&D===10)F('עשרה בטבת');if(m==='Shevat'&&D===15)N('ט״ו בשבט');
+  if(m==='Adar I'&&D===14)N('פורים קטן');if(m==='Adar I'&&D===15)N('שושן פורים קטן');
+  if(m===A){if((D===13&&dow!==6)||(D===11&&dow===4))F('תענית אסתר');if(D===14)Y('פורים');if(D===15)N('שושן פורים (ירושלים)')}
+  if(m==='Nisan'){if(D===14)N('ערב פסח');if(D===15)Y('פסח');if(D>=16&&D<=20)N('חול המועד פסח');if(D===21)Y('שביעי של פסח')}
+  if(m==='Iyar'){if(D===14)N('פסח שני');if(D===18)N('ל״ג בעומר')}
+  if(m==='Sivan'){if(D===5)N('ערב שבועות');if(D===6)Y('שבועות')}
+  if(m==='Tamuz'&&((D===17&&dow!==6)||(D===18&&dow===0)))F('שבעה עשר בתמוז');
+  if(m==='Av'){if((D===9&&dow!==6)||(D===10&&dow===0))F('תשעה באב');if(D===15)N('ט״ו באב')}
+  if(dow===6&&!E.some(e=>e[1]==='yt'))E.unshift(['שבת קודש','yt']);if(dow===5&&!E.length)E.push(['ערב שבת','']);
+  return E}
+function hanukkah(d){for(let i=0;i<8;i++){const h=hd(add(d,-i));if(h.m==='Kislev'&&h.d===25)return i+1}return 0}
+function omer(d){for(let i=1;i<=49;i++){const h=hd(add(d,-i));if(h.m==='Nisan'&&h.d===15)return i}return 0}
+const SEF=['חסד','גבורה','תפארת','נצח','הוד','יסוד','מלכות'];
+function omerText(n){const w=n/7|0,r=n%7,num=['','אחד','שני','שלושה','ארבעה','חמישה','שישה'];
+  let s=`היום ${n===1?'יום אחד':n+' ימים'}`;if(w)s+=`, שהם ${w===1?'שבוע אחד':w+' שבועות'}${r?` ו${r===1?'יום אחד':r+' ימים'}`:''}`;return s+' לעומר'}
+const SHAS=[['ברכות',64],['שבת',157],['עירובין',105],['פסחים',121],['שקלים',22],['יומא',88],['סוכה',56],['ביצה',40],['ראש השנה',35],['תענית',31],['מגילה',32],['מועד קטן',29],['חגיגה',27],['יבמות',122],['כתובות',112],['נדרים',91],['נזיר',66],['סוטה',49],['גיטין',90],['קידושין',82],['בבא קמא',119],['בבא מציעא',119],['בבא בתרא',176],['סנהדרין',113],['מכות',24],['שבועות',49],['עבודה זרה',76],['הוריות',14],['זבחים',120],['מנחות',110],['חולין',142],['בכורות',61],['ערכין',34],['תמורה',34],['כריתות',28],['מעילה',22],['קינים',4],['תמיד',9],['מידות',5],['נדה',73]];
+function daf(d){const start=Date.UTC(2020,0,5),t=Date.UTC(d.getFullYear(),d.getMonth(),d.getDate());let dno=Math.round((t-start)/864e5);dno=((dno%2711)+2711)%2711;
+  let total=0;for(let j=0;j<SHAS.length;j++){total+=SHAS[j][1]-1;if(dno<total){let b=SHAS[j][1]+1-(total-dno);if(j===36)b+=21;if(j===37)b+=24;if(j===38)b+=32;return SHAS[j][0]+' '+gem(b)}}}
+let view=new Date(),sel=new Date();view.setDate(1);
+function render(){const y=view.getFullYear(),m=view.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),start=add(first,-first.getDay()),today=new Date().toDateString();
+  const h1=hd(first),h2=hd(last);$('mt').textContent=`${first.toLocaleDateString('he-IL',{month:'long',year:'numeric'})} · ${HM[h1.m]}${h1.m!==h2.m?'–'+HM[h2.m]:''} ${gem(h2.y%1000)}`;
+  let html=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'].map(x=>`<div class="hd">${x}</div>`).join('');
+  const cells=Math.ceil((first.getDay()+last.getDate())/7)*7;
+  for(let i=0;i<cells;i++){const d=add(start,i),h=hd(d),ev=events(d).filter(e=>!(e[0]==='ערב שבת'));
+    html+=`<div class="cell ${d.getMonth()!==m?'out':''} ${d.toDateString()===today?'today':''} ${d.toDateString()===sel.toDateString()?'sel':''} ${d.getDay()===6?'shab':''}" data-t="${+d}"><div class="top"><span class="hn">${gem(h.d)}</span><span class="gn">${d.getDate()}</span></div>${ev.map(([t,c])=>`<span class="ev ${c}">${t}</span>`).join('')}</div>`}
+  $('cal').innerHTML=html;info()}
+function info(){const d=sel,h=hd(d),ev=events(d),om=omer(d);$('dtitle').textContent=`${d.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}`;
+  $('dinfo').innerHTML=`<div class="big">${hstr(h)}</div>${ev.map(e=>`<div>• ${e[0]}</div>`).join('')}<div>📖 דף היומי: <b>${daf(d)}</b></div>${om?`<div>🌾 ${om} לעומר</div>`:''}<div class="muted" style="font-size:.85rem">השנה ${leap(h.y)?'מעוברת (13 חודשים)':'פשוטה'}</div>`;
+  const oToday=omer(new Date());if(om||oToday){const n=om||oToday;$('omer').innerHTML=`<div class="big">${omerText(n)}</div><div>ספירה: <b>${SEF[(n-1)%7]} שב${SEF[(n-1)/7|0]}</b></div><div class="muted" style="font-size:.85rem">סופרים בלילה, אחרי צאת הכוכבים. ${om?'':'(לפי היום)'}</div>`}
+  else{let x=new Date();let k=0;while(!omer(x)&&k<400){x=add(x,1);k++}$('omer').innerHTML=`<div class="muted">ספירת העומר תתחיל במוצאי יום טוב ראשון של פסח, בליל ${x.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'})} בערב ${add(x,-1).toLocaleDateString('he-IL',{day:'numeric',month:'numeric'})}.</div>`}}
+$('cal').onclick=e=>{const c=e.target.closest('.cell');if(!c)return;sel=new Date(+c.dataset.t);if(sel.getMonth()!==view.getMonth()){view=new Date(sel.getFullYear(),sel.getMonth(),1)}render()};
+$('prev').onclick=()=>{view=new Date(view.getFullYear(),view.getMonth()-1,1);render()};
+$('next').onclick=()=>{view=new Date(view.getFullYear(),view.getMonth()+1,1);render()};
+$('today').onclick=()=>{sel=new Date();view=new Date(sel.getFullYear(),sel.getMonth(),1);render()};
+addEventListener('keydown',e=>{if(e.key==='ArrowRight')$('prev').click();if(e.key==='ArrowLeft')$('next').click()});
+render();
+</script>
+</div>
+</body>
+</html>

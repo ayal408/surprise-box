@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>פתקים דביקים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffd60a}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1300px!important}
+.corkbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cork{position:relative;min-height:70vh;border-radius:18px;background:#b4895a radial-gradient(rgba(0,0,0,.12) 1px,transparent 1.5px) 0 0/7px 7px;box-shadow:inset 0 0 40px rgba(0,0,0,.45);overflow:hidden;border:10px solid #6b4a2b}
+.note{position:absolute;width:200px;min-height:170px;padding:26px 12px 10px;color:#2a2210;box-shadow:3px 6px 14px rgba(0,0,0,.35);display:flex;flex-direction:column;touch-action:none;transition:box-shadow .15s}
+.note.dragging{box-shadow:8px 16px 26px rgba(0,0,0,.45);z-index:999!important}
+.note .pin{position:absolute;top:6px;left:50%;transform:translateX(-50%);font-size:1.1rem;cursor:grab}
+.note textarea{flex:1;background:transparent;border:0;resize:none;color:inherit;font:inherit;font-family:"Segoe Print","Comic Sans MS","Segoe UI",sans-serif;font-size:1rem;padding:0;outline:0;min-height:110px}
+.note .tools{display:flex;gap:4px;justify-content:space-between;align-items:center;opacity:.25;transition:opacity .2s}
+.note:hover .tools,.note:focus-within .tools{opacity:1}
+.note .tools span{width:16px;height:16px;border-radius:50%;cursor:pointer;border:1px solid rgba(0,0,0,.25);display:inline-block}
+.note .tools button{background:none;border:0;padding:0 3px;color:#2a2210;font-size:.95rem}
+.note.hide{display:none}
+.note small{font-size:.7rem;opacity:.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🗒️ פתקים דביקים</h1>
+<p class="sub">לוח שעם עם פתקים: גוררים לכל מקום, משנים צבע, מצמידים למעלה ומחפשים. הכל נשמר בדפדפן.</p>
+<div class="panel corkbar">
+  <button class="pri" id="add">+ פתק חדש</button>
+  <input id="q" placeholder="🔍 חיפוש בפתקים" style="flex:1;min-width:140px">
+  <button id="tidy">🧹 לסדר בשורות</button>
+  <span class="muted" id="cnt"></span>
+</div>
+<div class="cork" id="cork"></div>
+<script>
+const $=id=>document.getElementById(id);
+const COL=['#fff176','#ffab91','#a5d6a7','#90caf9','#ce93d8','#f8bbd0'];
+let N;try{N=JSON.parse(localStorage.getItem('notes'))}catch{}
+if(!N)N=[{id:1,x:20,y:20,c:COL[0],t:'ברוכים הבאים ללוח! 📌\nגררו אותי מהסיכה למעלה.',r:-2,z:1,d:Date.now()},{id:2,x:250,y:60,c:COL[2],t:'רעיון: להוסיף פתק לכל משימה קטנה.',r:3,z:2,d:Date.now()},{id:3,x:480,y:30,c:COL[3],t:'להתקשר לסבתא ☎️',r:-1,z:3,d:Date.now()}];
+let Z=Math.max(0,...N.map(n=>n.z));
+const save=()=>{try{localStorage.setItem('notes',JSON.stringify(N))}catch{}};
+function el(n){const d=document.createElement('div');d.className='note';d.dataset.id=n.id;
+  d.innerHTML=`<span class="pin" title="גרירה">📌</span><textarea spellcheck="false"></textarea><div class="tools"><div>${COL.map(c=>`<span data-c="${c}" style="background:${c}"></span>`).join(' ')}</div><small></small><button data-del title="מחיקה">🗑</button></div>`;
+  d.querySelector('textarea').value=n.t;place(d,n);return d}
+function place(d,n){Object.assign(d.style,{left:n.x+'px',top:n.y+'px',background:n.c,transform:`rotate(${n.r}deg)`,zIndex:n.z});d.querySelector('small').textContent=new Date(n.d).toLocaleDateString('he-IL')}
+function render(){$('cork').innerHTML='';N.forEach(n=>$('cork').appendChild(el(n)));filter()}
+function filter(){const q=$('q').value.trim();let v=0;document.querySelectorAll('.note').forEach(d=>{const n=N.find(x=>x.id==d.dataset.id);const h=q&&!n.t.includes(q);d.classList.toggle('hide',h);if(!h)v++});$('cnt').textContent=`${v} פתקים`}
+const get=d=>N.find(x=>x.id==d.dataset.id);
+let drag=null;
+$('cork').addEventListener('pointerdown',e=>{const d=e.target.closest('.note');if(!d)return;const n=get(d);n.z=++Z;d.style.zIndex=Z;
+  if(!e.target.classList.contains('pin')&&e.target.tagName!=='SMALL'&&e.target!==d)return;
+  e.preventDefault();drag={d,n,sx:e.clientX,sy:e.clientY,ox:n.x,oy:n.y};d.classList.add('dragging');d.setPointerCapture(e.pointerId)});
+$('cork').addEventListener('pointermove',e=>{if(!drag)return;const W=$('cork').clientWidth-200,H=$('cork').clientHeight-170;
+  drag.n.x=Math.max(0,Math.min(W,drag.ox+e.clientX-drag.sx));drag.n.y=Math.max(0,Math.min(H,drag.oy+e.clientY-drag.sy));drag.d.style.left=drag.n.x+'px';drag.d.style.top=drag.n.y+'px'});
+$('cork').addEventListener('pointerup',()=>{if(drag){drag.d.classList.remove('dragging');drag=null;save()}});
+$('cork').addEventListener('input',e=>{const d=e.target.closest('.note');if(d){get(d).t=e.target.value;save()}});
+$('cork').addEventListener('click',e=>{const d=e.target.closest('.note');if(!d)return;const n=get(d);
+  if(e.target.dataset.c){n.c=e.target.dataset.c;place(d,n);save()}
+  else if(e.target.dataset.del!==undefined&&(!n.t.trim()||confirm('למחוק את הפתק?'))){N=N.filter(x=>x!==n);d.remove();save();filter()}});
+$('add').onclick=()=>{const w=$('cork').clientWidth;const n={id:Date.now(),x:Math.random()*Math.max(10,w-230)+10,y:20+Math.random()*120,c:COL[Math.random()*COL.length|0],t:'',r:Math.round(Math.random()*6-3),z:++Z,d:Date.now()};N.push(n);const d=el(n);$('cork').appendChild(d);d.querySelector('textarea').focus();save();filter()};
+$('tidy').onclick=()=>{const w=$('cork').clientWidth,per=Math.max(1,Math.floor((w-20)/220));N.forEach((n,i)=>{n.x=w-230-(i%per)*220;n.y=20+Math.floor(i/per)*200;n.r=0});save();render()};
+$('q').oninput=filter;
+render();
+</script>
+</div>
+</body>
+</html>

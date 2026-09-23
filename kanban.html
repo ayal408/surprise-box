@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>לוח משימות</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#c77dff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1200px!important}
+.board{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:12px;overflow-x:auto;padding-bottom:6px}
+.col{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px;min-height:300px;display:flex;flex-direction:column;gap:8px}
+.col.over{outline:2px dashed var(--acc)}
+.col h3{margin:0 4px 4px;font-size:1rem;display:flex;justify-content:space-between}
+.col h3 span{color:var(--muted);font-weight:400}
+.card{background:#231d4a;border:1px solid var(--line);border-inline-start:4px solid var(--p);border-radius:12px;padding:9px 10px;cursor:grab;display:flex;flex-direction:column;gap:5px}
+.card.drag{opacity:.4}
+.card .t{font-weight:600;word-break:break-word}
+.card .m{display:flex;gap:6px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);align-items:center}
+.card .late{color:#ff8fab;font-weight:700}
+.card .acts{display:flex;gap:4px;justify-content:flex-end}
+.card .acts button{padding:2px 7px;font-size:.8rem;border-radius:8px}
+.quick{display:flex;gap:6px}
+.quick input{flex:1;padding:6px 9px;font-size:.9rem}
+@media(max-width:700px){.board{grid-template-columns:repeat(4,78vw)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>📋 לוח משימות</h1>
+<p class="sub">לוח קנבן: גוררים כרטיסים בין העמודות, עם עדיפות, תאריך יעד, תגיות וחיפוש.</p>
+<div class="panel row">
+  <input id="q" placeholder="🔍 חיפוש כרטיס או תגית" style="flex:1">
+  <select id="pf"><option value="">כל העדיפויות</option><option value="3">דחוף</option><option value="2">בינוני</option><option value="1">נמוך</option></select>
+  <button id="exp">⬇ גיבוי</button><button id="imp">⬆ שחזור</button><input type="file" id="file" accept=".json" hidden>
+</div>
+<div class="board" id="board"></div>
+<dialog id="dlg" style="background:#1d1840;color:var(--ink);border:1px solid var(--line);border-radius:16px;max-width:420px;width:92%">
+  <form method="dialog" id="df" style="display:flex;flex-direction:column;gap:10px">
+    <h2 style="margin:0">עריכת כרטיס</h2>
+    <label>כותרת<input id="dt" required></label>
+    <label>הערות<textarea id="dn" rows="3"></textarea></label>
+    <div class="row"><label style="flex:1">עדיפות<select id="dp"><option value="1">נמוך</option><option value="2">בינוני</option><option value="3">דחוף</option></select></label><label style="flex:1">תאריך יעד<input type="date" id="dd"></label></div>
+    <label>תגיות (מופרדות בפסיק)<input id="dg"></label>
+    <div class="row" style="justify-content:space-between"><button value="del" id="ddel">🗑 מחיקה</button><span class="row"><button value="cancel">ביטול</button><button value="ok" class="pri">שמירה</button></span></div>
+  </form>
+</dialog>
+<script>
+const $=id=>document.getElementById(id);
+const COLS=[['todo','📥 לעשות'],['doing','⚙️ בעבודה'],['wait','⏳ ממתין'],['done','✅ הושלם']];
+const PC={1:'#4cc9f0',2:'#ffb703',3:'#ff4d6d'},PN={1:'נמוך',2:'בינוני',3:'דחוף'};
+let C;try{C=JSON.parse(localStorage.getItem('kanban'))}catch{}
+if(!C)C=[{id:1,c:'todo',t:'להגיש דוח מע״מ',p:3,d:'',g:['עבודה'],n:''},{id:2,c:'todo',t:'לקנות מתנה ליום הולדת',p:2,d:'',g:['בית'],n:''},{id:3,c:'doing',t:'לסדר את הארון',p:1,d:'',g:['בית'],n:''},{id:4,c:'done',t:'לנסות את קופסת ההפתעות',p:2,d:'',g:['כיף'],n:''}];
+const save=()=>{try{localStorage.setItem('kanban',JSON.stringify(C))}catch{}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let edit=null;const today=new Date().toISOString().slice(0,10);
+function render(){const q=$('q').value.trim().toLowerCase(),pf=$('pf').value;
+  $('board').innerHTML=COLS.map(([k,n])=>{const cs=C.filter(c=>c.c===k&&(!pf||c.p==pf)&&(!q||(c.t+' '+c.g.join(' ')+' '+c.n).toLowerCase().includes(q))).sort((a,b)=>b.p-a.p);
+    return`<div class="col" data-c="${k}"><h3>${n}<span>${cs.length}</span></h3>${cs.map(c=>`<div class="card" draggable="true" data-id="${c.id}" style="--p:${PC[c.p]}"><div class="t" ${k==='done'?'style="text-decoration:line-through;opacity:.7"':''}>${esc(c.t)}</div>${c.n?`<div class="m">${esc(c.n).slice(0,90)}</div>`:''}<div class="m"><span>${PN[c.p]}</span>${c.d?`<span class="${c.d<today&&k!=='done'?'late':''}">📅 ${c.d.split('-').reverse().join('/')}</span>`:''}${c.g.map(g=>`<span class="tag">${esc(g)}</span>`).join('')}</div><div class="acts">${k!=='todo'?`<button data-mv="-1">→</button>`:''}<button data-ed>✏️</button>${k!=='done'?`<button data-mv="1">←</button>`:''}</div></div>`).join('')}
+    <form class="quick" data-add="${k}"><input placeholder="+ כרטיס חדש"><button class="pri" style="padding:4px 10px">+</button></form></div>`}).join('');save()}
+const board=$('board');
+board.addEventListener('dragstart',e=>{const c=e.target.closest('.card');if(c){e.dataTransfer.setData('text',c.dataset.id);c.classList.add('drag')}});
+board.addEventListener('dragend',e=>{const c=e.target.closest('.card');c&&c.classList.remove('drag')});
+board.addEventListener('dragover',e=>{const col=e.target.closest('.col');if(col){e.preventDefault();document.querySelectorAll('.col').forEach(x=>x.classList.toggle('over',x===col))}});
+board.addEventListener('drop',e=>{const col=e.target.closest('.col');if(!col)return;e.preventDefault();const c=C.find(x=>x.id==e.dataTransfer.getData('text'));if(c){c.c=col.dataset.c;render()}});
+board.addEventListener('click',e=>{const card=e.target.closest('.card');if(!card)return;const c=C.find(x=>x.id==card.dataset.id);
+  if(e.target.dataset.mv){const i=COLS.findIndex(k=>k[0]===c.c)+ +e.target.dataset.mv;c.c=COLS[i][0];render()}
+  else if(e.target.dataset.ed!==undefined||e.target.classList.contains('t'))openEdit(c)});
+board.addEventListener('submit',e=>{e.preventDefault();const f=e.target,v=f.querySelector('input').value.trim();if(!v)return;C.push({id:Date.now(),c:f.dataset.add,t:v,p:2,d:'',g:[],n:''});render();board.querySelector(`[data-add="${f.dataset.add}"] input`).focus()});
+function openEdit(c){edit=c;$('dt').value=c.t;$('dn').value=c.n;$('dp').value=c.p;$('dd').value=c.d;$('dg').value=c.g.join(', ');$('dlg').showModal()}
+$('dlg').addEventListener('close',()=>{const r=$('dlg').returnValue;if(!edit)return;if(r==='ok'){Object.assign(edit,{t:$('dt').value,n:$('dn').value,p:+$('dp').value,d:$('dd').value,g:$('dg').value.split(',').map(s=>s.trim()).filter(Boolean)})}else if(r==='del'){C=C.filter(x=>x!==edit)}edit=null;render()});
+$('ddel').onclick=e=>{if(!confirm('למחוק את הכרטיס?'))e.preventDefault()};
+$('q').oninput=render;$('pf').onchange=render;
+$('exp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(C,null,1)],{type:'application/json'}));a.download='לוח-משימות.json';a.click()};
+$('imp').onclick=()=>$('file').click();
+$('file').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());if(Array.isArray(d)){C=d;render()}}catch{alert('הקובץ לא תקין')}};
+render();
+</script>
+</div>
+</body>
+</html>

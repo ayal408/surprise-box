@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מופעי הירח</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#e8e4ff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.moonbox{display:flex;flex-direction:column;align-items:center;gap:10px}
+#mc{width:min(280px,70vw);aspect-ratio:1}
+.ph{font-size:1.5rem;font-weight:800;color:var(--acc)}
+.mcal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}
+.mcal div{background:rgba(255,255,255,.04);border-radius:10px;padding:6px 2px;font-size:.8rem}
+.mcal div.today{outline:2px solid var(--acc)}
+.mcal canvas{width:34px;height:34px;display:block;margin:2px auto}
+.mcal .hd{background:none;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🌙 מופעי הירח</h1>
+<p class="sub">איך הירח נראה עכשיו, כמה ממנו מואר, מתי מולד הלבנה הבא ומתי ירח מלא, ולוח של כל החודש. אפשר לגלגל את הזמן קדימה ואחורה.</p>
+<div class="grid2">
+  <div class="panel moonbox">
+    <canvas id="mc" width="560" height="560"></canvas>
+    <div class="ph" id="ph"></div>
+    <div class="row"><button data-d="-1">→ יום</button><button id="now">עכשיו</button><button data-d="1">יום ←</button></div>
+    <input type="range" id="sl" min="-15" max="15" value="0" step="0.25" style="width:100%">
+    <div class="muted" id="when"></div>
+  </div>
+  <div class="panel">
+    <div class="stats">
+      <div class="stat"><small>חלק מואר</small><b id="ill"></b></div>
+      <div class="stat"><small>גיל הירח</small><b id="age"></b></div>
+      <div class="stat"><small>מרחק מכדור הארץ</small><b id="dist" style="font-size:1.1rem"></b></div>
+      <div class="stat"><small>גודל נראה</small><b id="sz" style="font-size:1.1rem"></b></div>
+    </div>
+    <table style="margin-top:12px"><tbody id="next"></tbody></table>
+    <p class="hint" style="margin-top:10px" id="fact"></p>
+  </div>
+</div>
+<div class="panel">
+  <div class="row" style="justify-content:space-between"><button id="pm">→</button><h2 id="mt" style="margin:0"></h2><button id="nm">←</button></div>
+  <div class="mcal" id="cal" style="margin-top:10px"></div>
+</div>
+<p class="hint">החישוב לפי נוסחאות אסטרונומיות מקורבות (דיוק של כמה שעות למולד ולירח מלא, ובערך 1% לחלק המואר). המולד העברי לפי חשבון הלוח עשוי להיות שונה בכמה שעות מהמולד האסטרונומי.</p>
+<script>
+const $=id=>document.getElementById(id);const SYN=29.530588853,R=Math.PI/180;
+function jd(d){return d/864e5+2440587.5}
+function moon(d){const T=(jd(d)-2451545)/36525;const D=(297.8501921+445267.1114034*T)%360,M=(357.5291092+35999.0502909*T)%360,Mp=(134.9633964+477198.8675055*T)%360,F=(93.272095+483202.0175233*T)%360;
+  const i=180-D-6.289*Math.sin(Mp*R)+2.1*Math.sin(M*R)-1.274*Math.sin((2*D-Mp)*R)-.658*Math.sin(2*D*R)-.214*Math.sin(2*Mp*R)-.11*Math.sin(D*R);
+  const k=(1+Math.cos(i*R))/2;const dist=385000.56-20905.355*Math.cos(Mp*R)-3699.111*Math.cos((2*D-Mp)*R)-2955.968*Math.cos(2*D*R)-569.925*Math.cos(2*Mp*R);
+  const el=((D%360)+360)%360;return{k,waxing:el<180,dist,el}}
+const REF=Date.UTC(2000,0,6,18,14);
+function age(d){return(((d-REF)/864e5)%SYN+SYN)%SYN}
+function name(a){return a<1.2||a>28.3?['🌑','מולד / ירח חדש']:a<6.4?['🌒','סהר עולה']:a<8.4?['🌓','רבע ראשון']:a<13.8?['🌔','ירח קמור עולה']:a<15.8?['🌕','ירח מלא']:a<21?['🌖','ירח קמור יורד']:a<23?['🌗','רבע אחרון']:['🌘','סהר יורד']}
+function findPhase(d,target){// next time elongation crosses target (0 new,90 first q,180 full,270 last q)
+  let t=+d;const a=age(d),want=target/360*SYN;let dt=((want-a)%SYN+SYN)%SYN;if(dt<.05)dt+=SYN;t+=dt*864e5;
+  for(let k=0;k<6;k++){const e=moon(new Date(t)).el;let diff=((e-target+540)%360)-180;t-=diff/12.19*864e5}return new Date(t)}
+function draw(cv,k,waxing,big){const x=cv.getContext('2d'),W=cv.width,r=W/2*.92,c=W/2;x.clearRect(0,0,W,W);
+  if(big){const g=x.createRadialGradient(c,c,r*.9,c,c,r*1.1);g.addColorStop(0,'rgba(232,228,255,.18)');g.addColorStop(1,'transparent');x.fillStyle=g;x.fillRect(0,0,W,W)}
+  x.fillStyle='#1c1838';x.beginPath();x.arc(c,c,r,0,7);x.fill();
+  x.save();x.beginPath();x.arc(c,c,r,0,7);x.clip();
+  const lit=x.createRadialGradient(c-r*.3,c-r*.3,r*.1,c,c,r);lit.addColorStop(0,'#fffdf2');lit.addColorStop(1,'#cfc9b8');x.fillStyle=lit;
+  // right side lit when waxing (northern hemisphere)
+  const s=waxing?1:-1,tx=(1-2*k)*r;x.beginPath();x.arc(c,c,r,-Math.PI/2,Math.PI/2,s<0);x.ellipse(c,c,Math.abs(tx),r,0,Math.PI/2,-Math.PI/2,(tx>0)===(s>0));x.fill();
+  if(big){x.fillStyle='rgba(0,0,0,.08)';[[.3,-.2,.18],[-.25,.25,.14],[.1,.35,.1],[-.1,-.35,.12],[.45,.2,.08]].forEach(([a,b,rr])=>{x.beginPath();x.arc(c+a*r,c+b*r,rr*r,0,7);x.fill()})}
+  x.restore()}
+let off=0;const base=()=>new Date(Date.now()+off*864e5);
+function render(){const d=base(),m=moon(d),a=age(d),[ic,nm]=name(a);draw($('mc'),m.k,m.waxing,true);
+  $('ph').textContent=ic+' '+nm;$('ill').textContent=Math.round(m.k*100)+'%';$('age').textContent=a.toFixed(1)+' ימים';$('dist').textContent=Math.round(m.dist).toLocaleString()+' ק״מ';
+  const sz=(384400/m.dist);$('sz').textContent=sz>1.05?'גדול מהרגיל (ירח־על)':sz<.95?'קטן מהרגיל':'רגיל';
+  $('when').textContent=off?d.toLocaleString('he-IL',{weekday:'long',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}):'עכשיו';
+  const N=[['🌑 מולד הבא',0],['🌓 רבע ראשון',90],['🌕 ירח מלא',180],['🌗 רבע אחרון',270]].map(([n,t])=>[n,findPhase(d,t)]).sort((a,b)=>a[1]-b[1]);
+  $('next').innerHTML=N.map(([n,t])=>`<tr><td>${n}</td><td>${t.toLocaleString('he-IL',{weekday:'short',day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'})}</td><td class="num muted">בעוד ${Math.round((t-d)/864e5*10)/10} ימים</td></tr>`).join('');
+  $('fact').textContent=m.k>.97?'בירח מלא הירח זורח בערך בשעת השקיעה ונמצא בשמיים כל הלילה.':m.k<.03?'במולד הירח נמצא בין כדור הארץ לשמש, והצד שפונה אלינו חשוך לגמרי.':m.waxing?'בחודש העברי הירח הולך ומתמלא עד אמצע החודש, ט״ו בחודש.':'אחרי אמצע החודש העברי הירח הולך ומתמעט עד המולד הבא.'}
+let cm=new Date();cm.setDate(1);
+function cal(){const y=cm.getFullYear(),mo=cm.getMonth(),first=new Date(y,mo,1),n=new Date(y,mo+1,0).getDate();$('mt').textContent=first.toLocaleDateString('he-IL',{month:'long',year:'numeric'});
+  let h=['א','ב','ג','ד','ה','ו','ש'].map(x=>`<div class="hd">${x}׳</div>`).join('')+'<div class="hd"></div>'.repeat(first.getDay());
+  for(let i=1;i<=n;i++){const d=new Date(y,mo,i,21);const m=moon(d);h+=`<div class="${new Date().toDateString()===d.toDateString()?'today':''}"><canvas width="68" height="68" data-k="${m.k}" data-w="${m.waxing?1:0}"></canvas>${i}</div>`}
+  $('cal').innerHTML=h;$('cal').querySelectorAll('canvas').forEach(c=>draw(c,+c.dataset.k,c.dataset.w==='1',false))}
+document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{off+=+b.dataset.d;$('sl').value=Math.max(-15,Math.min(15,off));render()});
+$('sl').oninput=e=>{off=+e.target.value;render()};$('now').onclick=()=>{off=0;$('sl').value=0;render()};
+$('pm').onclick=()=>{cm=new Date(cm.getFullYear(),cm.getMonth()-1,1);cal()};$('nm').onclick=()=>{cm=new Date(cm.getFullYear(),cm.getMonth()+1,1);cal()};
+render();cal();setInterval(()=>{if(!off)render()},60000);
+</script>
+</div>
+</body>
+</html>

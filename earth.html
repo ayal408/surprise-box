@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>כדור הארץ עכשיו</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#4fb3ff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1200px!important}
+.stage{position:relative;height:64vh;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:radial-gradient(circle at 50% 50%,#0b1030,#02030a);touch-action:none}
+.stage canvas{display:block;width:100%;height:100%}
+#load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.cities{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.city{background:rgba(255,255,255,.04);border-radius:12px;padding:8px 10px}
+.city b{display:block;font-size:1.25rem;direction:ltr;text-align:right}
+.city small{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🌍 כדור הארץ עכשיו</h1>
+<p class="sub">כדור הארץ בתלת־ממד עם יום ולילה בזמן אמת: איפה עכשיו זורחת השמש, איפה כבר חושך ואורות הערים דולקים, ומה השעה בערים ברחבי העולם. גוררים כדי לסובב, וגלגלת או צביטה מתקרבות.</p>
+<div class="panel row">
+  <button id="now">עכשיו</button><button data-h="-6">−6 ש׳</button><button data-h="-1">−1 ש׳</button><button data-h="1">+1 ש׳</button><button data-h="6">+6 ש׳</button><button id="play">▶ יממה בדקה</button>
+  <label class="inline"><input type="checkbox" id="spin"> סיבוב אוטומטי</label>
+  <label class="inline"><input type="checkbox" id="lock" checked> להציג את ישראל</label>
+  <span class="muted" id="when" style="margin-inline-start:auto"></span>
+</div>
+<div class="stage" id="st"><div id="load">טוען את כדור הארץ...</div></div>
+<div class="panel"><h2>🕐 מה השעה בעולם</h2><div class="cities" id="cities"></div></div>
+<p class="hint">תמונות כדור הארץ: NASA Blue Marble ו־Black Marble. מיקום השמש מחושב לפי התאריך והשעה, כולל עונות השנה: בחורף בצפון הקוטב הצפוני בחושך כל היממה.</p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=id=>document.getElementById(id),st=$('st');let off=0,play=false;
+const CITIES=[['ירושלים','Asia/Jerusalem',31.78,35.23],['ניו יורק','America/New_York',40.71,-74.0],['לונדון','Europe/London',51.5,-.13],['פריז','Europe/Paris',48.86,2.35],['מוסקבה','Europe/Moscow',55.75,37.6],['דובאי','Asia/Dubai',25.2,55.27],['מומבאי','Asia/Kolkata',19.07,72.87],['בייג׳ינג','Asia/Shanghai',39.9,116.4],['טוקיו','Asia/Tokyo',35.68,139.7],['סידני','Australia/Sydney',-33.87,151.2],['לוס אנג׳לס','America/Los_Angeles',34.05,-118.24],['ריו דה ז׳ניירו','America/Sao_Paulo',-22.9,-43.2],['יוהנסבורג','Africa/Johannesburg',-26.2,28.05],['בואנוס איירס','America/Argentina/Buenos_Aires',-34.6,-58.4]];
+const now=()=>new Date(Date.now()+off*36e5);
+function sunDir(d){const R=Math.PI/180,n=d/864e5+2440587.5-2451545,L=(280.46+.9856474*n)%360,g=(357.528+.9856003*n)*R,lam=(L+1.915*Math.sin(g)+.02*Math.sin(2*g))*R,e=23.44*R;
+  const dec=Math.asin(Math.sin(e)*Math.sin(lam));const ra=Math.atan2(Math.cos(e)*Math.sin(lam),Math.cos(lam));const gmst=((280.46061837+360.98564736629*n)%360)*R;const lonSub=ra-gmst;return{lat:dec,lon:lonSub}}
+function v3(lat,lon,r=1){return new THREE.Vector3(r*Math.cos(lat)*Math.cos(lon),r*Math.sin(lat),-r*Math.cos(lat)*Math.sin(lon))}
+function cities(){const d=now();const s=sunDir(d);$('cities').innerHTML=CITIES.map(([n,tz,la,lo])=>{const R=Math.PI/180;const p=v3(la*R,lo*R),sd=v3(s.lat,s.lon);const day=p.dot(sd)>-.05;
+  return`<div class="city"><small>${day?'☀️':'🌙'} ${n}</small><b>${d.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit',timeZone:tz})}</b><small>${d.toLocaleDateString('he-IL',{weekday:'short',timeZone:tz})}</small></div>`}).join('');
+  $('when').textContent=off?d.toLocaleString('he-IL',{weekday:'short',day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'})+' (שעון ישראל)':'עכשיו'}
+if(!window.THREE){$('load').textContent='לא הצלחתי לטעון את מנוע התלת־ממד. בדקו חיבור לאינטרנט.';cities();setInterval(cities,30000)}else{
+const W=()=>st.clientWidth,H=()=>st.clientHeight;
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(2,devicePixelRatio));renderer.setSize(W(),H());st.appendChild(renderer.domElement);
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,W()/H(),.1,100);cam.position.set(0,0,3.6);
+const TL=new THREE.TextureLoader();TL.setCrossOrigin('anonymous');const base='https://cdn.jsdelivr.net/npm/three-globe@2.31.0/example/img/';
+const uni={day:{value:null},night:{value:null},sun:{value:new THREE.Vector3(1,0,0)}};
+const mat=new THREE.ShaderMaterial({uniforms:uni,vertexShader:`varying vec2 vUv;varying vec3 vN;void main(){vUv=uv;vN=normalize((modelMatrix*vec4(normal,0.)).xyz);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`uniform sampler2D day;uniform sampler2D night;uniform vec3 sun;varying vec2 vUv;varying vec3 vN;void main(){float c=dot(normalize(vN),normalize(sun));float m=smoothstep(-.12,.12,c);vec3 d=texture2D(day,vUv).rgb;vec3 n=texture2D(night,vUv).rgb*1.6+vec3(.02,.03,.06);vec3 col=mix(n,d*(.35+.75*max(c,0.)),m);float rim=pow(1.-abs(dot(normalize(vN),vec3(0,0,1))),3.);gl_FragColor=vec4(col+vec3(.25,.5,1.)*rim*.35,1.);}`});
+const globe=new THREE.Mesh(new THREE.SphereGeometry(1,96,96),mat);scene.add(globe);
+const atm=new THREE.Mesh(new THREE.SphereGeometry(1.04,64,64),new THREE.MeshBasicMaterial({color:0x4fb3ff,transparent:true,opacity:.08,side:THREE.BackSide}));scene.add(atm);
+const stars=new THREE.BufferGeometry(),sp=[];for(let i=0;i<1500;i++){const v=new THREE.Vector3().randomDirection?new THREE.Vector3().randomDirection():new THREE.Vector3(Math.random()-.5,Math.random()-.5,Math.random()-.5).normalize();sp.push(v.x*40,v.y*40,v.z*40)}stars.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));scene.add(new THREE.Points(stars,new THREE.PointsMaterial({color:0xffffff,size:.08})));
+const pin=new THREE.Mesh(new THREE.SphereGeometry(.018,12,12),new THREE.MeshBasicMaterial({color:0xffd166}));globe.add(pin);pin.position.copy(v3(31.78*Math.PI/180,35.23*Math.PI/180,1.01));
+let loaded=0;const done=()=>{if(++loaded===2)$('load').style.display='none'};
+uni.day.value=TL.load(base+'earth-blue-marble.jpg',done,undefined,()=>{$('load').textContent='לא הצלחתי לטעון את התמונות של כדור הארץ'});uni.night.value=TL.load(base+'earth-night.jpg',done);
+let rotY=-(35.23+90)*Math.PI/180,rotX=.35,drag=null,dist=3.6;
+function frame(){if(play)off+=24/60/60;if($('spin').checked&&!drag)rotY+=.002;
+  globe.rotation.set(rotX,rotY,0,'XYZ');atm.rotation.copy(globe.rotation);const s=sunDir(now());const sv=v3(s.lat,s.lon);sv.applyEuler(globe.rotation);uni.sun.value.copy(sv);
+  cam.position.z+=(dist-cam.position.z)*.15;renderer.render(scene,cam);requestAnimationFrame(frame)}
+st.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,ry:rotY,rx:rotX};$('lock').checked=false;st.setPointerCapture(e.pointerId)});
+st.addEventListener('pointermove',e=>{if(!drag)return;rotY=drag.ry+(e.clientX-drag.x)*.006;rotX=Math.max(-1.4,Math.min(1.4,drag.rx+(e.clientY-drag.y)*.006))});
+st.addEventListener('pointerup',()=>drag=null);
+st.addEventListener('wheel',e=>{e.preventDefault();dist=Math.max(1.6,Math.min(8,dist*(e.deltaY>0?1.1:.9)))},{passive:false});
+$('lock').onchange=()=>{if($('lock').checked){rotY=-(35.23+90)*Math.PI/180;rotX=.55}};
+addEventListener('resize',()=>{renderer.setSize(W(),H());cam.aspect=W()/H();cam.updateProjectionMatrix()});
+document.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{off+=+b.dataset.h;cities()});
+$('now').onclick=()=>{off=0;play=false;$('play').textContent='▶ יממה בדקה';cities()};
+$('play').onclick=()=>{play=!play;$('play').textContent=play?'⏸ עצירה':'▶ יממה בדקה'};
+frame();cities();setInterval(cities,play?1000:20000);setInterval(()=>{if(play)cities()},1000)}
+</script>
+</div>
+</body>
+</html>

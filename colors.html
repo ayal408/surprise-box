@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעבדת הצבעים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff8fab}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.sw{height:140px;border-radius:16px;display:flex;align-items:flex-end;justify-content:space-between;padding:12px;font-weight:700;border:1px solid var(--line)}
+.pal{display:flex;border-radius:12px;overflow:hidden;height:64px;margin-top:6px}
+.pal div{flex:1;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;font-size:.72rem;cursor:pointer;font-weight:700;direction:ltr}
+.codes{display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;direction:ltr}
+.codes input{font-family:Consolas,monospace}
+.cr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.demo{border-radius:12px;padding:14px;border:1px solid var(--line)}
+.ok{color:#90e0a0}.bad{color:#ff8fab}
+#img{max-width:100%;border-radius:12px;cursor:crosshair;display:none;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🎨 מעבדת הצבעים</h1>
+<p class="sub">בוחרים צבע ומקבלים HEX/RGB/HSL, פלטות מתאימות, גוונים, בדיקת ניגודיות לנגישות ושליפת צבעים מתמונה.</p>
+<div class="grid2">
+  <div class="panel">
+    <div class="sw" id="sw"><span id="nm"></span><input type="color" id="pick"></div>
+    <div class="codes" style="margin-top:12px">
+      <b>HEX</b><input id="hex"><button data-cp="hex">📋</button>
+      <b>RGB</b><input id="rgb"><button data-cp="rgb">📋</button>
+      <b>HSL</b><input id="hsl"><button data-cp="hsl">📋</button>
+    </div>
+    <button id="rnd" style="margin-top:10px">🎲 צבע אקראי</button>
+  </div>
+  <div class="panel">
+    <h2>פלטות מתאימות</h2>
+    <div id="pals"></div>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel">
+    <h2>בדיקת ניגודיות (WCAG)</h2>
+    <div class="row"><label>טקסט<input type="color" id="fg" value="#ffffff"></label><label>רקע<input type="color" id="bg"></label><button id="swap">⇄</button></div>
+    <div class="demo" id="demo" style="margin-top:10px"><b style="font-size:1.3rem">כותרת לדוגמה</b><p style="margin:4px 0 0">טקסט רגיל לבדיקה אם קל לקרוא אותו.</p></div>
+    <p id="ratio" style="margin:10px 0 0;line-height:1.8"></p>
+  </div>
+  <div class="panel">
+    <h2>שליפת צבעים מתמונה</h2>
+    <input type="file" id="file" accept="image/*">
+    <canvas id="img"></canvas>
+    <div class="pal" id="imgpal" style="display:none"></div>
+    <p class="hint" style="margin-top:6px">לחיצה על התמונה בוחרת את הצבע בנקודה. התמונה לא יוצאת מהמחשב.</p>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const h2r=h=>{h=h.replace('#','');if(h.length===3)h=[...h].map(c=>c+c).join('');const n=parseInt(h,16);return[n>>16&255,n>>8&255,n&255]};
+const r2h=(r,g,b)=>'#'+[r,g,b].map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join('');
+function r2l(r,g,b){r/=255;g/=255;b/=255;const M=Math.max(r,g,b),m=Math.min(r,g,b),l=(M+m)/2;let h=0,s=0;if(M!==m){const d=M-m;s=l>.5?d/(2-M-m):d/(M+m);h=M===r?(g-b)/d+(g<b?6:0):M===g?(b-r)/d+2:(r-g)/d+4;h*=60}return[Math.round(h),Math.round(s*100),Math.round(l*100)]}
+function l2r(h,s,l){s/=100;l/=100;const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,9-k(n),1));return[f(0)*255,f(8)*255,f(4)*255]}
+const hsl2hex=(h,s,l)=>r2h(...l2r(((h%360)+360)%360,clamp(s,0,100),clamp(l,0,100)));
+const lum=hex=>{const c=h2r(hex).map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]};
+const ratio=(a,b)=>{const x=lum(a),y=lum(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+const txt=hex=>lum(hex)>.35?'#140f2b':'#ffffff';
+const NAMES=[[0,'אדום'],[20,'כתום'],[45,'צהוב'],[70,'ירוק־צהוב'],[100,'ירוק'],[160,'טורקיז'],[195,'תכלת'],[225,'כחול'],[260,'סגול'],[290,'סגלגל'],[320,'ורוד'],[345,'אדום']];
+function name(h,s,l){if(l<12)return'שחור';if(l>92)return'לבן';if(s<12)return'אפור';const n=[...NAMES].reverse().find(([d])=>h>=d)[1];return(l<35?n+' כהה':l>70?n+' בהיר':n)}
+let cur='#7c5cff';
+function set(hex,from){cur=hex.toLowerCase();const[r,g,b]=h2r(cur),[h,s,l]=r2l(r,g,b);
+  if(from!=='hex')$('hex').value=cur;if(from!=='rgb')$('rgb').value=`rgb(${r}, ${g}, ${b})`;if(from!=='hsl')$('hsl').value=`hsl(${h}, ${s}%, ${l}%)`;
+  $('pick').value=cur;$('sw').style.background=cur;$('sw').style.color=txt(cur);$('nm').textContent=name(h,s,l);$('bg').value=cur;
+  const P={'משלים':[h,h+180],'אנלוגי':[h-30,h-15,h,h+15,h+30],'משולש':[h,h+120,h+240],'מפוצל':[h,h+150,h+210],'ריבועי':[h,h+90,h+180,h+270]};
+  const sh=[92,80,65,l,40,28,15].map(L=>hsl2hex(h,s,L));
+  $('pals').innerHTML=Object.entries(P).map(([n,hs])=>`<div class="muted" style="font-size:.85rem;margin-top:8px">${n}</div><div class="pal">${hs.map(x=>hsl2hex(x,s,l)).map(c=>`<div style="background:${c};color:${txt(c)}" data-c="${c}">${c}</div>`).join('')}</div>`).join('')+
+    `<div class="muted" style="font-size:.85rem;margin-top:8px">גוונים (בהיר עד כהה)</div><div class="pal">${sh.map(c=>`<div style="background:${c};color:${txt(c)}" data-c="${c}">${c}</div>`).join('')}</div>`;
+  contrast();try{localStorage.setItem('color',cur)}catch{}}
+function contrast(){const f=$('fg').value,b=$('bg').value,r=ratio(f,b);$('demo').style.cssText=`background:${b};color:${f};margin-top:10px`;
+  const m=(ok,t)=>`<span class="${ok?'ok':'bad'}">${ok?'✔':'✘'} ${t}</span>`;$('ratio').innerHTML=`יחס ניגודיות: <b>${r.toFixed(2)}:1</b><br>${m(r>=4.5,'AA טקסט רגיל')} · ${m(r>=3,'AA טקסט גדול')} · ${m(r>=7,'AAA')}`}
+$('pick').oninput=e=>set(e.target.value);
+$('hex').oninput=e=>{const v=e.target.value.trim();if(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v))set(v[0]==='#'?v:'#'+v,'hex')};
+$('rgb').oninput=e=>{const m=e.target.value.match(/\d+/g);if(m&&m.length>=3)set(r2h(+m[0],+m[1],+m[2]),'rgb')};
+$('hsl').oninput=e=>{const m=e.target.value.match(/\d+/g);if(m&&m.length>=3)set(hsl2hex(+m[0],+m[1],+m[2]),'hsl')};
+document.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{navigator.clipboard.writeText($(b.dataset.cp).value);b.textContent='✓';setTimeout(()=>b.textContent='📋',1000)});
+document.addEventListener('click',e=>{const c=e.target.dataset.c;if(c){set(c);navigator.clipboard&&navigator.clipboard.writeText(c)}});
+$('rnd').onclick=()=>set(hsl2hex(Math.random()*360,50+Math.random()*40,40+Math.random()*25));
+$('fg').oninput=contrast;$('bg').oninput=contrast;$('swap').onclick=()=>{const t=$('fg').value;$('fg').value=$('bg').value;$('bg').value=t;contrast()};
+const cv=$('img'),cx=cv.getContext('2d',{willReadFrequently:true});
+$('file').onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{const sc=Math.min(1,600/im.width);cv.width=im.width*sc;cv.height=im.height*sc;cx.drawImage(im,0,0,cv.width,cv.height);cv.style.display='block';
+  const d=cx.getImageData(0,0,cv.width,cv.height).data,b={};for(let i=0;i<d.length;i+=16){const k=(d[i]>>5)+','+(d[i+1]>>5)+','+(d[i+2]>>5);(b[k]=b[k]||[0,0,0,0]);b[k][0]+=d[i];b[k][1]+=d[i+1];b[k][2]+=d[i+2];b[k][3]++}
+  const top=Object.values(b).sort((a,c)=>c[3]-a[3]).slice(0,6).map(([r,g,bb,n])=>r2h(r/n,g/n,bb/n));$('imgpal').style.display='flex';$('imgpal').innerHTML=top.map(c=>`<div style="background:${c};color:${txt(c)}" data-c="${c}">${c}</div>`).join('');URL.revokeObjectURL(im.src)};im.src=URL.createObjectURL(f)};
+cv.onclick=e=>{const r=cv.getBoundingClientRect(),p=cx.getImageData((e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height,1,1).data;set(r2h(p[0],p[1],p[2]))};
+let saved;try{saved=localStorage.getItem('color')}catch{}set(saved||cur);
+</script>
+</div>
+</body>
+</html>

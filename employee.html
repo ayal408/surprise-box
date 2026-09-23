@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>זכויות עובד</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#4cc9f0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>👔 זכויות עובד: חופשה, הבראה ופיצויים</h1>
+<p class="sub">לפי תאריך תחילת עבודה ושכר: ימי חופשה שנתיים, דמי הבראה, צבירת ימי מחלה, פיצויי פיטורין והחלק הפטור ממס.</p>
+<div class="grid2">
+  <div class="panel">
+    <label>תחילת עבודה<input type="date" id="st" value="2019-03-01"></label>
+    <label style="margin-top:8px">תאריך סיום / חישוב<input type="date" id="en"></label>
+    <div class="row" style="margin-top:8px"><label style="flex:1">שכר חודשי אחרון (₪)<input id="sal" type="number" value="12000"></label><label style="flex:1">היקף משרה (%)<input id="pct" type="number" value="100"></label></div>
+    <div class="row" style="margin-top:8px"><label style="flex:1">שבוע עבודה<select id="wk"><option value="5">5 ימים</option><option value="6">6 ימים</option></select></label><label style="flex:1">מגזר<select id="sec"><option value="p">פרטי (418 ₪ ליום הבראה)</option><option value="g">ציבורי (471.4 ₪)</option></select></label></div>
+    <label class="inline" style="margin-top:8px"><input type="checkbox" id="s14" checked> יש סעיף 14 (הפקדות לפיצויים במקום פיצויים)</label>
+  </div>
+  <div class="panel">
+    <div class="stats">
+      <div class="stat"><small>ותק</small><b id="vetek" style="font-size:1.1rem"></b></div>
+      <div class="stat"><small>ימי חופשה בשנה</small><b id="vac"></b></div>
+      <div class="stat"><small>ימי הבראה בשנה</small><b id="hbd"></b></div>
+      <div class="stat"><small>דמי הבראה שנתיים</small><b id="hb"></b></div>
+      <div class="stat"><small>ימי מחלה שנצברו</small><b id="sick"></b></div>
+      <div class="stat"><small>שווי יום עבודה</small><b id="day"></b></div>
+    </div>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel">
+    <h2>💼 פיצויי פיטורין</h2>
+    <table><tbody id="sev"></tbody></table>
+    <p class="hint" style="margin-top:8px" id="s14n"></p>
+  </div>
+  <div class="panel">
+    <h2>📋 טבלת זכאות לפי ותק</h2>
+    <table><thead><tr><th>שנה</th><th class="num">חופשה (5 ימים)</th><th class="num">חופשה (6 ימים)</th><th class="num">הבראה (פרטי)</th></tr></thead><tbody id="tbl"></tbody></table>
+  </div>
+</div>
+<p class="hint">חופשה לפי חוק חופשה שנתית (ימי עבודה, לפי התיקון מ־2017). הבראה לפי צו ההרחבה במגזר הפרטי, אחרי שנת עבודה ראשונה, באופן יחסי להיקף המשרה. תקרת הפטור ממס על פיצויים: 13,750 ₪ לכל שנת עבודה (2025–2027). הסכם קיבוצי, צו הרחבה ענפי או חוזה אישי עשויים לתת יותר. לחישוב גמר חשבון מלא כדאי לבדוק מול רואה חשבון או יועץ שכר.</p>
+<script>
+const $=id=>document.getElementById(id);
+const V5=[12,12,12,12,12,14,15,16,17,18,19,20,20,20],V6=[14,14,14,14,14,16,18,19,20,21,22,23,24,24];
+const HB=y=>y<1?0:y<2?5:y<4?6:y<11?7:y<16?8:y<20?9:10;
+const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');
+const P=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+function calc(){const s=P($('st').value),e=$('en').value?P($('en').value):new Date(),sal=+$('sal').value||0,pc=(+$('pct').value||100)/100,wk=+$('wk').value;
+  const years=Math.max(0,(e-s)/(365.25*864e5)),yi=Math.floor(years),mo=Math.floor((years-yi)*12);
+  $('vetek').textContent=`${yi} שנים ו־${mo} חודשים`;
+  const vac=(wk===5?V5:V6)[Math.min(yi,13)];$('vac').textContent=vac;
+  const hbd=HB(years),rate=$('sec').value==='p'?418:471.4;$('hbd').textContent=hbd;$('hb').textContent=f(hbd*rate*pc);
+  $('sick').textContent=Math.min(90,Math.floor(years*18))+' / 90';$('day').textContent=f(sal/(wk===5?21.67:25));
+  const sev=sal*years,cap=13750*years,ex=Math.min(sev,cap);
+  $('sev').innerHTML=[['שכר קובע',f(sal)],['שנות עבודה',years.toFixed(2)],['פיצויים (שכר × שנים)',f(sev)],['תקרת פטור ממס',f(cap)],['חלק פטור',f(ex)],['חלק חייב במס',f(Math.max(0,sev-cap))]].map(([a,b])=>`<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('');
+  $('s14n').textContent=$('s14').checked?'כשיש סעיף 14 וההפקדות היו מלאות (8.33%), הכספים בקופת הפיצויים באים במקום תשלום הפיצויים, והמעסיק בדרך כלל לא משלים. אם ההפקדה הייתה 6%, ייתכן שיש השלמה.':'בלי סעיף 14, המעסיק משלם את ההפרש בין הצבירה בקופה לבין שכר אחרון × שנות עבודה.';
+  $('tbl').innerHTML=[1,2,3,4,5,6,7,8,9,10,11,12,13,14].map(y=>`<tr style="${y===yi+1?'background:rgba(76,201,240,.12)':''}"><td>${y}${y===14?'+':''}</td><td class="num">${V5[y-1]}</td><td class="num">${V6[y-1]}</td><td class="num">${HB(y)}</td></tr>`).join('');
+  try{localStorage.setItem('employee',JSON.stringify(['st','en','sal','pct','wk','sec'].map(k=>$(k).value)))}catch{}}
+try{const s=JSON.parse(localStorage.getItem('employee'));if(s)['st','en','sal','pct','wk','sec'].forEach((k,i)=>$(k).value=s[i])}catch{}
+document.querySelectorAll('input,select').forEach(i=>i.oninput=calc);calc();
+</script>
+</div>
+</body>
+</html>

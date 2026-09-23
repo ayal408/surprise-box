@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מפת השמיים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#9bd1ff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1000px!important}
+.skybox{position:relative;width:min(100%,640px);aspect-ratio:1;margin:0 auto}
+canvas{width:100%;height:100%;display:block}
+#tip{position:absolute;pointer-events:none;background:#1d1840;border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-size:.85rem;display:none;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>✨ מפת השמיים הלילה</h1>
+<p class="sub">מה רואים בשמיים עכשיו מהמיקום שלך: הכוכבים הבהירים, קבוצות הכוכבים והירח, כמו שהם נראים כשמסתכלים למעלה. אפשר לגלגל את השעה ולראות איך השמיים מסתובבים.</p>
+<div class="panel row">
+  <label style="flex:1;min-width:140px">מיקום<select id="city"><option value="31.778,35.235">ירושלים</option><option value="32.083,34.833">בני ברק / תל אביב</option><option value="32.794,34.989">חיפה</option><option value="31.252,34.791">באר שבע</option><option value="29.557,34.952">אילת</option><option value="51.507,-0.128">לונדון</option><option value="40.65,-73.95">ניו יורק</option></select></label>
+  <button id="gps" style="align-self:end">📍 המיקום שלי</button>
+  <label class="inline" style="align-self:end"><input type="checkbox" id="lines" checked> קווי קבוצות</label>
+  <label class="inline" style="align-self:end"><input type="checkbox" id="names" checked> שמות</label>
+</div>
+<div class="panel">
+  <div class="skybox"><canvas id="cv" width="1280" height="1280"></canvas><div id="tip"></div></div>
+  <div class="row" style="justify-content:center;margin-top:10px"><button data-h="-1">→ שעה</button><button id="now">עכשיו</button><button data-h="1">שעה ←</button><button id="play">▶ הרצת זמן</button></div>
+  <input type="range" id="sl" min="-12" max="12" step="0.1" value="0" style="width:100%">
+  <div class="muted" id="when" style="text-align:center"></div>
+</div>
+<div class="panel"><h2>🔭 מה שווה לחפש עכשיו</h2><div id="vis" class="row" style="gap:6px"></div></div>
+<p class="hint">המפה מציגה את כל כיפת השמיים: המרכז הוא הנקודה שמעל הראש, והעיגול החיצוני הוא האופק. מחזיקים את המסך מעל הראש כשהצפון (צ) פונה צפונה. כוכבי לכת לא מוצגים. גם בעיר עם זיהום אור רואים את הכוכבים הבהירים.</p>
+<script>
+const $=id=>document.getElementById(id),cv=$('cv'),x=cv.getContext('2d'),R=Math.PI/180;
+// [name, RA hours, Dec deg, magnitude]
+const S=[['סיריוס',6.752,-16.716,-1.46],['קנופוס',6.399,-52.696,-.74],['ארקטורוס',14.261,19.182,-.05],['וגה',18.616,38.784,.03],['קפלה',5.278,45.998,.08],['ריגל',5.242,-8.202,.13],['פרוקיון',7.655,5.225,.34],['בטלגז',5.919,7.407,.5],['אכרנר',1.629,-57.237,.46],['אלטאיר',19.846,8.868,.76],['אלדברן',4.599,16.509,.86],['אנטארס',16.49,-26.432,.96],['ספיקה',13.42,-11.161,.97],['פולוקס',7.755,28.026,1.14],['פומלהאוט',22.961,-29.622,1.16],['דנב',20.69,45.28,1.25],['רגולוס',10.139,11.967,1.35],['קסטור',7.577,31.888,1.58],['בלטריקס',5.419,6.35,1.64],['אלנילם',5.604,-1.202,1.69],['אלניטק',5.679,-1.943,1.77],['מינטקה',5.533,-.299,2.23],['סאיף',5.796,-9.67,2.07],['כוכב הצפון',2.53,89.264,1.98],['דובהה',11.062,61.751,1.79],['מרק',11.031,56.382,2.37],['פקדה',11.897,53.695,2.44],['מגרז',12.257,57.033,3.31],['אליות',12.9,55.96,1.77],['מיצר',13.399,54.925,2.23],['אלקאיד',13.792,49.313,1.86],['שדר',.675,56.537,2.24],['קף',.153,59.15,2.28],['גמא קסיופאה',.945,60.717,2.15],['רוכבה',1.43,60.235,2.68],['סגין',1.907,63.67,3.35],['שאולה',17.56,-37.104,1.62],['סרגס',17.622,-42.998,1.86],['דשובה',16.006,-22.622,2.29],['אקרב',16.091,-19.806,2.62],['סדר',20.37,40.257,2.23],['אלביראו',19.512,27.96,3.05],['גיינה',20.77,33.97,2.48],['דלתא ברבור',19.75,45.131,2.87],['דנבולה',11.818,14.572,2.14],['אלגייבה',10.333,19.842,2.08],['זוסמה',11.235,20.524,2.56],['צ׳רטן',11.237,15.43,3.33],['אתא אריה',10.122,16.763,3.49],['ראס אלאסד',9.764,23.774,2.98],['שליאק',18.835,33.363,3.52],['סולפט',18.982,32.69,3.25],['זטא נבל',18.746,37.605,4.3],['אלקיונה (כימה)',3.791,24.105,2.87],['מרקב',23.079,15.205,2.49],['שאט',23.063,28.083,2.42],['אלגניב',.221,15.184,2.83],['אלפרץ',.14,29.091,2.06],['אלנת',5.438,28.608,1.65],['מירח',1.162,35.621,2.05],['אלמך',2.065,42.33,2.1],['מירפק',3.405,49.861,1.79],['אלגול',3.136,40.956,2.1],['ראס אלחג׳ה',17.582,12.56,2.07],['נונקי',18.921,-26.297,2.05],['קאוס אוסטרליס',18.403,-34.385,1.85],['אלפא צנטאורי',14.66,-60.835,-.27],['הדר',14.064,-60.373,.61],['אקרוקס',12.443,-63.099,.76],['מימוזה',12.795,-59.689,1.25],['גמא צלב',12.519,-57.113,1.63],['דלתא צלב',12.252,-58.749,2.8]];
+const LINES={'אוריון':[['בטלגז','בלטריקס'],['בטלגז','אלניטק'],['בלטריקס','מינטקה'],['מינטקה','אלנילם'],['אלנילם','אלניטק'],['אלניטק','סאיף'],['מינטקה','ריגל']],'העגלה הגדולה':[['דובהה','מרק'],['מרק','פקדה'],['פקדה','מגרז'],['מגרז','דובהה'],['מגרז','אליות'],['אליות','מיצר'],['מיצר','אלקאיד']],'קסיופאה':[['קף','שדר'],['שדר','גמא קסיופאה'],['גמא קסיופאה','רוכבה'],['רוכבה','סגין']],'עקרב':[['אקרב','דשובה'],['דשובה','אנטארס'],['אנטארס','שאולה'],['שאולה','סרגס']],'ברבור':[['דנב','סדר'],['סדר','אלביראו'],['גיינה','סדר'],['סדר','דלתא ברבור']],'אריה':[['רגולוס','אתא אריה'],['אתא אריה','אלגייבה'],['אלגייבה','ראס אלאסד'],['אלגייבה','זוסמה'],['זוסמה','דנבולה'],['דנבולה','צ׳רטן'],['צ׳רטן','רגולוס']],'נבל':[['וגה','זטא נבל'],['זטא נבל','שליאק'],['שליאק','סולפט'],['סולפט','זטא נבל']],'פגסוס ואנדרומדה':[['מרקב','שאט'],['שאט','אלפרץ'],['אלפרץ','אלגניב'],['אלגניב','מרקב'],['אלפרץ','מירח'],['מירח','אלמך']],'תאומים':[['קסטור','פולוקס']],'המשולש הקיצי':[['וגה','דנב'],['דנב','אלטאיר'],['אלטאיר','וגה']],'הצלב הדרומי':[['אקרוקס','גמא צלב'],['מימוזה','דלתא צלב']]};
+const byN=Object.fromEntries(S.map(s=>[s[0],s]));
+let lat=31.778,lon=35.235,off=0,play=null,pts=[];
+function jd(d){return d/864e5+2440587.5}
+function lst(d){const J=jd(d)-2451545;return((280.46061837+360.98564736629*J+lon)%360+360)%360}
+function altaz(ra,dec,d){const H=(lst(d)-ra*15)*R,dc=dec*R,la=lat*R;const alt=Math.asin(Math.sin(dc)*Math.sin(la)+Math.cos(dc)*Math.cos(la)*Math.cos(H));
+  const az=Math.atan2(-Math.sin(H)*Math.cos(dc),Math.sin(dc)*Math.cos(la)-Math.cos(dc)*Math.sin(la)*Math.cos(H));return[alt/R,((az/R)+360)%360]}
+function moonRaDec(d){const T=(jd(d)-2451545)/36525,L=(218.316+481267.881*T)%360,M=(134.963+477198.867*T)%360,F=(93.272+483202.018*T)%360;const lam=(L+6.289*Math.sin(M*R))*R,bet=5.128*Math.sin(F*R)*R,e=23.44*R;
+  const ra=Math.atan2(Math.sin(lam)*Math.cos(e)-Math.tan(bet)*Math.sin(e),Math.cos(lam)),dec=Math.asin(Math.sin(bet)*Math.cos(e)+Math.cos(bet)*Math.sin(e)*Math.sin(lam));return[((ra/R+360)%360)/15,dec/R]}
+function sunAlt(d){const n=jd(d)-2451545,L=(280.46+.9856474*n)%360,g=(357.528+.9856003*n)*R,lam=(L+1.915*Math.sin(g)+.02*Math.sin(2*g))*R,e=23.44*R;const ra=Math.atan2(Math.cos(e)*Math.sin(lam),Math.cos(lam)),dec=Math.asin(Math.sin(e)*Math.sin(lam));return altaz(((ra/R+360)%360)/15,dec/R,d)[0]}
+const W=1280,C=W/2,RR=W/2*.94;
+function proj(alt,az){const r=RR*(90-alt)/90,a=az*R;return[C-r*Math.sin(a),C-r*Math.cos(a)]}
+function draw(){const d=new Date(Date.now()+off*36e5),sa=sunAlt(d);x.clearRect(0,0,W,W);
+  const sky=sa>-6?'#1b2a55':sa>-12?'#0f1636':'#060818';const g=x.createRadialGradient(C,C,0,C,C,RR);g.addColorStop(0,sky);g.addColorStop(1,sa>-6?'#2d3f78':'#0b0f28');x.fillStyle=g;x.beginPath();x.arc(C,C,RR,0,7);x.fill();
+  x.strokeStyle='rgba(255,255,255,.08)';x.lineWidth=1.5;[30,60].forEach(a=>{x.beginPath();x.arc(C,C,RR*(90-a)/90,0,7);x.stroke()});
+  x.strokeStyle='rgba(155,209,255,.5)';x.lineWidth=3;x.beginPath();x.arc(C,C,RR,0,7);x.stroke();
+  x.fillStyle='#9bd1ff';x.font='bold 36px Segoe UI';x.textAlign='center';x.textBaseline='middle';[['צ',0],['מז',90],['ד',180],['מע',270]].forEach(([t,a])=>{const[px,py]=proj(-4,a);x.fillText(t,px,py)});
+  const P={};pts=[];S.forEach(s=>{const[al,az]=altaz(s[1],s[2],d);if(al>-1){P[s[0]]=proj(al,az);pts.push([...P[s[0]],s[0],s[3],al])}});
+  if($('lines').checked){x.strokeStyle='rgba(155,209,255,.35)';x.lineWidth=2;Object.entries(LINES).forEach(([n,ls])=>{let any=false,sx=0,sy=0,k=0;ls.forEach(([a,b])=>{if(P[a]&&P[b]){any=true;x.beginPath();x.moveTo(...P[a]);x.lineTo(...P[b]);x.stroke();sx+=P[a][0]+P[b][0];sy+=P[a][1]+P[b][1];k+=2}});
+    if(any&&$('names').checked){x.fillStyle='rgba(155,209,255,.7)';x.font='italic 26px Segoe UI';x.fillText(n,sx/k,sy/k+34)}})}
+  pts.forEach(([px,py,n,m])=>{const r=Math.max(2.2,9-m*2.2);const gl=x.createRadialGradient(px,py,0,px,py,r*2.5);gl.addColorStop(0,'rgba(255,255,255,.9)');gl.addColorStop(1,'transparent');x.fillStyle=gl;x.beginPath();x.arc(px,py,r*2.5,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(px,py,r,0,7);x.fill();
+    if($('names').checked&&m<1.4){x.fillStyle='#e8e4ff';x.font='24px Segoe UI';x.fillText(n,px,py-r-16)}});
+  const[mra,mdec]=moonRaDec(d),[mal,maz]=altaz(mra,mdec,d);let moonUp=false;if(mal>-1){moonUp=true;const[px,py]=proj(mal,maz);x.fillStyle='#fffbe6';x.shadowColor='#fffbe6';x.shadowBlur=30;x.beginPath();x.arc(px,py,20,0,7);x.fill();x.shadowBlur=0;x.fillStyle='#fffbe6';x.font='bold 26px Segoe UI';x.fillText('הירח',px,py+40);pts.push([px,py,'הירח',-12,mal])}
+  $('when').textContent=d.toLocaleString('he-IL',{weekday:'long',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})+(sa>-6?' · עדיין מואר, הכוכבים יתחילו להופיע אחרי השקיעה':sa>-12?' · דמדומים':' · לילה');
+  $('vis').innerHTML=pts.filter(p=>p[3]<1.2&&p[4]>10).sort((a,b)=>a[3]-b[3]).map(p=>`<span class="tag">${p[2]} · ${Math.round(p[4])}° מעל האופק</span>`).join('')+Object.keys(LINES).filter(n=>LINES[n].some(([a,b])=>P[a]&&P[b])).map(n=>`<span class="tag">✦ ${n}</span>`).join('')}
+cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect(),mx=(e.clientX-r.left)*W/r.width,my=(e.clientY-r.top)*W/r.height;const h=pts.find(p=>Math.hypot(p[0]-mx,p[1]-my)<26);const t=$('tip');
+  if(h){t.style.display='block';t.style.left=(e.clientX-r.left+12)+'px';t.style.top=(e.clientY-r.top+12)+'px';t.textContent=`${h[2]} · בהירות ${h[3]>-10?h[3]:'—'} · גובה ${Math.round(h[4])}°`}else t.style.display='none'});
+$('city').onchange=()=>{[lat,lon]=$('city').value.split(',').map(Number);draw()};
+$('gps').onclick=()=>navigator.geolocation&&navigator.geolocation.getCurrentPosition(p=>{lat=p.coords.latitude;lon=p.coords.longitude;$('gps').textContent='📍 המיקום שלי ✓';draw()});
+document.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{off+=+b.dataset.h;$('sl').value=Math.max(-12,Math.min(12,off));draw()});
+$('sl').oninput=e=>{off=+e.target.value;draw()};$('now').onclick=()=>{off=0;$('sl').value=0;draw()};
+$('play').onclick=()=>{if(play){clearInterval(play);play=null;$('play').textContent='▶ הרצת זמן'}else{play=setInterval(()=>{off+=.05;if(off>12)off=-12;$('sl').value=off;draw()},40);$('play').textContent='⏸ עצירה'}};
+['lines','names'].forEach(k=>$(k).onchange=draw);
+draw();setInterval(()=>{if(!play&&!off)draw()},60000);
+</script>
+</div>
+</body>
+</html>

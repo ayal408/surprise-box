@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחולל אקראיות</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffb703}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.dice{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;min-height:80px;margin:10px 0}
+.die{width:64px;height:64px;background:#fff;border-radius:14px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:8px;box-shadow:0 4px 0 #bbb}
+.die i{width:12px;height:12px;border-radius:50%;background:#1d1840;place-self:center}
+.die.roll{animation:rl .5s}
+@keyframes rl{30%{transform:rotate(-25deg) scale(.85)}60%{transform:rotate(20deg) scale(1.1)}}
+.coin{width:110px;height:110px;border-radius:50%;margin:10px auto;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;background:radial-gradient(circle at 35% 30%,#ffe08a,#e0a200);color:#5a3d00;box-shadow:0 6px 0 #a67700,inset 0 0 0 6px rgba(255,255,255,.25)}
+.coin.flip{animation:fl .8s}
+@keyframes fl{50%{transform:rotateY(900deg) translateY(-40px)}}
+.win{font-size:2rem;font-weight:800;text-align:center;color:var(--acc);min-height:1.4em;margin:8px 0}
+.teams{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}
+.teams div{background:rgba(255,255,255,.05);border-radius:12px;padding:10px}
+.teams b{color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🎲 מחולל אקראיות</h1>
+<p class="sub">קוביות, מטבע, מספר אקראי, בחירת זוכה מרשימה וחלוקה הוגנת לקבוצות. לתורנויות, להגרלות ולמשחקים.</p>
+<div class="grid2">
+  <div class="panel">
+    <h2>🎲 קוביות</h2>
+    <div class="row"><label class="inline">כמות <input id="dn" type="number" value="2" min="1" max="12" style="width:70px"></label><button class="pri" id="roll">הטלה</button></div>
+    <div class="dice" id="dice"></div>
+    <div class="muted" id="dsum" style="text-align:center"></div>
+  </div>
+  <div class="panel">
+    <h2>🪙 מטבע</h2>
+    <div class="coin" id="coin">?</div>
+    <div class="row" style="justify-content:center"><button class="pri" id="flip">הטלת מטבע</button></div>
+    <div class="muted" id="cst" style="text-align:center;margin-top:8px"></div>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel">
+    <h2>🔢 מספר אקראי</h2>
+    <div class="row"><label style="flex:1">מ־<input id="lo" type="number" value="1"></label><label style="flex:1">עד<input id="hi" type="number" value="100"></label><label style="flex:1">כמה<input id="cnt" type="number" value="1" min="1"></label></div>
+    <label class="inline" style="margin-top:8px"><input type="checkbox" id="norep" checked> בלי חזרות</label>
+    <button class="pri" id="gen" style="margin-top:8px">הגרלה</button>
+    <div class="win" id="nums"></div>
+  </div>
+  <div class="panel">
+    <h2>🏆 בחירה מרשימה וקבוצות</h2>
+    <textarea id="names" rows="5" placeholder="שם בכל שורה">נועה
+אורי
+מאיה
+איתי
+תמר
+יונתן
+שירה
+דניאל</textarea>
+    <div class="row" style="margin-top:8px"><button class="pri" id="pick">בחירת זוכה</button><label class="inline">קבוצות <input id="tn" type="number" value="2" min="2" style="width:64px"></label><button id="teams">חלוקה</button></div>
+    <div class="win" id="winner"></div>
+    <div class="teams" id="tres"></div>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const R=n=>{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%n};
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=R(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+const die=v=>`<div class="die roll">${[...Array(9)].map((_,i)=>PIPS[v].includes(i)?'<i></i>':'<span></span>').join('')}</div>`;
+let AC,quiet=true;const click=()=>{if(quiet)return;try{AC=AC||new AudioContext();const o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.value=300+R(300);g.gain.setValueAtTime(.12,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+.08);o.connect(g).connect(AC.destination);o.start();o.stop(AC.currentTime+.08)}catch{}};
+$('roll').onclick=()=>{const n=Math.min(12,Math.max(1,+$('dn').value||1)),v=[...Array(n)].map(()=>R(6)+1);$('dice').innerHTML=v.map(die).join('');$('dsum').textContent=n>1?'סכום: '+v.reduce((a,b)=>a+b):'';click()};
+let heads=0,tails=0;
+$('flip').onclick=()=>{const c=$('coin');c.classList.remove('flip');void c.offsetWidth;c.classList.add('flip');c.textContent='';click();setTimeout(()=>{const h=R(2);h?heads++:tails++;c.textContent=h?'עץ 🌳':'פלי ₪';$('cst').textContent=`עץ ${heads} · פלי ${tails}`},420)};
+$('gen').onclick=()=>{let lo=Math.ceil(+$('lo').value),hi=Math.floor(+$('hi').value);if(hi<lo)[lo,hi]=[hi,lo];const span=hi-lo+1,n=Math.max(1,+$('cnt').value||1);
+  if($('norep').checked&&n>span){$('nums').textContent='אין מספיק מספרים בטווח';return}
+  let out;if($('norep').checked){const s=new Set();while(s.size<n)s.add(lo+R(span));out=[...s]}else out=[...Array(n)].map(()=>lo+R(span));
+  let k=0;const t=setInterval(()=>{$('nums').textContent=lo+R(span);click();if(++k>12){clearInterval(t);$('nums').textContent=out.join(' · ')}},55)};
+const names=()=>$('names').value.split('\n').map(s=>s.trim()).filter(Boolean);
+$('pick').onclick=()=>{const n=names();if(!n.length)return;let k=0;const t=setInterval(()=>{$('winner').textContent=n[R(n.length)];click();if(++k>18){clearInterval(t);$('winner').textContent='🎉 '+n[R(n.length)]}},70+k)};
+$('teams').onclick=()=>{const n=shuffle(names()),k=Math.max(2,+$('tn').value||2),T=[...Array(k)].map(()=>[]);n.forEach((x,i)=>T[i%k].push(x));
+  $('tres').innerHTML=T.map((t,i)=>`<div><b>קבוצה ${i+1}</b><br>${t.map(x=>x.replace(/</g,'&lt;')).join('<br>')}</div>`).join('');$('winner').textContent=''};
+$('roll').click();quiet=false;
+</script>
+</div>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>זמני היום</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffd166}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.now{font-size:1.1rem;text-align:center;line-height:1.7}
+.now b{color:var(--acc);font-size:1.5rem}
+table.z td:first-child{font-weight:600}
+table.z td small{display:block;color:var(--muted);font-weight:400;font-size:.78rem}
+table.z tr.past{opacity:.45}
+table.z tr.next td{background:rgba(255,209,102,.12)}
+.shab{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🕯️ זמני היום וזמני שבת</h1>
+<p class="sub">זמני היום לפי עיר: עלות השחר, הנץ, סוף זמן קריאת שמע ותפילה (מג״א והגר״א), חצות, מנחה, שקיעה וצאת הכוכבים. גם זמני כניסת שבת ויציאתה.</p>
+<div class="panel row">
+  <label style="flex:1;min-width:160px">עיר<select id="city"></select></label>
+  <label>תאריך<input type="date" id="dt"></label>
+  <button id="gps" style="align-self:end">📍 המיקום שלי</button>
+  <label style="align-self:end" class="inline">הדלקת נרות לפני השקיעה <input id="cl" type="number" value="18" style="width:70px"> דק׳</label>
+</div>
+<div class="panel now" id="now"></div>
+<div class="grid2">
+  <div class="panel">
+    <h2 id="title"></h2>
+    <table class="z"><tbody id="z"></tbody></table>
+  </div>
+  <div class="panel">
+    <h2 id="stitle">🕯️ שבת הקרובה</h2>
+    <div class="shab" id="shab"></div>
+    <h2 style="margin-top:16px">שעות זמניות</h2>
+    <table><tbody id="sh"></tbody></table>
+  </div>
+</div>
+<p class="hint">החישוב נעשה בדפדפן לפי מיקום השמש, בגובה פני הים, בלי תיקון לגובה העיר או להרים שמסתירים את האופק. עלות השחר וצאת הכוכבים לשיטת מג״א: 16.1°. צאת הכוכבים: 8.5°. ר״ת: 72 דקות. ייתכנו הפרשים של דקה או שתיים מהלוחות המקובלים. להלכה יש להסתמך על לוח מוסמך.</p>
+<script>
+const $=id=>document.getElementById(id);
+const CITIES=[['ירושלים',31.778,35.235,'Asia/Jerusalem',40],['בני ברק',32.0833,34.8333,'Asia/Jerusalem',18],['בית שמש',31.747,34.988,'Asia/Jerusalem',30],['מודיעין עילית',31.933,35.043,'Asia/Jerusalem',30],['ביתר עילית',31.697,35.116,'Asia/Jerusalem',40],['אלעד',32.052,34.951,'Asia/Jerusalem',18],['אשדוד',31.804,34.655,'Asia/Jerusalem',18],['פתח תקווה',32.087,34.887,'Asia/Jerusalem',18],['תל אביב',32.085,34.781,'Asia/Jerusalem',18],['נתניה',32.321,34.853,'Asia/Jerusalem',18],['חיפה',32.794,34.989,'Asia/Jerusalem',30],['רכסים',32.748,35.093,'Asia/Jerusalem',30],['צפת',32.965,35.496,'Asia/Jerusalem',30],['טבריה',32.795,35.531,'Asia/Jerusalem',30],['חריש',32.46,35.04,'Asia/Jerusalem',18],['באר שבע',31.252,34.791,'Asia/Jerusalem',18],['ערד',31.258,35.212,'Asia/Jerusalem',18],['אופקים',31.314,34.62,'Asia/Jerusalem',18],['לונדון',51.5074,-0.1278,'Europe/London',18],['ניו יורק (ברוקלין)',40.65,-73.95,'America/New_York',18],['אנטוורפן',51.2194,4.4025,'Europe/Brussels',18],['מנצ׳סטר',53.4808,-2.2426,'Europe/London',18]];
+let loc={n:'ירושלים',lat:31.778,lon:35.235,tz:'Asia/Jerusalem'};
+$('city').innerHTML=CITIES.map((c,i)=>`<option value="${i}">${c[0]}</option>`).join('');
+const R=Math.PI/180,sin=d=>Math.sin(d*R),cos=d=>Math.cos(d*R),tan=d=>Math.tan(d*R),asin=x=>Math.asin(x)/R,acos=x=>Math.acos(x)/R,atan=x=>Math.atan(x)/R,mod=(a,b)=>((a%b)+b)%b;
+function sun(y,m,d,lat,lon,zen,rising){const N=Math.round((Date.UTC(y,m,d)-Date.UTC(y,0,0))/864e5),lh=lon/15,t=N+((rising?6:18)-lh)/24,M=.9856*t-3.289;
+  const L=mod(M+1.916*sin(M)+.02*sin(2*M)+282.634,360);let RA=mod(atan(.91764*tan(L)),360);RA=(RA+Math.floor(L/90)*90-Math.floor(RA/90)*90)/15;
+  const sd=.39782*sin(L),cd=cos(asin(sd)),ch=(cos(zen)-sd*sin(lat))/(cd*cos(lat));if(ch>1||ch<-1)return null;
+  const H=(rising?360-acos(ch):acos(ch))/15,T=H+RA-.06571*t-6.622;let UT=T-lh;const noon=12-lh;while(UT<noon-12)UT+=24;while(UT>noon+12)UT-=24;return Date.UTC(y,m,d)+UT*36e5}
+function zm(date){const y=date.getFullYear(),m=date.getMonth(),d=date.getDate(),{lat,lon}=loc;const s=(z,r)=>sun(y,m,d,lat,lon,z,r);
+  const rise=s(90.833,1),set=s(90.833,0),alot=s(106.1,1),tz161=s(106.1,0),mis=s(101.5,1),tzeit=s(98.5,0);if(!rise||!set)return null;
+  const gra=(set-rise)/12,mga=(tz161-alot)/12;
+  return{rise,set,alot,mis,tzeit,gra,mga,list:[
+   ['עלות השחר','16.1° מתחת לאופק',alot],['משיכיר (זמן טלית ותפילין)','11.5°',mis],['הנץ החמה','זריחה מישורית',rise],
+   ['סוף זמן ק״ש – מג״א','3 שעות זמניות מעלות השחר',alot+3*mga],['סוף זמן ק״ש – הגר״א','3 שעות זמניות מהנץ',rise+3*gra],
+   ['סוף זמן תפילה – מג״א','4 שעות זמניות',alot+4*mga],['סוף זמן תפילה – הגר״א','4 שעות זמניות',rise+4*gra],
+   ['חצות היום והלילה','',rise+6*gra],['מנחה גדולה','חצות + חצי שעה זמנית',rise+6.5*gra],['מנחה קטנה','9.5 שעות זמניות',rise+9.5*gra],['פלג המנחה','10.75 שעות זמניות',rise+10.75*gra],
+   ['שקיעה','שקיעה מישורית',set],['צאת הכוכבים','8.5°',tzeit],['צאת הכוכבים – ר״ת','72 דקות אחרי השקיעה',set+72*6e4]]}}
+const T=ms=>ms?new Date(ms).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit',timeZone:loc.tz}):'—';
+const HM={Tishri:'תשרי',Heshvan:'חשוון',Kislev:'כסלו',Tevet:'טבת',Shevat:'שבט',Adar:'אדר','Adar I':'אדר א׳','Adar II':'אדר ב׳',Nisan:'ניסן',Iyar:'אייר',Sivan:'סיוון',Tamuz:'תמוז',Av:'אב',Elul:'אלול'};
+const HF=new Intl.DateTimeFormat('en-u-ca-hebrew',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});
+function gem(n){const o=['','א','ב','ג','ד','ה','ו','ז','ח','ט'],t=['','י','כ','ל','מ','נ','ס','ע','פ','צ'],h=['','ק','ר','ש','ת','תק','תר','תש','תת','תתק'];let s=h[n/100|0];const r=n%100;s+=r===15?'טו':r===16?'טז':t[r/10|0]+o[r%10];return s.length>1?s.slice(0,-1)+'״'+s.slice(-1):s+'׳'}
+function heb(d){const p=HF.formatToParts(new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))),g=k=>p.find(x=>x.type===k).value;return`${gem(+g('day'))} ${HM[g('month')]||g('month')} ${gem(+g('year')%1000)}`}
+const P=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+function render(){const date=P($('dt').value),z=zm(date);$('title').textContent=`${loc.n} · ${date.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'numeric'})} · ${heb(date)}`;
+  if(!z){$('z').innerHTML='<tr><td>אין זריחה או שקיעה בתאריך זה במיקום הזה</td></tr>';return}
+  const now=Date.now(),isToday=new Date().toDateString()===date.toDateString();let nextI=isToday?z.list.findIndex(r=>r[2]>now):-1;
+  $('z').innerHTML=z.list.map((r,i)=>`<tr class="${isToday&&r[2]<now?'past':''} ${i===nextI?'next':''}"><td>${r[0]}${r[1]?`<small>${r[1]}</small>`:''}</td><td class="num" style="font-size:1.15rem">${T(r[2])}</td></tr>`).join('');
+  $('now').innerHTML=isToday&&nextI>=0?`הזמן הבא: ${z.list[nextI][0]} בשעה <b>${T(z.list[nextI][2])}</b> · בעוד ${Math.floor((z.list[nextI][2]-now)/36e5)} שעות ו־${Math.round((z.list[nextI][2]-now)%36e5/6e4)} דקות`:isToday?'✨ לילה טוב':'זמני היום לתאריך שנבחר';
+  $('sh').innerHTML=[['שעה זמנית (גר״א)',Math.round(z.gra/6e4)+' דקות'],['שעה זמנית (מג״א)',Math.round(z.mga/6e4)+' דקות'],['אורך היום',Math.floor((z.set-z.rise)/36e5)+':'+String(Math.round((z.set-z.rise)%36e5/6e4)).padStart(2,'0')+' שעות']].map(([a,b])=>`<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('');
+  const fri=new Date(date);fri.setDate(fri.getDate()+((5-fri.getDay()+7)%7));const sat=new Date(fri);sat.setDate(sat.getDate()+1);const zf=zm(fri),zs=zm(sat),cl=+$('cl').value||18;
+  $('stitle').textContent=`🕯️ שבת ${fri.toLocaleDateString('he-IL',{day:'numeric',month:'numeric'})}–${sat.toLocaleDateString('he-IL',{day:'numeric',month:'numeric'})}`;
+  $('shab').innerHTML=zf&&zs?[['🕯️ הדלקת נרות',T(zf.set-cl*6e4)],['🌅 שקיעה ביום שישי',T(zf.set)],['⏰ סוף זמן ק״ש בשבת (מג״א)',T(zs.alot+3*zs.mga)],['⏰ סוף זמן ק״ש בשבת (גר״א)',T(zs.rise+3*zs.gra)],['✨ צאת השבת',T(zs.tzeit)],['✨ צאת השבת – ר״ת',T(zs.set+72*6e4)]].map(([a,b])=>`<div class="stat"><small>${a}</small><b>${b}</b></div>`).join(''):'';
+  try{localStorage.setItem('zmanim',JSON.stringify({loc,cl:$('cl').value}))}catch{}}
+$('city').onchange=()=>{const c=CITIES[+$('city').value];loc={n:c[0],lat:c[1],lon:c[2],tz:c[3]};$('cl').value=c[4];render()};
+$('gps').onclick=()=>{if(!navigator.geolocation)return;$('gps').textContent='📍 מאתר...';navigator.geolocation.getCurrentPosition(p=>{loc={n:'המיקום שלי',lat:p.coords.latitude,lon:p.coords.longitude,tz:Intl.DateTimeFormat().resolvedOptions().timeZone};$('gps').textContent='📍 המיקום שלי ✓';render()},()=>{$('gps').textContent='📍 אין הרשאה למיקום'})};
+$('dt').oninput=render;$('cl').oninput=render;
+const t=new Date();$('dt').value=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+try{const s=JSON.parse(localStorage.getItem('zmanim'));if(s){loc=s.loc;$('cl').value=s.cl;const i=CITIES.findIndex(c=>c[0]===loc.n);if(i>=0)$('city').value=i}}catch{}
+render();setInterval(()=>{if(new Date().toDateString()===P($('dt').value).toDateString())render()},30000);
+</script>
+</div>
+</body>
+</html>

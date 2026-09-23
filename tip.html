@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>טיפ וחלוקת חשבון</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff9f68}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.big{font-size:2.4rem;font-weight:800;color:var(--acc);text-align:center;margin:6px 0}
+.pp{display:grid;grid-template-columns:1fr 110px 36px;gap:6px;align-items:center;margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🍽️ טיפ וחלוקת חשבון</h1>
+<p class="sub">כמה טיפ להשאיר ואיך מתחלקים. אפשר לחלק שווה בשווה או לפי מה שכל אחד הזמין.</p>
+<div class="grid2">
+  <div class="panel">
+    <label>סכום החשבון (₪)<input id="bill" type="number" value="360" step="0.01"></label>
+    <div style="margin-top:12px" class="muted">אחוז טיפ: <b id="tpv" style="color:var(--ink)">12%</b></div>
+    <input id="tp" type="range" min="0" max="25" value="12" style="width:100%">
+    <div class="row"><button class="q" data-v="10">10%</button><button class="q" data-v="12">12%</button><button class="q" data-v="15">15%</button><button class="q" data-v="18">18%</button></div>
+    <label class="inline" style="margin-top:12px"><input type="checkbox" id="round"> לעגל את הסכום הכולל כלפי מעלה</label>
+    <label style="margin-top:12px">מספר סועדים<input id="ppl" type="number" value="4" min="1"></label>
+  </div>
+  <div class="panel">
+    <div class="stats"><div class="stat"><small>טיפ</small><b id="tip"></b></div><div class="stat"><small>סה״כ לתשלום</small><b id="tot"></b></div></div>
+    <div class="muted" style="text-align:center;margin-top:14px">כל אחד משלם</div>
+    <div class="big" id="each"></div>
+    <p class="hint" style="text-align:center">בישראל מקובל להשאיר 10%–15% בשירות שולחני. במקומות רבים מוסיפים את הטיפ לתשלום באשראי.</p>
+  </div>
+</div>
+<div class="panel">
+  <h2>חלוקה לפי הזמנה</h2>
+  <div id="pps"></div>
+  <div class="row"><button id="addp">+ סועד</button><label class="inline"><input type="checkbox" id="shared"> לחלק שווה בשווה את מה שלא שויך (שתייה, מנות משותפות)</label></div>
+  <table style="margin-top:10px"><thead><tr><th>שם</th><th class="num">הזמנה</th><th class="num">חלק משותף</th><th class="num">טיפ</th><th class="num">לתשלום</th></tr></thead><tbody id="res"></tbody></table>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const f=v=>'₪'+(Math.round(v*100)/100).toLocaleString('he-IL',{maximumFractionDigits:2});
+let P=[{n:'אני',a:95},{n:'דנה',a:110},{n:'אורי',a:78}];
+function calc(){const b=+$('bill').value||0,t=+$('tp').value;$('tpv').textContent=t+'%';let tot=b*(1+t/100);if($('round').checked)tot=Math.ceil(tot/10)*10;
+  $('tip').textContent=f(tot-b);$('tot').textContent=f(tot);$('each').textContent=f(tot/Math.max(1,+$('ppl').value||1));
+  document.querySelectorAll('.q').forEach(x=>x.classList.toggle('on',+x.dataset.v===t));
+  const sum=P.reduce((s,p)=>s+(+p.a||0),0),rest=Math.max(0,b-sum),share=$('shared').checked&&P.length?rest/P.length:0,ratio=b?tot/b:1;
+  $('res').innerHTML=P.map(p=>{const base=(+p.a||0)+share;return`<tr><td>${p.n.replace(/</g,'&lt;')||'—'}</td><td class="num">${f(+p.a||0)}</td><td class="num">${f(share)}</td><td class="num">${f(base*(ratio-1))}</td><td class="num"><b>${f(base*ratio)}</b></td></tr>`}).join('')+
+    (!$('shared').checked&&rest>0.01?`<tr><td colspan="5" class="muted">לא שויך: ${f(rest)} מתוך החשבון</td></tr>`:'')}
+function draw(){$('pps').innerHTML=P.map((p,i)=>`<div class="pp"><input data-i="${i}" data-k="n" value="${p.n.replace(/"/g,'&quot;')}" placeholder="שם"><input data-i="${i}" data-k="a" type="number" step="0.01" value="${p.a}" placeholder="₪"><button data-x="${i}" style="padding:6px">✕</button></div>`).join('');calc()}
+$('pps').oninput=e=>{const i=e.target.dataset.i;if(i!==undefined){P[i][e.target.dataset.k]=e.target.value;calc()}};
+$('pps').onclick=e=>{const x=e.target.dataset.x;if(x!==undefined){P.splice(+x,1);draw()}};
+$('addp').onclick=()=>{P.push({n:'',a:0});draw()};
+['bill','tp','round','ppl','shared'].forEach(k=>$(k).oninput=calc);
+document.querySelectorAll('.q').forEach(b=>b.onclick=()=>{$('tp').value=b.dataset.v;calc()});
+draw();
+</script>
+</div>
+</body>
+</html>

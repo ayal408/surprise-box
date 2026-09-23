@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ארגז כלים למפתחים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#5fc1cf}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+textarea,input.mono{font-family:Consolas,"Courier New",monospace;direction:ltr;text-align:left}
+textarea{width:100%;min-height:160px;font-size:.92rem}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.pane{display:none}
+.pane.on{display:block}
+.out{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:10px;padding:10px;font-family:Consolas,monospace;direction:ltr;text-align:left;white-space:pre-wrap;word-break:break-all;min-height:40px;font-size:.9rem}
+.err{color:#ff8fab}
+mark{background:#ffb703;color:#000;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🧑‍💻 ארגז כלים למפתחים</h1>
+<p class="sub">עיצוב ובדיקת JSON, Base64, קידוד URL, גיבובים (SHA), UUID, המרת Timestamp, בסיסי מספרים ובודק Regex. הכל רץ מקומית בדפדפן.</p>
+<div class="panel tabs" id="tabs">
+  <button class="on" data-p="json">{ } JSON</button><button data-p="b64">Base64</button><button data-p="url">URL</button><button data-p="hash">SHA</button><button data-p="uuid">UUID</button><button data-p="ts">Timestamp</button><button data-p="base">בסיסים</button><button data-p="re">Regex</button>
+</div>
+<div class="panel pane on" id="json">
+  <textarea id="ji">{"name":"קופסת ההפתעות","tools":20,"live":true,"tags":["כלים","משחקים"]}</textarea>
+  <div class="row" style="margin:8px 0"><button class="pri" id="jf">עיצוב</button><button id="jm">דחיסה</button><button id="js">מיון מפתחות</button><button id="jc">📋</button></div>
+  <div class="out" id="jo"></div>
+</div>
+<div class="panel pane" id="b64">
+  <textarea id="bi">שלום עולם! Hello</textarea>
+  <div class="row" style="margin:8px 0"><button class="pri" id="be">קידוד ←</button><button id="bd">→ פענוח</button><label class="inline"><input type="checkbox" id="bu"> URL-safe</label></div>
+  <div class="out" id="bo"></div>
+</div>
+<div class="panel pane" id="url">
+  <textarea id="ui">https://example.com/חיפוש?q=קופסת הפתעות&x=1</textarea>
+  <div class="row" style="margin:8px 0"><button class="pri" id="ue">encodeURIComponent</button><button id="uE">encodeURI</button><button id="ud">פענוח</button><button id="up">פירוק לחלקים</button></div>
+  <div class="out" id="uo"></div>
+</div>
+<div class="panel pane" id="hash">
+  <textarea id="hi">hello</textarea>
+  <div class="out" id="ho" style="margin-top:8px"></div>
+</div>
+<div class="panel pane" id="uuid">
+  <div class="row"><label class="inline">כמות <input id="un" type="number" value="5" min="1" max="100" style="width:80px"></label><label class="inline"><input type="checkbox" id="uup"> אותיות גדולות</label><button class="pri" id="ug">יצירה</button><button id="uc">📋</button></div>
+  <div class="out" id="uu" style="margin-top:8px"></div>
+</div>
+<div class="panel pane" id="ts">
+  <div class="row"><input class="mono" id="tv" style="flex:1"><button id="tnow">עכשיו</button></div>
+  <div class="out" id="to" style="margin-top:8px"></div>
+  <p class="hint" style="margin-top:6px">מזהה לבד שניות, מילישניות או תאריך טקסטואלי (ISO).</p>
+</div>
+<div class="panel pane" id="base">
+  <div class="grid2"><label>עשרוני<input class="mono bs" data-b="10" value="255"></label><label>הקסדצימלי<input class="mono bs" data-b="16"></label><label>בינארי<input class="mono bs" data-b="2"></label><label>אוקטלי<input class="mono bs" data-b="8"></label></div>
+</div>
+<div class="panel pane" id="re">
+  <div class="row"><input class="mono" id="rp" value="\d{2,3}-?\d{7}" style="flex:1"><input class="mono" id="rf" value="g" style="width:70px"></div>
+  <textarea id="rt" style="margin-top:8px;min-height:100px">טלפון: 052-1234567, בבית 031234567 ועוד 12-34</textarea>
+  <div class="out" id="ro" style="margin-top:8px"></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id===b.dataset.p))});
+const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const cp=(b,t)=>{navigator.clipboard.writeText(t);const o=b.textContent;b.textContent='✓';setTimeout(()=>b.textContent=o,1000)};
+function jrun(fn){try{const v=JSON.parse($('ji').value);$('jo').className='out';$('jo').textContent=fn(v)}catch(e){$('jo').className='out err';const m=/position (\d+)/.exec(e.message);let extra='';if(m){const p=+m[1],s=$('ji').value;const line=s.slice(0,p).split('\n').length;extra=`\nשורה ${line}: ...${s.slice(Math.max(0,p-20),p)}⟵ כאן`}$('jo').textContent='❌ JSON לא תקין: '+e.message+extra}}
+const sortK=v=>Array.isArray(v)?v.map(sortK):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,sortK(v[k])])):v;
+$('jf').onclick=()=>jrun(v=>JSON.stringify(v,null,2));$('jm').onclick=()=>jrun(v=>JSON.stringify(v));$('js').onclick=()=>jrun(v=>JSON.stringify(sortK(v),null,2));$('jc').onclick=e=>cp(e.target,$('jo').textContent);
+const b64e=s=>{const b=new TextEncoder().encode(s);let r='';b.forEach(x=>r+=String.fromCharCode(x));return btoa(r)};
+const b64d=s=>{s=s.trim().replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return new TextDecoder().decode(Uint8Array.from(atob(s),c=>c.charCodeAt(0)))};
+$('be').onclick=()=>{let r=b64e($('bi').value);if($('bu').checked)r=r.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');$('bo').className='out';$('bo').textContent=r};
+$('bd').onclick=()=>{try{$('bo').className='out';$('bo').textContent=b64d($('bi').value)}catch{$('bo').className='out err';$('bo').textContent='❌ Base64 לא תקין'}};
+$('ue').onclick=()=>$('uo').textContent=encodeURIComponent($('ui').value);$('uE').onclick=()=>$('uo').textContent=encodeURI($('ui').value);
+$('ud').onclick=()=>{try{$('uo').textContent=decodeURIComponent($('ui').value.replace(/\+/g,' '))}catch{$('uo').textContent='❌ קידוד לא תקין'}};
+$('up').onclick=()=>{try{const u=new URL($('ui').value.trim());$('uo').textContent=[['protocol',u.protocol],['host',u.host],['path',decodeURIComponent(u.pathname)],['hash',u.hash],...[...u.searchParams].map(([k,v])=>['?'+k,v])].map(([k,v])=>k.padEnd(10)+v).join('\n')}catch{$('uo').textContent='❌ כתובת לא תקינה'}};
+async function hash(){const d=new TextEncoder().encode($('hi').value);const out=[];for(const a of['SHA-1','SHA-256','SHA-384','SHA-512']){const h=await crypto.subtle.digest(a,d);out.push(a.padEnd(8)+[...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join(''))}$('ho').textContent=out.join('\n\n')}
+$('hi').oninput=hash;
+const uuid=()=>crypto.randomUUID?crypto.randomUUID():([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16));
+$('ug').onclick=()=>{const n=Math.min(100,Math.max(1,+$('un').value||1));let r=[...Array(n)].map(uuid).join('\n');if($('uup').checked)r=r.toUpperCase();$('uu').textContent=r};$('uc').onclick=e=>cp(e.target,$('uu').textContent);
+function ts(){const v=$('tv').value.trim();let d;if(/^-?\d+$/.test(v))d=new Date(v.length>11?+v:+v*1000);else d=new Date(v);
+  if(isNaN(d)){$('to').textContent='❌ לא זוהה תאריך';return}const rel=Math.round((d-Date.now())/1000);const rf=new Intl.RelativeTimeFormat('he',{numeric:'auto'});const [n,u]=Math.abs(rel)<60?[rel,'second']:Math.abs(rel)<3600?[Math.round(rel/60),'minute']:Math.abs(rel)<86400?[Math.round(rel/3600),'hour']:[Math.round(rel/86400),'day'];
+  $('to').textContent=[['Unix (s)',Math.floor(d/1000)],['Unix (ms)',+d],['ISO',d.toISOString()],['Local',d.toLocaleString('he-IL')],['UTC',d.toUTCString()],['יחסי',rf.format(n,u)]].map(([k,x])=>k.padEnd(10)+x).join('\n')}
+$('tv').oninput=ts;$('tnow').onclick=()=>{$('tv').value=Math.floor(Date.now()/1000);ts()};
+document.querySelectorAll('.bs').forEach(i=>i.oninput=()=>{const v=i.value.trim().replace(/^0x|^0b/i,'');let n;try{n=BigInt((i.dataset.b==16?'0x':i.dataset.b==2?'0b':i.dataset.b==8?'0o':'')+(v||'0'))}catch{i.style.outline='2px solid #ff4d6d';return}i.style.outline='';document.querySelectorAll('.bs').forEach(o=>{if(o!==i)o.value=n.toString(+o.dataset.b).toUpperCase()})});
+function re(){try{const r=new RegExp($('rp').value,$('rf').value);const t=$('rt').value;const ms=[...t.matchAll(new RegExp(r.source,r.flags.includes('g')?r.flags:r.flags+'g'))];
+  let h='',last=0;ms.forEach(m=>{h+=esc(t.slice(last,m.index))+'<mark>'+esc(m[0])+'</mark>';last=m.index+m[0].length});h+=esc(t.slice(last));
+  $('ro').innerHTML=`<b>${ms.length} התאמות</b>\n\n`+h+(ms.some(m=>m.length>1)?'\n\nקבוצות:\n'+ms.map((m,i)=>`#${i+1}: `+m.slice(1).map(esc).join(' | ')).join('\n'):'')}catch(e){$('ro').innerHTML='<span class="err">❌ '+esc(e.message)+'</span>'}}
+['rp','rf','rt'].forEach(k=>$(k).oninput=re);
+jrun(v=>JSON.stringify(v,null,2));hash();$('ug').click();$('tnow').click();document.querySelector('.bs').oninput();re();
+</script>
+</div>
+</body>
+</html>

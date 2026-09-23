@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>תאריכים עבריים במשפחה</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#c9a0ff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.it{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px;border-radius:14px;background:rgba(255,255,255,.04);margin-bottom:6px}
+.it .ic{font-size:1.6rem}
+.it .nx{text-align:left}
+.it .nx b{display:block;color:var(--acc)}
+.it.soon{outline:2px solid var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🕯️ ימי זיכרון וימי הולדת עבריים</h1>
+<p class="sub">רושמים פעם אחת את התאריך הלועזי, והכלי מחשב את התאריך העברי ומתי הוא יחול השנה: יארצייט, יום הולדת עברי ובר/בת מצווה.</p>
+<div class="panel">
+  <form id="f" class="row">
+    <input id="nm" placeholder="שם (למשל: סבא ר׳ משה ז״ל)" required style="flex:1;min-width:180px">
+    <select id="tp"><option value="y">🕯️ יארצייט</option><option value="b">🎂 יום הולדת עברי</option><option value="bm">📜 בר מצווה (13)</option><option value="bt">🌸 בת מצווה (12)</option></select>
+    <input type="date" id="dt" required>
+    <label class="inline" title="אחרי השקיעה היום העברי כבר התחלף"><input type="checkbox" id="ns"> אחרי השקיעה</label>
+    <button class="pri">הוספה</button>
+  </form>
+  <p class="hint" style="margin-top:8px" id="preview"></p>
+</div>
+<div class="panel"><h2>📅 בקרוב</h2><div id="list"></div></div>
+<div class="row"><button id="exp">⬇ גיבוי</button><button id="imp">⬆ שחזור</button><input type="file" id="file" accept=".json" hidden><button id="ics">📅 ייצוא ליומן (ICS)</button></div>
+<p class="hint">כללים: מי שנפטר באדר בשנה פשוטה, בשנה מעוברת מוצג היארצייט באדר ב׳ (יש שנוהגים גם באדר א׳, כדאי לשאול רב). תאריך ל׳ בחשוון או בכסלו, בשנה שאין בה ל׳, מוצג בכ״ט. בר ובת מצווה מחושבים לפי התאריך העברי של הלידה, 13 או 12 שנים אחרי.</p>
+<script>
+const $=id=>document.getElementById(id);
+const HM={Tishri:'תשרי',Heshvan:'חשוון',Kislev:'כסלו',Tevet:'טבת',Shevat:'שבט',Adar:'אדר','Adar I':'אדר א׳','Adar II':'אדר ב׳',Nisan:'ניסן',Iyar:'אייר',Sivan:'סיוון',Tamuz:'תמוז',Av:'אב',Elul:'אלול'};
+const HF=new Intl.DateTimeFormat('en-u-ca-hebrew',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});
+function gem(n){const o=['','א','ב','ג','ד','ה','ו','ז','ח','ט'],t=['','י','כ','ל','מ','נ','ס','ע','פ','צ'],h=['','ק','ר','ש','ת','תק','תר','תש','תת','תתק'];let s=h[n/100|0];const r=n%100;s+=r===15?'טו':r===16?'טז':t[r/10|0]+o[r%10];return s.length>1?s.slice(0,-1)+'״'+s.slice(-1):s+'׳'}
+const C={};function hd(d){const k=+d;if(C[k])return C[k];const p=HF.formatToParts(new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))),g=t=>p.find(x=>x.type===t).value;return C[k]={d:+g('day'),m:g('month'),y:+g('year')}}
+const add=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
+const P=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const hstr=h=>`${gem(h.d)} ${HM[h.m]} ${gem(h.y%1000)}`;
+const leap=y=>((7*y+1)%19)<7;
+const TY={y:['🕯️','יארצייט'],b:['🎂','יום הולדת עברי'],bm:['📜','בר מצווה'],bt:['🌸','בת מצווה']};
+let L;try{L=JSON.parse(localStorage.getItem('yahrzeit'))||[]}catch{L=[]}
+const save=()=>{try{localStorage.setItem('yahrzeit',JSON.stringify(L))}catch{}};
+function orig(x){let d=P(x.d);if(x.ns)d=add(d,1);return hd(d)}
+function target(o,hy){let m=o.m;if(m==='Adar I'||m==='Adar II'){if(!leap(hy))m='Adar'}else if(m==='Adar'&&leap(hy))m='Adar II';return{m,d:o.d}}
+function findDate(hy,t){// search the gregorian date in hebrew year hy with month t.m and day t.d (fallback to 29)
+  let d=new Date(hy-3761,0,1);d=add(d,-120);for(let i=0;i<520;i++,d=add(d,1)){const h=hd(d);if(h.y===hy&&h.m===t.m){if(h.d===t.d)return d;if(t.d===30&&h.d===29){const n=hd(add(d,1));if(n.m!==t.m)return d}}}return null}
+function next(x){const o=orig(x),now=new Date();now.setHours(0,0,0,0);const cy=hd(now).y;
+  if(x.t==='bm'||x.t==='bt'){const y=o.y+(x.t==='bm'?13:12);return{date:findDate(y,target(o,y)),h:{...target(o,y),y}}}
+  for(const y of[cy,cy+1]){const t=target(o,y),d=findDate(y,t);if(d&&d>=now)return{date:d,h:{...t,y},n:y-o.y}}return{}}
+function render(){const now=new Date();now.setHours(0,0,0,0);
+  const R=L.map((x,i)=>({x,i,...next(x)})).sort((a,b)=>(a.date||Infinity)-(b.date||Infinity));
+  $('list').innerHTML=R.map(({x,i,date,h,n})=>{const days=date?Math.round((date-now)/864e5):null;const past=days!==null&&days<0;
+    return`<div class="it ${days!==null&&days>=0&&days<=14?'soon':''}" style="${past?'opacity:.5':''}"><span class="ic">${TY[x.t][0]}</span><div><b>${x.n.replace(/</g,'&lt;')}</b><div class="muted" style="font-size:.85rem">${TY[x.t][1]} · ${hstr(orig(x))}${x.t==='y'&&n?` · שנה ${gem(n)}`:''}${x.t==='b'&&n?` · גיל ${n}`:''}</div></div>
+    <div class="nx">${date?`<b>${gem(h.d)} ${HM[h.m]}</b>${date.toLocaleDateString('he-IL',{weekday:'short',day:'numeric',month:'numeric',year:'2-digit'})}<div class="muted" style="font-size:.8rem">${days===0?'היום!':past?'עבר':'בעוד '+days+' ימים'}${x.t==='y'&&date?' · מתחיל בערב הקודם':''}</div>`:'—'}<button data-x="${i}" style="padding:2px 8px;margin-top:4px">✕</button></div></div>`}).join('')||'<p class="muted" style="text-align:center">עוד לא נוספו תאריכים</p>';save()}
+function prev(){if(!$('dt').value){$('preview').textContent='';return}const x={d:$('dt').value,ns:$('ns').checked};$('preview').textContent='התאריך העברי: '+hstr(orig(x))+($('ns').checked?' (אחרי השקיעה)':'')}
+$('f').onsubmit=e=>{e.preventDefault();L.push({n:$('nm').value,t:$('tp').value,d:$('dt').value,ns:$('ns').checked});$('nm').value='';render()};
+$('list').onclick=e=>{const i=e.target.dataset.x;if(i!==undefined&&confirm('למחוק?')){L.splice(+i,1);render()}};
+$('dt').oninput=prev;$('ns').onchange=prev;
+$('exp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(L)],{type:'application/json'}));a.download='תאריכים-עבריים.json';a.click()};
+$('imp').onclick=()=>$('file').click();$('file').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());if(Array.isArray(d)){L=d;render()}}catch{alert('קובץ לא תקין')}};
+$('ics').onclick=()=>{const ds=d=>d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');let s='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//surprise-box//yahrzeit//HE\r\n';
+  L.forEach((x,i)=>{const o=orig(x),cy=hd(new Date()).y;for(let y=cy;y<cy+10;y++){if((x.t==='bm'||x.t==='bt')&&y!==o.y+(x.t==='bm'?13:12))continue;const d=findDate(y,target(o,y));if(!d)continue;s+=`BEGIN:VEVENT\r\nUID:${i}-${y}@surprise-box\r\nDTSTART;VALUE=DATE:${ds(d)}\r\nDTEND;VALUE=DATE:${ds(add(d,1))}\r\nSUMMARY:${TY[x.t][1]} – ${x.n}\r\nEND:VEVENT\r\n`}});
+  s+='END:VCALENDAR';const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'text/calendar'}));a.download='תאריכים-עבריים.ics';a.click()};
+render();
+</script>
+</div>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>לוח ציור</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#4cc9f0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1200px!important}
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.bar button{padding:7px 11px;font-size:.95rem}
+.sw{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);cursor:pointer}
+.sw.on{outline:3px solid var(--ink);outline-offset:1px}
+.stage{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#fff;touch-action:none;height:68vh;position:relative}
+canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+.stage.dark{background:#1e1e24}
+.stage.grid{background-image:linear-gradient(rgba(0,0,0,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.07) 1px,transparent 1px);background-size:24px 24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🖍️ לוח ציור</h1>
+<p class="sub">לוח לבן להסברים, סקיצות ומשחקי ניחוש: עט, מרקר, קווים, מלבנים, עיגולים, חצים, טקסט, מחק, ביטול ושמירה כתמונה.</p>
+<div class="panel bar">
+  <button class="t on" data-t="pen">✏️ עט</button><button class="t" data-t="hl">🖍️ מרקר</button><button class="t" data-t="line">╱ קו</button><button class="t" data-t="arrow">➜ חץ</button><button class="t" data-t="rect">▭ מלבן</button><button class="t" data-t="ell">◯ עיגול</button><button class="t" data-t="text">A טקסט</button><button class="t" data-t="erase">🧽 מחק</button>
+  <span style="width:10px"></span>
+  <span id="sws" class="bar"></span><input type="color" id="cc" value="#7c5cff">
+  <label class="inline">עובי <input type="range" id="w" min="1" max="40" value="4" style="width:90px"></label>
+  <label class="inline"><input type="checkbox" id="fill"> מילוי</label>
+  <span style="width:10px"></span>
+  <button id="undo">↶</button><button id="redo">↷</button><button id="bg">🌓 רקע</button><button id="clr">🗑</button><button class="pri" id="save">💾 PNG</button>
+</div>
+<div class="stage" id="st"><canvas id="cv"></canvas></div>
+<p class="hint">Ctrl+Z ביטול · Ctrl+Y חזרה · Shift בזמן ציור צורה שומר על ריבוע או עיגול מושלם. הציור נשמר בדפדפן.</p>
+<script>
+const $=id=>document.getElementById(id),cv=$('cv'),x=cv.getContext('2d'),st=$('st');
+const SW=['#111111','#ff4d6d','#ffb703','#2bd67b','#4cc9f0','#7c5cff','#ff8fab','#ffffff'];
+let tool='pen',col='#111111',shapes=[],redo=[],cur=null,bgm=0;
+try{const s=JSON.parse(localStorage.getItem('wb'));if(s){shapes=s.shapes||[];bgm=s.bgm||0}}catch{}
+const save=()=>{try{localStorage.setItem('wb',JSON.stringify({shapes,bgm}))}catch{}};
+$('sws').innerHTML=SW.map(c=>`<span class="sw" data-c="${c}" style="background:${c}"></span>`).join('');
+function setCol(c){col=c;$('cc').value=c;document.querySelectorAll('.sw').forEach(s=>s.classList.toggle('on',s.dataset.c===c))}
+function size(){const d=devicePixelRatio||1;cv.width=st.clientWidth*d;cv.height=st.clientHeight*d;x.setTransform(d,0,0,d,0,0);draw()}
+function arrow(a,b,w){const ang=Math.atan2(b.y-a.y,b.x-a.x),h=Math.max(12,w*3);x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke();x.beginPath();x.moveTo(b.x,b.y);x.lineTo(b.x-h*Math.cos(ang-.45),b.y-h*Math.sin(ang-.45));x.lineTo(b.x-h*Math.cos(ang+.45),b.y-h*Math.sin(ang+.45));x.closePath();x.fillStyle=x.strokeStyle;x.fill()}
+function one(s){x.save();x.lineCap=x.lineJoin='round';x.lineWidth=s.w;x.strokeStyle=s.c;x.fillStyle=s.c;
+  if(s.t==='hl'){x.globalAlpha=.35;x.lineCap='butt'}if(s.t==='erase'){x.globalCompositeOperation='destination-out';x.lineWidth=s.w*3}
+  if(s.t==='pen'||s.t==='hl'||s.t==='erase'){const p=s.p;x.beginPath();x.moveTo(p[0].x,p[0].y);for(let i=1;i<p.length-1;i++){const mx=(p[i].x+p[i+1].x)/2,my=(p[i].y+p[i+1].y)/2;x.quadraticCurveTo(p[i].x,p[i].y,mx,my)}const l=p[p.length-1];x.lineTo(l.x+.01,l.y);x.stroke()}
+  else if(s.t==='line'){x.beginPath();x.moveTo(s.a.x,s.a.y);x.lineTo(s.b.x,s.b.y);x.stroke()}
+  else if(s.t==='arrow')arrow(s.a,s.b,s.w);
+  else if(s.t==='rect'){const r=[s.a.x,s.a.y,s.b.x-s.a.x,s.b.y-s.a.y];s.f?x.fillRect(...r):x.strokeRect(...r)}
+  else if(s.t==='ell'){x.beginPath();x.ellipse((s.a.x+s.b.x)/2,(s.a.y+s.b.y)/2,Math.abs(s.b.x-s.a.x)/2,Math.abs(s.b.y-s.a.y)/2,0,0,7);s.f?x.fill():x.stroke()}
+  else if(s.t==='text'){x.font=`700 ${10+s.w*3}px Segoe UI, Arial`;x.textAlign='right';x.direction='rtl';s.s.split('\n').forEach((l,i)=>x.fillText(l,s.a.x,s.a.y+i*(12+s.w*3)))}
+  x.restore()}
+function draw(){x.clearRect(0,0,cv.width,cv.height);shapes.forEach(one);if(cur)one(cur)}
+const pt=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+function constrain(a,b,e){if(!e.shiftKey)return b;const dx=b.x-a.x,dy=b.y-a.y;if(tool==='line'||tool==='arrow'){const ang=Math.round(Math.atan2(dy,dx)/(Math.PI/4))*Math.PI/4,l=Math.hypot(dx,dy);return{x:a.x+l*Math.cos(ang),y:a.y+l*Math.sin(ang)}}const m=Math.max(Math.abs(dx),Math.abs(dy));return{x:a.x+Math.sign(dx)*m,y:a.y+Math.sign(dy)*m}}
+cv.addEventListener('pointerdown',e=>{const p=pt(e),w=+$('w').value;
+  if(tool==='text'){const s=prompt('טקסט:');if(s){shapes.push({t:'text',a:p,s,c:col,w});redo=[];save();draw()}return}
+  cv.setPointerCapture(e.pointerId);cur=['pen','hl','erase'].includes(tool)?{t:tool,p:[p],c:col,w}:{t:tool,a:p,b:p,c:col,w,f:$('fill').checked}});
+cv.addEventListener('pointermove',e=>{if(!cur)return;const p=pt(e);if(cur.p)cur.p.push(p);else cur.b=constrain(cur.a,p,e);draw()});
+cv.addEventListener('pointerup',()=>{if(cur){shapes.push(cur);cur=null;redo=[];save();draw()}});
+document.querySelectorAll('.t').forEach(b=>b.onclick=()=>{tool=b.dataset.t;document.querySelectorAll('.t').forEach(y=>y.classList.toggle('on',y===b))});
+$('sws').onclick=e=>{if(e.target.dataset.c)setCol(e.target.dataset.c)};$('cc').oninput=e=>setCol(e.target.value);
+$('undo').onclick=()=>{if(shapes.length){redo.push(shapes.pop());save();draw()}};$('redo').onclick=()=>{if(redo.length){shapes.push(redo.pop());save();draw()}};
+$('clr').onclick=()=>{if(shapes.length&&confirm('לנקות את כל הלוח?')){redo=[...shapes].reverse();shapes=[];save();draw()}};
+function applyBg(){st.className='stage'+(bgm===1?' grid':bgm===2?' dark':'')}
+$('bg').onclick=()=>{bgm=(bgm+1)%3;applyBg();if(bgm===2&&col==='#111111')setCol('#ffffff');else if(bgm!==2&&col==='#ffffff')setCol('#111111');save()};
+$('save').onclick=()=>{const c=document.createElement('canvas');c.width=cv.width;c.height=cv.height;const y=c.getContext('2d');y.fillStyle=bgm===2?'#1e1e24':'#fff';y.fillRect(0,0,c.width,c.height);y.drawImage(cv,0,0);const a=document.createElement('a');a.download='לוח.png';a.href=c.toDataURL();a.click()};
+addEventListener('keydown',e=>{if(!(e.ctrlKey||e.metaKey))return;if(e.key==='z'){e.preventDefault();$('undo').click()}else if(e.key==='y'){e.preventDefault();$('redo').click()}});
+addEventListener('resize',size);applyBg();setCol(bgm===2?'#ffffff':'#111111');size();
+</script>
+</div>
+</body>
+</html>
