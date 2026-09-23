@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מי חייב למי</title>
+<style>
+:root{--paper:#fff;--ink:#222;--fade:#888}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#e4e1dc;color:var(--ink);font-family:"Courier New",Consolas,monospace;padding:24px 12px 50px;display:flex;justify-content:center}
+.receipt{width:100%;max-width:420px;background:var(--paper);padding:26px 22px 30px;position:relative;box-shadow:0 12px 30px rgba(0,0,0,.18);filter:drop-shadow(0 1px 0 #ddd)}
+.receipt::before,.receipt::after{content:"";position:absolute;left:0;right:0;height:12px;background:linear-gradient(-45deg,transparent 8px,var(--paper) 0) 0 0/16px 12px,linear-gradient(45deg,transparent 8px,var(--paper) 0) 0 0/16px 12px}
+.receipt::before{top:-12px;transform:scaleY(-1)}
+.receipt::after{bottom:-12px}
+.c{text-align:center}
+h1{margin:0;font-size:1.5rem;letter-spacing:2px}
+.dash{border:0;border-top:2px dashed #bbb;margin:14px 0}
+a{color:var(--fade);font-size:.8rem}
+input,select{font:inherit;border:0;border-bottom:1px dotted #999;background:transparent;padding:4px 2px;min-width:0;outline:0}
+input:focus,select:focus{border-bottom-color:#000}
+button{font:inherit;background:#222;color:#fff;border:0;padding:6px 10px;cursor:pointer;letter-spacing:1px}
+button.ln{background:none;color:var(--fade);padding:0 4px}
+.people{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid #222;padding:2px 8px;display:flex;gap:4px;align-items:center}
+.line{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:baseline;padding:3px 0}
+.line small{grid-column:1/-1;color:var(--fade);font-size:.75rem;margin-top:-4px}
+.r{direction:ltr;text-align:left;white-space:nowrap}
+.tot{display:flex;justify-content:space-between;font-weight:700;font-size:1.1rem}
+.add{display:grid;grid-template-columns:1fr 90px;gap:6px}
+.add .full{grid-column:1/-1}
+.who{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.85rem}
+.pay{font-weight:700;padding:4px 0;display:flex;justify-content:space-between;gap:6px}
+.bar{height:40px;background:repeating-linear-gradient(90deg,#222 0 2px,transparent 2px 4px,#222 4px 5px,transparent 5px 8px,#222 8px 11px,transparent 11px 12px);margin:16px auto 4px;width:80%}
+.muted{color:var(--fade);font-size:.8rem}
+@media print{body{background:none}.noprint{display:none}}
+</style>
+</head>
+<body>
+<div class="receipt">
+  <div class="c"><h1>מי חייב למי</h1><div class="muted">חלוקת הוצאות לקבוצה · טיול, דירה, ארוחה</div><div class="noprint" style="margin-top:6px"><a href="התחל כאן.html">« חזרה לקופסת ההפתעות</a></div></div>
+  <hr class="dash">
+  <div class="c muted" id="stamp"></div>
+  <input id="title" class="c" style="width:100%;text-align:center;font-weight:700;margin-top:6px" placeholder="שם האירוע">
+  <hr class="dash">
+  <b>משתתפים</b>
+  <div class="people" id="people" style="margin:8px 0"></div>
+  <form class="noprint" id="pf" style="display:flex;gap:6px"><input id="pn" placeholder="+ שם משתתף" style="flex:1"><button>הוסף</button></form>
+  <hr class="dash">
+  <b>הוצאות</b>
+  <div id="items" style="margin:6px 0"></div>
+  <form class="add noprint" id="xf">
+    <input id="xd" placeholder="על מה? (סופר, דלק...)" required>
+    <input id="xa" type="number" step="0.01" min="0" placeholder="₪" required>
+    <select id="xp" class="full"></select>
+    <div class="who full" id="xw"></div>
+    <button class="full">+ הוספת הוצאה</button>
+  </form>
+  <hr class="dash">
+  <div class="tot"><span>סה״כ</span><span class="r" id="total">0.00</span></div>
+  <div class="muted" id="per"></div>
+  <hr class="dash">
+  <b>התחשבנות (מספר העברות מינימלי)</b>
+  <div id="settle" style="margin-top:6px"></div>
+  <hr class="dash">
+  <div class="c noprint" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap"><button id="copy">📋 העתק לוואטסאפ</button><button onclick="print()">🖨 הדפס</button><button id="reset">🗑 חדש</button></div>
+  <div class="bar"></div>
+  <div class="c muted">תודה שהתחלקתם בהגינות ♥</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+let S;try{S=JSON.parse(localStorage.getItem('split'))}catch{}
+if(!S)S={t:'סופ״ש בצפון',p:['אביטל','יונתן','נועה','דניאל'],x:[{d:'צימר',a:1800,p:0,w:[0,1,2,3]},{d:'סופר',a:436.5,p:1,w:[0,1,2,3]},{d:'דלק',a:320,p:2,w:[0,2]},{d:'ארוחה במסעדה',a:612,p:3,w:[0,1,2,3]}]};
+const save=()=>{try{localStorage.setItem('split',JSON.stringify(S))}catch{}};
+const f=v=>v.toLocaleString('he-IL',{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc=s=>String(s).replace(/[<&]/g,c=>c==='<'?'&lt;':'&amp;');
+function balances(){const b=S.p.map(()=>0);S.x.forEach(x=>{const w=x.w.filter(i=>i<S.p.length);if(!w.length)return;b[x.p]+=x.a;w.forEach(i=>b[i]-=x.a/w.length)});return b}
+function settle(b){const cr=[],db=[];b.forEach((v,i)=>{v=Math.round(v*100)/100;if(v>0.004)cr.push([i,v]);else if(v<-0.004)db.push([i,-v])});cr.sort((a,c)=>c[1]-a[1]);db.sort((a,c)=>c[1]-a[1]);
+  const out=[];let i=0,j=0;while(i<db.length&&j<cr.length){const m=Math.min(db[i][1],cr[j][1]);out.push([db[i][0],cr[j][0],m]);db[i][1]-=m;cr[j][1]-=m;if(db[i][1]<.005)i++;if(cr[j][1]<.005)j++}return out}
+function render(){$('title').value=S.t;$('stamp').textContent=new Date().toLocaleString('he-IL',{dateStyle:'short',timeStyle:'short'})+'  #'+String(S.x.length).padStart(4,'0');
+  $('people').innerHTML=S.p.map((n,i)=>`<span class="chip">${esc(n)}<button class="ln noprint" data-rp="${i}">×</button></span>`).join('');
+  $('xp').innerHTML=S.p.map((n,i)=>`<option value="${i}">שילם/ה: ${esc(n)}</option>`).join('');
+  $('xw').innerHTML='מתחלק בין: '+S.p.map((n,i)=>`<label><input type="checkbox" value="${i}" checked> ${esc(n)}</label>`).join('');
+  $('items').innerHTML=S.x.map((x,k)=>`<div class="line"><span>${esc(x.d)}</span><span class="r">${f(x.a)}</span><button class="ln noprint" data-rx="${k}">×</button><small>שילם/ה ${esc(S.p[x.p]??'?')} · ${x.w.length===S.p.length?'כולם':x.w.map(i=>esc(S.p[i]??'')).join(', ')}</small></div>`).join('')||'<div class="muted">עוד אין הוצאות</div>';
+  const tot=S.x.reduce((s,x)=>s+x.a,0);$('total').textContent='₪ '+f(tot);$('per').textContent=S.p.length?`ממוצע למשתתף: ₪ ${f(tot/S.p.length)}`:'';
+  const tr=settle(balances());$('settle').innerHTML=tr.map(([a,b,m])=>`<div class="pay"><span>${esc(S.p[a])} מעביר/ה ל${esc(S.p[b])}</span><span class="r">₪ ${f(m)}</span></div>`).join('')||'<div class="muted">הכל מאוזן ✓</div>';save()}
+$('title').oninput=e=>{S.t=e.target.value;save()};
+$('pf').onsubmit=e=>{e.preventDefault();const n=$('pn').value.trim();if(n){S.p.push(n);$('pn').value='';render()}};
+$('people').onclick=e=>{let i=e.target.dataset.rp;if(i===undefined)return;i=+i;if(S.x.some(x=>x.p===i)){alert('למשתתף/ת יש הוצאות ששילם/ה. מחקו אותן קודם.');return}
+  S.p.splice(i,1);S.x.forEach(x=>{x.p-=x.p>i;x.w=x.w.filter(w=>w!==i).map(w=>w-(w>i))});render()};
+$('items').onclick=e=>{const k=e.target.dataset.rx;if(k!==undefined){S.x.splice(+k,1);render()}};
+$('xf').onsubmit=e=>{e.preventDefault();const w=[...$('xw').querySelectorAll('input:checked')].map(c=>+c.value);if(!w.length)return;S.x.push({d:$('xd').value,a:+$('xa').value,p:+$('xp').value,w});$('xd').value='';$('xa').value='';render()};
+$('copy').onclick=()=>{const tr=settle(balances());const t=`🧾 ${S.t}\nסה״כ: ₪${f(S.x.reduce((s,x)=>s+x.a,0))}\n\nהתחשבנות:\n`+(tr.map(([a,b,m])=>`• ${S.p[a]} מעביר/ה ל${S.p[b]} ₪${f(m)}`).join('\n')||'הכל מאוזן');navigator.clipboard.writeText(t).then(()=>{$('copy').textContent='✓ הועתק';setTimeout(()=>$('copy').textContent='📋 העתק לוואטסאפ',1500)})};
+$('reset').onclick=()=>{if(confirm('להתחיל חשבון חדש?')){S={t:'',p:[],x:[]};render()}};
+render();
+</script>
+</body>
+</html>

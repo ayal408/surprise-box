@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מזג אוויר חי</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{--ink:#fff;--muted:rgba(255,255,255,.75);--glass:rgba(255,255,255,.14);--line:rgba(255,255,255,.22);--sky1:#3A7BD5;--sky2:#6FB1FC;--mark:#fff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:"Heebo","Segoe UI",Arial,sans-serif;background:linear-gradient(170deg,var(--sky1),var(--sky2));transition:background 1s}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding-inline:16px;padding-block:20px 50px;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.top select,.top button{font:inherit;color:var(--ink);background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:8px 12px;cursor:pointer;backdrop-filter:blur(8px)}
+.top select option{color:#111}
+.hero{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center}
+.icon{font-size:clamp(5rem,18vw,8rem);line-height:1;filter:drop-shadow(0 8px 24px rgba(0,0,0,.25));animation:float 5s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px)}}
+.temp{font-weight:900;font-size:clamp(4rem,15vw,7rem);line-height:.9}
+.desc{font-size:1.4rem;font-weight:400}
+.city{font-size:1rem;color:var(--muted)}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.chip{background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:12px 14px;backdrop-filter:blur(8px);display:flex;flex-direction:column;gap:2px}
+.chip b{font-family:"JetBrains Mono",monospace;font-weight:500;font-size:1.25rem}
+.chip span{font-size:.82rem;color:var(--muted)}
+.card{background:var(--glass);border:1px solid var(--line);border-radius:20px;padding:16px;backdrop-filter:blur(8px);display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h2{margin:0;font-size:1.05rem;font-weight:700}
+.chart{position:relative}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart text{fill:var(--muted);font-family:"JetBrains Mono",monospace;font-size:11px}
+.chart .gl{stroke:rgba(255,255,255,.15)}
+.chart .ln{fill:none;stroke:var(--mark);stroke-width:2;stroke-linejoin:round}
+.chart .ar{fill:rgba(255,255,255,.14)}
+.chart .hair{stroke:rgba(255,255,255,.6);stroke-width:1}
+.chart .dot{fill:var(--mark);stroke:rgba(0,0,0,.25);stroke-width:2}
+.tip{position:absolute;pointer-events:none;background:rgba(10,20,40,.85);border-radius:10px;padding:6px 10px;font-size:.85rem;transform:translate(-50%,-120%);white-space:nowrap}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.day{background:rgba(255,255,255,.08);border-radius:14px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.day .e{font-size:1.8rem}
+.day b{font-family:"JetBrains Mono",monospace;font-weight:500}
+.day small{color:var(--muted);font-size:.75rem}
+.err{background:rgba(120,0,0,.35);border-radius:14px;padding:12px}
+footer{font-size:.8rem;color:var(--muted)}
+footer a{color:var(--ink)}
+.skel{opacity:.6}
+@media (max-width:720px){.chips{grid-template-columns:repeat(2,1fr)}.days{grid-template-columns:repeat(4,1fr)}.hero{grid-template-columns:1fr;text-align:center;justify-items:center}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="wrap">
+  <div class="top">
+    <select id="city" aria-label="עיר"></select>
+    <button id="here" type="button">📍 המיקום שלי</button>
+    <span id="upd" style="color:var(--muted);font-size:.85rem"></span>
+  </div>
+  <div class="hero">
+    <div class="icon" id="icon">⛅</div>
+    <div>
+      <div class="temp" id="temp">--°</div>
+      <div class="desc" id="desc">טוען…</div>
+      <div class="city" id="cityName"></div>
+    </div>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="card">
+    <h2>טמפרטורה ב־24 השעות הקרובות</h2>
+    <div class="chart" id="chart" dir="ltr"></div>
+  </div>
+  <div class="card">
+    <h2>התחזית לשבוע</h2>
+    <div class="days" id="days"></div>
+  </div>
+  <div id="err"></div>
+  <footer>הנתונים מגיעים בזמן אמת מ־<a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>, שירות מזג אוויר פתוח וחינמי. המסך מתעדכן כל 15 דקות.</footer>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const CITIES=[["ירושלים",31.7683,35.2137],["תל אביב",32.0853,34.7818],["חיפה",32.794,34.9896],["באר שבע",31.2518,34.7913],["אשדוד",31.8014,34.6435],["בני ברק",32.0807,34.8338],["פתח תקווה",32.084,34.8878],["נתניה",32.3215,34.8532],["מודיעין",31.8969,35.0104],["אילת",29.5577,34.9519],["טבריה",32.7922,35.5312],["צפת",32.9646,35.496],["אשקלון",31.6688,34.5743],["רחובות",31.8928,34.8113]];
+CITIES.forEach(([n],i)=>{ const o=document.createElement("option"); o.value=i; o.textContent=n; $("city").appendChild(o); });
+let sel=0; try{ sel=+localStorage.getItem("wx.city")||0; }catch(e){} $("city").value=sel;
+const WMO={0:["בהיר","☀️","clear"],1:["בהיר ברובו","🌤️","clear"],2:["מעונן חלקית","⛅","cloud"],3:["מעונן","☁️","cloud"],45:["ערפל","🌫️","fog"],48:["ערפל","🌫️","fog"],
+ 51:["טפטוף קל","🌦️","rain"],53:["טפטוף","🌦️","rain"],55:["טפטוף חזק","🌧️","rain"],61:["גשם קל","🌦️","rain"],63:["גשם","🌧️","rain"],65:["גשם חזק","🌧️","rain"],
+ 66:["גשם קפוא","🌧️","rain"],67:["גשם קפוא","🌧️","rain"],71:["שלג קל","🌨️","snow"],73:["שלג","🌨️","snow"],75:["שלג כבד","❄️","snow"],77:["פתיתי שלג","🌨️","snow"],
+ 80:["ממטרים","🌦️","rain"],81:["ממטרים","🌧️","rain"],82:["ממטרים עזים","⛈️","rain"],85:["ממטרי שלג","🌨️","snow"],86:["ממטרי שלג","🌨️","snow"],95:["סופת רעמים","⛈️","storm"],96:["סופת רעמים וברד","⛈️","storm"],99:["סופת רעמים וברד","⛈️","storm"]};
+const wmo=c=>WMO[c]||["—","🌡️","cloud"];
+const SKY={clear:["#2F80ED","#56CCF2"],cloud:["#5B6C86","#9AAFC9"],fog:["#7D8A99","#BFC8D2"],rain:["#2C3E57","#5D7A99"],snow:["#8FA7C2","#DCE6F2"],storm:["#1F2533","#4A5470"],night:["#0B1230","#2A3466"]};
+let fxKind="clear", night=false;
+async function load(lat,lon,name){
+  $("err").innerHTML=""; document.body.classList.add("skel");
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,is_day&hourly=temperature_2m,precipitation_probability,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset,uv_index_max&timezone=auto&forecast_days=7`;
+  try{
+    const r=await fetch(url); if(!r.ok) throw new Error("השרת החזיר שגיאה "+r.status); const d=await r.json();
+    render(d,name);
+  }catch(e){ $("err").innerHTML=`<div class="err">לא הצלחתי להביא את מזג האוויר (${e.message}). צריך חיבור לאינטרנט. מנסה שוב בעוד דקה.</div>`; setTimeout(()=>go(),60000); }
+  document.body.classList.remove("skel");
+}
+function render(d,name){
+  const c=d.current, [txt,emo,kind]=wmo(c.weather_code); night=!c.is_day;
+  $("icon").textContent= night&&kind==="clear" ? "🌙" : emo;
+  $("temp").textContent=Math.round(c.temperature_2m)+"°"; $("desc").textContent=txt; $("cityName").textContent=name;
+  $("upd").textContent="עודכן "+new Date().toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"});
+  const t=(s)=>new Date(s).toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"});
+  $("chips").innerHTML=[[Math.round(c.apparent_temperature)+"°","מרגיש כמו"],[c.relative_humidity_2m+"%","לחות"],[Math.round(c.wind_speed_10m)+" קמ\"ש","רוח"],[`${t(d.daily.sunrise[0])} · ${t(d.daily.sunset[0])}`,"זריחה · שקיעה"]]
+    .map(([b,s])=>`<div class="chip"><b>${b}</b><span>${s}</span></div>`).join("");
+  const sky=SKY[night?"night":kind]; document.body.style.setProperty("--sky1",sky[0]); document.body.style.setProperty("--sky2",sky[1]);
+  fxKind=kind;
+  // hourly: next 24 from now
+  const now=Date.now(); let start=d.hourly.time.findIndex(s=>new Date(s).getTime()>=now-3600e3); if(start<0) start=0;
+  const hrs=d.hourly.time.slice(start,start+24).map((s,i)=>({t:new Date(s),v:d.hourly.temperature_2m[start+i],p:d.hourly.precipitation_probability[start+i]}));
+  chart(hrs);
+  const days=["א׳","ב׳","ג׳","ד׳","ה׳","ו׳","ש׳"];
+  $("days").innerHTML=d.daily.time.map((s,i)=>{ const dt=new Date(s+"T12:00"), [tx,em]=wmo(d.daily.weather_code[i]);
+    return `<div class="day" title="${tx}"><small>${i===0?"היום":"יום "+days[dt.getDay()]}</small><span class="e">${em}</span><b>${Math.round(d.daily.temperature_2m_max[i])}°</b><small>${Math.round(d.daily.temperature_2m_min[i])}° · 💧${d.daily.precipitation_probability_max[i]??0}%</small></div>`; }).join("");
+}
+function chart(H){
+  const W=720,Hh=200,L=34,R=10,T=18,B=26, vs=H.map(h=>h.v);
+  const lo=Math.floor(Math.min(...vs)-1), hi=Math.ceil(Math.max(...vs)+1), x=i=>L+(W-L-R)*i/(H.length-1), y=v=>T+(Hh-T-B)*(1-(v-lo)/(hi-lo));
+  const pts=H.map((h,i)=>`${x(i).toFixed(1)},${y(h.v).toFixed(1)}`).join(" ");
+  let s=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="טמפרטורה לפי שעה">`;
+  const step=Math.max(1,Math.round((hi-lo)/4));
+  for(let v=lo;v<=hi;v+=step) s+=`<line class="gl" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${v}°</text>`;
+  s+=`<polygon class="ar" points="${x(0)},${y(lo)} ${pts} ${x(H.length-1)},${y(lo)}"/><polyline class="ln" points="${pts}"/>`;
+  H.forEach((h,i)=>{ if(i%3===0) s+=`<text x="${x(i)}" y="${Hh-8}" text-anchor="middle">${String(h.t.getHours()).padStart(2,"0")}:00</text>`; });
+  const mi=vs.indexOf(Math.max(...vs)); s+=`<text x="${x(mi)}" y="${y(vs[mi])-8}" text-anchor="middle" style="fill:#fff;font-weight:500">${Math.round(vs[mi])}°</text>`;
+  s+=`<line class="hair" id="hair" y1="${T}" y2="${Hh-B}" visibility="hidden"/><circle class="dot" id="hdot" r="5" visibility="hidden"/><rect id="hit" x="${L}" y="0" width="${W-L-R}" height="${Hh}" fill="transparent"/></svg><div class="tip" id="tip" hidden></div>`;
+  const el=$("chart"); el.innerHTML=s; const svg=el.querySelector("svg");
+  $("hit").addEventListener("pointermove",e=>{ const r=svg.getBoundingClientRect(), sx=(e.clientX-r.left)*W/r.width; const i=Math.max(0,Math.min(H.length-1,Math.round((sx-L)/((W-L-R)/(H.length-1))))), h=H[i];
+    $("hair").setAttribute("x1",x(i)); $("hair").setAttribute("x2",x(i)); $("hair").setAttribute("visibility","visible");
+    $("hdot").setAttribute("cx",x(i)); $("hdot").setAttribute("cy",y(h.v)); $("hdot").setAttribute("visibility","visible");
+    const tip=$("tip"); tip.hidden=false; tip.dir="rtl"; tip.textContent=`${String(h.t.getHours()).padStart(2,"0")}:00 · ${h.v.toFixed(1)}° · 💧${h.p??0}%`;
+    tip.style.left=Math.min(Math.max(x(i)*r.width/W,60),r.width-60)+"px"; tip.style.top=(y(h.v)*r.width/W)+"px"; });
+  $("hit").addEventListener("pointerleave",()=>{ $("tip").hidden=true; $("hair").setAttribute("visibility","hidden"); $("hdot").setAttribute("visibility","hidden"); });
+}
+/* ambient effects */
+const cv=$("fx"), cx=cv.getContext("2d"); let W=0,Hc=0, drops=[];
+function size(){ W=cv.width=innerWidth; Hc=cv.height=innerHeight; drops=Array.from({length:160},()=>({x:Math.random()*W,y:Math.random()*Hc,s:Math.random()*.6+.4})); }
+addEventListener("resize",size); size();
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function fx(t){
+  cx.clearRect(0,0,W,Hc);
+  if(!reduce){
+    if(fxKind==="rain"||fxKind==="storm"){ cx.strokeStyle="rgba(200,220,255,.45)"; cx.lineWidth=1.2; cx.beginPath();
+      drops.forEach(d=>{ d.y+=14*d.s; d.x-=2*d.s; if(d.y>Hc){ d.y=-20; d.x=Math.random()*W*1.1; } cx.moveTo(d.x,d.y); cx.lineTo(d.x+3,d.y-14*d.s); }); cx.stroke();
+      if(fxKind==="storm" && Math.random()<.004){ cx.fillStyle="rgba(255,255,255,.35)"; cx.fillRect(0,0,W,Hc); } }
+    else if(fxKind==="snow"){ cx.fillStyle="rgba(255,255,255,.85)"; drops.forEach(d=>{ d.y+=1.2*d.s; d.x+=Math.sin(t*.001+d.y*.01)*.5; if(d.y>Hc){d.y=-5;} cx.beginPath(); cx.arc(d.x,d.y,2.2*d.s,0,6.283); cx.fill(); }); }
+    else if(fxKind==="clear" && !night){ const g=cx.createRadialGradient(W*.85,-40,0,W*.85,-40,Hc*.9); g.addColorStop(0,"rgba(255,245,200,.55)"); g.addColorStop(1,"rgba(255,245,200,0)"); cx.fillStyle=g; cx.fillRect(0,0,W,Hc); }
+    else if(night){ drops.slice(0,90).forEach((d,i)=>{ cx.fillStyle=`rgba(255,255,255,${.3+.5*Math.abs(Math.sin(t*.001+i))})`; cx.fillRect(d.x,d.y*.6,1.6,1.6); }); }
+    if(fxKind==="cloud"||fxKind==="fog"){ for(let i=0;i<5;i++){ const x=((t*.01*(i+1)+i*300)%(W+400))-200, y=60+i*70; cx.fillStyle=`rgba(255,255,255,${fxKind==="fog"?.12:.08})`; cx.beginPath(); cx.ellipse(x,y,180,40,0,0,6.283); cx.fill(); } }
+  }
+  requestAnimationFrame(fx);
+}
+requestAnimationFrame(fx);
+function go(){ const c=CITIES[+$("city").value]; load(c[1],c[2],c[0]); }
+$("city").addEventListener("change",()=>{ try{ localStorage.setItem("wx.city",$("city").value); }catch(e){} go(); });
+$("here").addEventListener("click",()=>{
+  if(!navigator.geolocation){ $("err").innerHTML='<div class="err">הדפדפן לא תומך באיתור מיקום. אפשר לבחור עיר מהרשימה.</div>'; return; }
+  navigator.geolocation.getCurrentPosition(p=>load(p.coords.latitude,p.coords.longitude,"המיקום שלך"),()=>{ $("err").innerHTML='<div class="err">לא התקבלה הרשאה למיקום. אפשר לבחור עיר מהרשימה.</div>'; },{timeout:8000});
+});
+go(); setInterval(go,15*60e3);
+})();
+</script>
+</body>
+</html>

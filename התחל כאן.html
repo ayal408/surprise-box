@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>קופסת ההפתעות</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#7a1d5a 0%,transparent 50%),var(--bg);color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:32px 18px}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:26px}
+.gift{font-size:4rem;animation:bob 2.4s ease-in-out infinite;display:inline-block}
+@keyframes bob{50%{transform:translateY(-10px) rotate(-6deg)}}
+h1{margin:0;font-size:clamp(2.2rem,6vw,3.4rem);background:linear-gradient(90deg,#ffd60a,#f72585,#4cc9f0);-webkit-background-clip:text;background-clip:text;color:transparent}
+p{margin:0;color:var(--muted);font-size:1.08rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+a.card{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;transition:transform .25s,border-color .25s,background .25s;animation:rise .6s ease both}
+a.card:hover{transform:translateY(-6px) scale(1.02);border-color:var(--c);background:rgba(255,255,255,.1)}
+a.card .ic{font-size:2.2rem}
+a.card b{font-size:1.3rem;color:var(--c)}
+a.card span{color:var(--muted);line-height:1.5}
+@keyframes rise{from{transform:translateY(20px);opacity:.2}}
+h2{margin:6px 0 -8px;font-size:1.4rem}
+footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:14px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="gift">🎁</span>
+    <h1>קופסת ההפתעות</h1>
+    <p>כל מה שנבנה בשבילך במקום אחד. לוחצים על כרטיס והוא נפתח בדפדפן.</p>
+  </header>
+  <h2>🎮 חדש: אולם המשחקים</h2>
+  <div class="grid">
+    <a class="card" href="2048.html" style="--c:#ffb703;animation-delay:0s"><span class="ic">🔢</span><b>2048</b><span>מחליקים אריחים, מאחדים זוגות ומטפסים עד 2048. עם ביטול מהלך, שיא אישי ותמיכה בהחלקה בטלפון.</span></a>
+    <a class="card" href="sudoku.html" style="--c:#4cc9f0;animation-delay:0s"><span class="ic">🧩</span><b>סודוקו</b><span>לוחות חדשים בכל פעם עם פתרון יחיד, שלוש רמות, מצב הערות, רמזים וסימון טעויות.</span></a>
+    <a class="card" href="minesweeper.html" style="--c:#90e0a0;animation-delay:0s"><span class="ic">💣</span><b>שולה המוקשים</b><span>הקלאסיקה בשלוש רמות, לחיצה ראשונה תמיד בטוחה, מצב דגל לטלפון ופתיחה מהירה סביב מספרים.</span></a>
+    <a class="card" href="snake.html" style="--c:#7cf2c4;animation-delay:0s"><span class="ic">🐍</span><b>הנחש</b><span>אוכלים תפוחים וגדלים. שלוש מהירויות, קירות עוברים או הורגים, ותפוחי זהב ששווים 5.</span></a>
+    <a class="card" href="tetris.html" style="--c:#c77dff;animation-delay:0s"><span class="ic">🟪</span><b>טטריס</b><span>שבע הצורות, צל נחיתה, הפלה מיידית, שלבים שמאיצים ושיא נשמר. עובד גם במקלדת וגם במגע.</span></a>
+    <a class="card" href="memory.html" style="--c:#ff8fab;animation-delay:0s"><span class="ic">🃏</span><b>משחק הזיכרון</b><span>מוצאים זוגות: ארבעה נושאים, שלושה גדלים ומצב של שני שחקנים לתחרות משפחתית.</span></a>
+    <a class="card" href="connect4.html" style="--c:#ff4d6d;animation-delay:0s"><span class="ic">🔴</span><b>ארבע בשורה</b><span>נגד חבר או נגד המחשב, שחושב כמה מהלכים קדימה. שלוש רמות קושי וטבלת ניצחונות.</span></a>
+    <a class="card" href="simon.html" style="--c:#2bd67b;animation-delay:0s"><span class="ic">🎵</span><b>סיימון אומר</b><span>זוכרים רצף של צבעים וצלילים שמתארך בכל סבב. יש גם מצב קשוח, ושיא אישי נשמר.</span></a>
+    <a class="card" href="breakout.html" style="--c:#ff9f43;animation-delay:0s"><span class="ic">🧱</span><b>שובר הלבנים</b><span>מחבט, כדור וקיר צבעוני. שלבים הולכים וקשים, ובונוסים של מחבט רחב, שלושה כדורים וחיים.</span></a>
+    <a class="card" href="puzzle15.html" style="--c:#5fc1cf;animation-delay:0s"><span class="ic">🔲</span><b>פאזל ההזזה</b><span>פאזל 15 הקלאסי בגדלים 3×3 עד 5×5, עם מספרים או תמונה, וכל ערבוב הוא פתיר.</span></a>
+  </div>
+  <h2>🧰 כלים ומשחקים</h2>
+  <div class="grid">
+    <a class="card" href="split.html" style="--c:#e9e4d8;animation-delay:0s"><span class="ic">🧾</span><b>מי חייב למי</b><span>חלוקת הוצאות לקבוצה בסגנון קבלה: מי שילם, על מה ובין מי, ובסוף רשימה של כמה שפחות העברות. מעתיקים לוואטסאפ בלחיצה.</span></a>
+    <a class="card" href="budget95.html" style="--c:#6fd0d0;animation-delay:0s"><span class="ic">💾</span><b>תקציב הבית 95</b><span>תקציב חודשי בעיצוב של Windows 95: הכנסות והוצאות לפי קטגוריה, יתרה, שיעור חיסכון, גרף וייצוא ל־CSV.</span></a>
+    <a class="card" href="blueprint.html" style="--c:#6aa8ff;animation-delay:0s"><span class="ic">📐</span><b>שרטוט הדירה</b><span>גוררים חדרים על רשת של שרטוט ומקבלים מידות, שטח במ״ר, שטח משוקלל למרפסות ומחסן ושווי משוער. אפשר לשמור כתמונה.</span></a>
+    <a class="card" href="convert.html" style="--c:#e0a080;animation-delay:0s"><span class="ic">⚖️</span><b>הממיר</b><span>המרת יחידות בעיצוב נקי: אורך, משקל, טמפרטורה, מידות מטבח, דונם ומ״ר, נפח, מהירות, נתונים וצריכת דלק.</span></a>
+    <a class="card" href="countdown.html" style="--c:#ff5fd8;animation-delay:0s"><span class="ic">⏳</span><b>ספירה לאחור</b><span>כמה זמן נשאר לחופשה, ליום הולדת או למבחן, בעיצוב ניאון של שנות ה־80. כמה אירועים במקביל, והם נשמרים.</span></a>
+    <a class="card" href="typewriter.html" style="--c:#d9b98a;animation-delay:0s"><span class="ic">✒️</span><b>מכונת הכתיבה</b><span>כתיבת מכתבים עם צליל של מכונת כתיבה אמיתית, תבניות מוכנות (תודה, פנייה רשמית, יומן), מצב ריכוז והדפסה.</span></a>
+    <a class="card" href="wheel.html" style="--c:#ffe14d;animation-delay:0s"><span class="ic">🎡</span><b>גלגל ההחלטות</b><span>מה אוכלים? מי עושה כלים? כותבים אפשרויות, מסובבים את הגלגל, והוא מחליט. יש אפשרויות מוכנות והיסטוריה.</span></a>
+    <a class="card" href="pixel.html" style="--c:#ffcd75;animation-delay:0s"><span class="ic">👾</span><b>סטודיו פיקסלים</b><span>עורך ציורי פיקסלים בסגנון 8 ביט: עט, דלי, דוגם צבע, מצב מראה, ביטול ושמירה כ־PNG בגדלים שונים.</span></a>
+    <a class="card" href="newspaper.html" style="--c:#c9b98f;animation-delay:0s"><span class="ic">📰</span><b>העיתון שלך</b><span>עמוד ראשי של עיתון וינטג׳ עם הכותרת הראשית עליך: מזינים שם ועיר ומקבלים גיליון מצחיק שאפשר להדפיס.</span></a>
+    <a class="card" href="terminal.html" style="--c:#33ff66;animation-delay:0s"><span class="ic">🖥️</span><b>הטרמינל</b><span>מסך מחשב ירוק מפעם עם פקודות: מחשבון, קוביות, בדיחות, עובדות, משחק ניחוש וגשם דיגיטלי כמו במטריקס.</span></a>
+    <a class="card" href="qr.html" style="--c:#9fe870;animation-delay:0s"><span class="ic">🔳</span><b>מחולל QR</b><span>יוצרים קוד QR לקישור, טקסט או רשת Wi‑Fi ושומרים אותו כתמונה.</span></a>
+    <a class="card" href="password.html" style="--c:#8ecae6;animation-delay:0s"><span class="ic">🔐</span><b>מעבדת הסיסמאות</b><span>יוצרים סיסמאות חזקות ובודקים כמה סיסמה קיימת חזקה באמת.</span></a>
+    <a class="card" href="weather.html" style="--c:#7ec8ff;animation-delay:0s"><span class="ic">🌦️</span><b>מזג אוויר חי</b><span>תחזית עדכנית לפי מיקום או לפי עיר.</span></a>
+    <a class="card" href="piano.html" style="--c:#c8a2ff;animation-delay:0s"><span class="ic">🎹</span><b>הפסנתר הקסום</b><span>פסנתר שמנגנים בו במקלדת או במגע.</span></a>
+    <a class="card" href="loan.html" style="--c:#1fa3c4;animation-delay:0s"><span class="ic">🏠</span><b>מחשבון המשכנתא</b><span>שפיצר מול קרן שווה, הצמדה למדד ופירעון מוקדם, עם גרף של קרן וריבית לפי שנה ולוח סילוקין מלא.</span></a>
+    <a class="card" href="beats.html" style="--c:#ff5470;animation-delay:0s"><span class="ic">🥁</span><b>סטודיו הביטים</b><span>מכונת תופים וסינתיסייזר: בונים ביט בלחיצות, בוחרים סגנון מוכן או "הפתעה", ורואים ויזואלייזר חי.</span></a>
+    <a class="card" href="focus.html" style="--c:#5fc1cf;animation-delay:0s"><span class="ic">🫧</span><b>בועת ריכוז</b><span>טיימר פומודורו עם צלילי רקע שנוצרים בזמן אמת (גשם, גלים, אח בוערת, רעש חום) שאפשר לערבב, וספירה של סבבי העבודה היום.</span></a>
+    <a class="card" href="life.html" style="--c:#7cf2c4;animation-delay:0s"><span class="ic">🦠</span><b>חיים מלאכותיים</b><span>אלפי חלקיקים עם כמה חוקי משיכה פשוטים, ומהם נוצרים תאים, נחשים וגלקסיות שנעים. אפשר לשנות את החוקים בזמן אמת.</span></a>
+    <a class="card" href="quote.html" style="--c:#8ab6e0;animation-delay:0s"><span class="ic">🧾</span><b>הצעת מחיר / חשבון עסקה</b><span>מחולל מסמכים לעסק: לוגו, פריטים, הנחה, מע"מ 18% או עוסק פטור, תצוגה מקדימה והדפסה כ־PDF.</span></a>
+    <a class="card" href="typing.html" style="--c:#9b9bff;animation-delay:0s"><span class="ic">⌨️</span><b>אצבעות קסם</b><span>הקלדה עיוורת בעברית עם מקלדת מונפשת, צבעים לכל אצבע, מדידת מהירות ודיוק ומפת חום של הטעויות.</span></a>
+    <a class="card" href="algo.html" style="--c:#58d68d;animation-delay:0s"><span class="ic">💻</span><b>מעבדת האלגוריתמים</b><span>7 אלגוריתמי מיון בפעולה, עם צליל ומצב מרוץ ראש בראש. רואים בעיניים למה O(n log n) מנצח את O(n²).</span></a>
+    <a class="card" href="solar.html" style="--c:#6fd3ff;animation-delay:0s"><span class="ic">🪐</span><b>מערכת השמש עכשיו</b><span>סימולציה בתלת־ממד שבה כוכבי הלכת נמצאים במקום האמיתי שלהם היום, לפי נתוני NASA. אפשר להריץ את הזמן, ללחוץ על כוכב ולראות כמה הוא רחוק מאיתנו.</span></a>
+    <a class="card" href="times.html" style="--c:#39ffb6;animation-delay:.02s"><span class="ic">🚀</span><b>חלליות הכפל</b><span>משחק חלל לתרגול לוח הכפל: אסטרואידים, לייזרים, שלבים, שיא אישי ורשימה של התרגילים שכדאי לחזור עליהם.</span></a>
+    <a class="card" href="garden.html" style="--c:#e0567a;animation-delay:.04s"><span class="ic">🌷</span><b>גן תודה</b><span>כל דבר שאת מודה עליו מגדל פרח בגן חי, עם פרפרים ביום, גחליליות בלילה ושמיים שמשתנים לפי השעה.</span></a>
+    <a class="card" href="family-game.html" style="--c:#ffd60a;animation-delay:.05s"><span class="ic">⏱️</span><b>סוגרים חשבון 2.0</b><span>משחק המשפחה המשודרג: תמיכה בקליקר, פודיום עם קונפטי, ג'וקרים, בונוסים, הגדרות ושמירה אוטומטית.</span></a>
+    <a class="card" href="index.html" style="--c:#ff4a60;animation-delay:.1s"><span class="ic">❤️</span><b>יד על הלב</b><span>מאמן החייאה: קצב של 110 לחיצות בדקה, שעון, יומן אירוע לצוות מד"א ומדריכים לחנק, לשבץ ולדימום.</span></a>
+    <a class="card" href="journey.html" style="--c:#4fb3ff;animation-delay:.15s"><span class="ic">🌍</span><b>המסע שלך סביב השמש</b><span>מזינים תאריך לידה ורואים את כדור הארץ מקיף את השמש, מוני פעימות לב, מופע הירח ותאריך עברי.</span></a>
+    <a class="card" href="breathe.html" style="--c:#57c2b1;animation-delay:.2s"><span class="ic">🌬️</span><b>רגע של נשימה</b><span>ארבעה תרגילי נשימה מונחים עם כדור מונפש וצליל עדין, להרגעה ולשינה.</span></a>
+    <a class="card" href="cancel.html" style="--c:#9c9bff;animation-delay:.25s"><span class="ic">🧾</span><b>מבטלים עסקה</b><span>זכויות ביטול לפי חוק הגנת הצרכן: מועד אחרון, דמי ביטול ומכתב ביטול מוכן להעתקה.</span></a>
+    <a class="card" href="ready.html" style="--c:#a9c06a;animation-delay:.3s"><span class="ic">🛡️</span><b>הבית מוכן</b><span>רשימת ציוד חירום לבית ולממ"ד, עם כמויות שמחושבות לפי מספר בני הבית.</span></a>
+  </div>
+  <footer>כל הקבצים נמצאים בתיקייה C:\ayaly\הפתעה יותר מפתיעה ונפתחים בכל דפדפן. גם בלי אינטרנט הם עובדים, חוץ מהגופנים והייבוא מאקסל בחלק מהכלים.</footer>
+</div>
+</body>
+</html>

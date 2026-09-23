@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>שולה המוקשים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#90e0a0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),var(--bg);color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:760px;display:flex;flex-direction:column;gap:14px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+h1{margin:0;font-size:2.4rem;color:var(--acc)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+.stat{flex:1;min-width:90px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.75rem}
+.stat b{font-size:1.3rem}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-weight:700}
+button.on{background:var(--acc);color:#0d2412;border-color:var(--acc)}
+.scroll{overflow:auto;max-width:100%}
+.board{display:grid;gap:2px;direction:ltr;margin:0 auto;width:max-content;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.c{width:30px;height:30px;border-radius:5px;background:#3a3166;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;cursor:pointer}
+.c:hover{background:#4a3f80}
+.c.o{background:rgba(255,255,255,.08);cursor:default}
+.c.boom{background:#d62839}
+.n1{color:#6fb3ff}.n2{color:#7cf2a0}.n3{color:#ff7b7b}.n4{color:#c49bff}.n5{color:#ffb86b}.n6{color:#5fe0e0}.n7{color:#fff}.n8{color:#aaa}
+.msg{min-height:1.6em;font-size:1.2rem;font-weight:700;text-align:center}
+p.hint{color:var(--muted);margin:0;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>💣 שולה המוקשים</h1>
+  <div class="bar">
+    <button data-l="0" class="lvl on">מתחיל</button>
+    <button data-l="1" class="lvl">בינוני</button>
+    <button data-l="2" class="lvl">מומחה</button>
+    <button id="flag">🚩 מצב דגל</button>
+    <button id="new">😊 משחק חדש</button>
+  </div>
+  <div class="bar">
+    <div class="stat"><small>מוקשים שנשארו</small><b id="left">0</b></div>
+    <div class="stat"><small>זמן</small><b id="time">0</b></div>
+    <div class="stat"><small>שיא ברמה</small><b id="best">–</b></div>
+  </div>
+  <div class="msg" id="msg"></div>
+  <div class="scroll"><div class="board" id="board"></div></div>
+  <p class="hint">לחיצה פותחת משבצת, לחיצה ימנית או לחיצה ארוכה מסמנת דגל. לחיצה על מספר שכבר מוקף במספיק דגלים פותחת את כל השכנים שלו. הלחיצה הראשונה תמיד בטוחה.</p>
+</div>
+<script>
+const LV=[{w:9,h:9,m:10},{w:16,h:16,m:40},{w:30,h:16,m:99}];
+let L=0,W,H,M,mines,open,flags,started,over,t0,timer,flagMode=false;
+const B=document.getElementById('board');
+const $=id=>document.getElementById(id);
+const nb=i=>{const x=i%W,y=i/W|0,r=[];for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(!dx&&!dy)continue;const nx=x+dx,ny=y+dy;if(nx>=0&&ny>=0&&nx<W&&ny<H)r.push(ny*W+nx)}return r};
+const cnt=i=>nb(i).filter(j=>mines[j]).length;
+function bestKey(){return'ms-best-'+L}
+function init(){({w:W,h:H,m:M}=LV[L]);mines=Array(W*H).fill(false);open=Array(W*H).fill(false);flags=Array(W*H).fill(false);started=over=false;clearInterval(timer);$('time').textContent=0;$('msg').textContent='';$('new').textContent='😊 משחק חדש';
+  const b=localStorage.getItem(bestKey());$('best').textContent=b?b+' שנ׳':'–';
+  B.style.gridTemplateColumns=`repeat(${W},30px)`;B.innerHTML='';
+  for(let i=0;i<W*H;i++){const d=document.createElement('div');d.className='c';d.dataset.i=i;B.appendChild(d)}draw()}
+function place(safe){const ban=new Set([safe,...nb(safe)]);let k=0;while(k<M){const i=Math.random()*W*H|0;if(!mines[i]&&!ban.has(i)){mines[i]=true;k++}}}
+function draw(){const cs=B.children;let f=0;for(let i=0;i<W*H;i++){const d=cs[i];if(flags[i])f++;
+  if(open[i]){d.className='c o';if(mines[i]){d.textContent='💣';if(d.dataset.boom)d.classList.add('boom')}else{const n=cnt(i);d.textContent=n||'';if(n)d.classList.add('n'+n)}}
+  else{d.className='c';d.textContent=flags[i]?'🚩':(over&&mines[i]?'💣':'')}}
+  $('left').textContent=M-f}
+function reveal(i){const st=[i];while(st.length){const j=st.pop();if(open[j]||flags[j])continue;open[j]=true;if(!mines[j]&&cnt(j)===0)st.push(...nb(j))}}
+function click(i){if(over)return;
+  if(!started){started=true;place(i);t0=Date.now();timer=setInterval(()=>$('time').textContent=((Date.now()-t0)/1000|0),250)}
+  if(open[i]){const n=cnt(i),fl=nb(i).filter(j=>flags[j]).length;if(n&&fl===n)nb(i).forEach(j=>{if(!flags[j]&&!open[j]){if(mines[j])lose(j);else reveal(j)}})}
+  else{if(flags[i])return;if(mines[i])return lose(i);reveal(i)}
+  if(!over)check();draw()}
+function toggle(i){if(over||open[i])return;flags[i]=!flags[i];draw()}
+function lose(i){over=true;clearInterval(timer);B.children[i].dataset.boom=1;open[i]=true;$('msg').textContent='💥 בום! נסו שוב';$('new').textContent='😵 משחק חדש';draw()}
+function check(){if(open.filter((o,i)=>!o&&!mines[i]).length)return;over=true;clearInterval(timer);const s=(Date.now()-t0)/1000|0;
+  mines.forEach((m,i)=>{if(m)flags[i]=true});const b=+localStorage.getItem(bestKey())||0;
+  if(!b||s<b){localStorage.setItem(bestKey(),s);$('best').textContent=s+' שנ׳';$('msg').textContent='🏆 ניצחון ושיא חדש! '+s+' שניות'}else $('msg').textContent='😎 ניצחון! '+s+' שניות';$('new').textContent='😎 משחק חדש'}
+let press=null,longDone=false;
+B.addEventListener('pointerdown',e=>{const d=e.target.closest('.c');if(!d||e.button===2)return;longDone=false;press=setTimeout(()=>{longDone=true;toggle(+d.dataset.i);navigator.vibrate&&navigator.vibrate(30)},450)});
+B.addEventListener('pointerup',()=>clearTimeout(press));
+B.addEventListener('pointerleave',()=>clearTimeout(press));
+B.addEventListener('click',e=>{const d=e.target.closest('.c');if(!d||longDone)return;const i=+d.dataset.i;if(flagMode&&!open[i])toggle(i);else click(i)});
+B.addEventListener('contextmenu',e=>{e.preventDefault();const d=e.target.closest('.c');if(d)toggle(+d.dataset.i)});
+document.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>{L=+b.dataset.l;document.querySelectorAll('.lvl').forEach(x=>x.classList.toggle('on',x===b));init()});
+$('flag').onclick=e=>{flagMode=!flagMode;e.currentTarget.classList.toggle('on',flagMode)};
+$('new').onclick=init;
+init();
+</script>
+</body>
+</html>

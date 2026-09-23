@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>משחק הזיכרון</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff8fab}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% 0%,#7a1d5a 0%,transparent 55%),var(--bg);color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:560px;display:flex;flex-direction:column;gap:12px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+h1{margin:0;font-size:2.2rem;color:var(--acc)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+select,button{font:inherit;cursor:pointer;border-radius:10px;padding:7px 12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+button.pri{background:var(--acc);color:#2a0612;border:0;font-weight:700}
+.info{margin-inline-start:auto;font-variant-numeric:tabular-nums}
+.grid{display:grid;gap:8px}
+.card{aspect-ratio:1;perspective:600px;cursor:pointer}
+.in{position:relative;width:100%;height:100%;transition:transform .35s;transform-style:preserve-3d}
+.card.up .in,.card.ok .in{transform:rotateY(180deg)}
+.f,.b{position:absolute;inset:0;border-radius:12px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden}
+.f{background:linear-gradient(135deg,#5a2a8a,#8a2a6a);border:1px solid var(--line);font-size:1.4rem;color:rgba(255,255,255,.35)}
+.b{background:#f7f2ff;transform:rotateY(180deg);font-size:clamp(1.4rem,7vw,2.6rem)}
+.card.ok .b{background:#c9f7de;animation:yay .4s}
+@keyframes yay{50%{transform:rotateY(180deg) scale(1.1)}}
+.msg{text-align:center;font-weight:800;font-size:1.3rem;min-height:1.6em;color:#7cf2c4}
+.players{display:flex;gap:8px}
+.pl{flex:1;background:var(--card);border:2px solid transparent;border-radius:10px;padding:6px;text-align:center}
+.pl.turn{border-color:var(--acc)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>משחק הזיכרון</h1>
+  <div class="bar">
+    <select id="size"><option value="8">16 קלפים</option><option value="12" selected>24 קלפים</option><option value="18">36 קלפים</option></select>
+    <select id="theme"><option value="animals">חיות</option><option value="food">אוכל</option><option value="space">חלל וטבע</option><option value="sport">ספורט</option></select>
+    <select id="mode"><option value="1">שחקן אחד</option><option value="2">שני שחקנים</option></select>
+    <button class="pri" id="new">ערבב</button>
+    <span class="info" id="info"></span>
+  </div>
+  <div class="players" id="players" hidden><div class="pl" id="p0">שחקן 1: <b>0</b></div><div class="pl" id="p1">שחקן 2: <b>0</b></div></div>
+  <div class="grid" id="grid"></div>
+  <div class="msg" id="msg"></div>
+</div>
+<script>
+const T={animals:'🐶🐱🦊🐼🐸🐵🦁🐯🐨🐷🐙🦄🐢🦋🐧🦉🐳🦒',food:'🍕🍔🍟🌭🍩🍪🍉🍓🍌🍇🥑🌽🧀🥐🍣🍦🍫🥨',space:'🌞🌙⭐🪐☄️🌈⚡❄️🔥🌊🌵🌻🍄🌴🌋🌍🌸🍁',sport:'⚽🏀🏈⚾🎾🏐🏉🎱🏓🏸🥊🎳⛳🏹🛹🚴🏊🥇'};
+let cards,open=[],moves,found,lock=false,t0,timer,turn=0,pts=[0,0],two=false;
+const G=document.getElementById('grid');
+function newGame(){const n=+document.getElementById('size').value,em=[...T[document.getElementById('theme').value].matchAll(/\p{Extended_Pictographic}️?/gu)].map(m=>m[0]).slice(0,n);
+  cards=[...em,...em].sort(()=>Math.random()-.5);open=[];moves=0;found=0;lock=false;turn=0;pts=[0,0];two=document.getElementById('mode').value==='2';
+  document.getElementById('players').hidden=!two;
+  const cols=n===8?4:6;G.style.gridTemplateColumns=`repeat(${cols},1fr)`;G.innerHTML='';
+  cards.forEach((e,i)=>{const d=document.createElement('div');d.className='card';d.innerHTML=`<div class="in"><div class="f">?</div><div class="b">${e}</div></div>`;d.onclick=()=>flip(i);G.appendChild(d)});
+  document.getElementById('msg').textContent='';clearInterval(timer);t0=null;info()}
+function info(){const s=t0?(Date.now()-t0)/1000|0:0;document.getElementById('info').textContent=`מהלכים ${moves} · ${s} שנ׳`;
+  if(two){[0,1].forEach(p=>{const el=document.getElementById('p'+p);el.classList.toggle('turn',p===turn);el.querySelector('b').textContent=pts[p]})}}
+function flip(i){const c=G.children[i];if(lock||c.classList.contains('up')||c.classList.contains('ok'))return;
+  if(!t0){t0=Date.now();timer=setInterval(info,1000)}
+  c.classList.add('up');open.push(i);
+  if(open.length===2){moves++;const[a,b]=open;
+    if(cards[a]===cards[b]){setTimeout(()=>{[a,b].forEach(k=>{G.children[k].classList.remove('up');G.children[k].classList.add('ok')});found++;pts[turn]++;open=[];info();if(found*2===cards.length)win()},300)}
+    else{lock=true;setTimeout(()=>{[a,b].forEach(k=>G.children[k].classList.remove('up'));open=[];lock=false;if(two)turn=1-turn;info()},850)}}
+  info()}
+function win(){clearInterval(timer);const s=(Date.now()-t0)/1000|0;
+  document.getElementById('msg').textContent=two?(pts[0]===pts[1]?'🤝 תיקו!':`🏆 שחקן ${pts[0]>pts[1]?1:2} ניצח!`):`🎉 כל הכבוד! ${moves} מהלכים ב־${s} שניות`}
+['new','size','theme','mode'].forEach(id=>document.getElementById(id)[id==='new'?'onclick':'onchange']=newGame);
+newGame();
+</script>
+</body>
+</html>

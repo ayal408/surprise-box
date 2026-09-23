@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>טטריס</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#c77dff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% 0%,#4a1d7a 0%,transparent 55%),var(--bg);color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:480px;display:flex;flex-direction:column;gap:12px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+h1{margin:0;font-size:2.2rem;color:var(--acc)}
+.game{display:flex;gap:12px;direction:ltr}
+canvas#cv{flex:1;min-width:0;aspect-ratio:1/2;background:#120f2c;border-radius:10px;border:1px solid var(--line);touch-action:none}
+.side{width:110px;display:flex;flex-direction:column;gap:8px;direction:rtl}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 8px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.75rem}.stat b{font-size:1.2rem}
+canvas#nx{width:100%;aspect-ratio:1;background:var(--card);border-radius:10px}
+button{font:inherit;cursor:pointer;border-radius:10px;padding:8px 10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+button.pri{background:var(--acc);color:#1c0630;border:0;font-weight:700}
+.pad{direction:ltr;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.pad button{height:52px;font-size:1.3rem}
+p.hint{color:var(--muted);margin:0;font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>טטריס</h1>
+  <div class="game">
+    <canvas id="cv" width="300" height="600"></canvas>
+    <div class="side">
+      <div class="stat"><small>הבא</small><canvas id="nx" width="100" height="100"></canvas></div>
+      <div class="stat"><small>ניקוד</small><b id="score">0</b></div>
+      <div class="stat"><small>שורות</small><b id="lines">0</b></div>
+      <div class="stat"><small>שלב</small><b id="level">1</b></div>
+      <div class="stat"><small>שיא</small><b id="best">0</b></div>
+      <button class="pri" id="go">התחל</button>
+      <button id="pause">השהה</button>
+    </div>
+  </div>
+  <div class="pad"><button data-a="L">◀</button><button data-a="R">▶</button><button data-a="rot">⟳</button><button data-a="D">▼</button><button data-a="drop">⤓</button></div>
+  <p class="hint">← → הזזה, ↑ או X סיבוב, ↓ ירידה רכה, רווח הפלה מיידית, P השהיה.</p>
+</div>
+<script>
+const W=10,H=20,cv=document.getElementById('cv'),x=cv.getContext('2d'),nx=document.getElementById('nx').getContext('2d'),S=30;
+const P={I:[[1,1,1,1]],O:[[1,1],[1,1]],T:[[0,1,0],[1,1,1]],S:[[0,1,1],[1,1,0]],Z:[[1,1,0],[0,1,1]],J:[[1,0,0],[1,1,1]],L:[[0,0,1],[1,1,1]]};
+const COL={I:'#4cc9f0',O:'#ffd60a',T:'#c77dff',S:'#7cf2a4',Z:'#ff5d73',J:'#4f7bff',L:'#ff9f43'};
+const LS=k=>{try{return localStorage.getItem(k)}catch(e){return null}},SV=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let board,cur,next,bag=[],score,lines,level,best=+LS('tetrisbest')||0,acc=0,last=0,running=false,paused=false,over=false;
+document.getElementById('best').textContent=best;
+function draw7(){if(!bag.length)bag=Object.keys(P).sort(()=>Math.random()-.5);return bag.pop()}
+function spawn(t){const m=P[t].map(r=>r.slice());return{t,m,x:(W-m[0].length)/2|0,y:0}}
+const rot=m=>m[0].map((_,i)=>m.map(r=>r[i]).reverse());
+function fits(p,dx=0,dy=0,m=p.m){return m.every((r,i)=>r.every((v,j)=>{if(!v)return true;const X=p.x+j+dx,Y=p.y+i+dy;return X>=0&&X<W&&Y<H&&(Y<0||!board[Y][X])}))}
+function start(){board=[...Array(H)].map(()=>Array(W).fill(null));score=0;lines=0;level=1;bag=[];cur=spawn(draw7());next=draw7();running=true;paused=false;over=false;upd();last=performance.now();requestAnimationFrame(frame)}
+function lock(){cur.m.forEach((r,i)=>r.forEach((v,j)=>{if(v&&cur.y+i>=0)board[cur.y+i][cur.x+j]=cur.t}));
+  let n=0;for(let y=H-1;y>=0;y--)if(board[y].every(Boolean)){board.splice(y,1);board.unshift(Array(W).fill(null));n++;y++}
+  score+=[0,100,300,500,800][n]*level;lines+=n;level=1+(lines/10|0);
+  cur=spawn(next);next=draw7();if(!fits(cur)){over=true;running=false;if(score>best){best=score;SV('tetrisbest',best)}}upd()}
+function upd(){Object.entries({score,lines,level,best}).forEach(([k,v])=>document.getElementById(k).textContent=v)}
+function act(a){if(!running||paused)return;
+  if(a==='L'&&fits(cur,-1))cur.x--;else if(a==='R'&&fits(cur,1))cur.x++;
+  else if(a==='D'){if(fits(cur,0,1)){cur.y++;score++;upd()}else lock()}
+  else if(a==='rot'){const m=rot(cur.m);for(const k of[0,-1,1,-2,2])if(fits(cur,k,0,m)){cur.m=m;cur.x+=k;break}}
+  else if(a==='drop'){while(fits(cur,0,1)){cur.y++;score+=2}lock()}
+  render()}
+function frame(t){if(!running){render();return}if(!paused){acc+=t-last;const sp=Math.max(80,800-(level-1)*70);if(acc>sp){acc=0;if(fits(cur,0,1))cur.y++;else lock()}}last=t;render();requestAnimationFrame(frame)}
+function blk(c,X,Y,col,a=1){c.globalAlpha=a;c.fillStyle=col;c.fillRect(X+1,Y+1,S-2,S-2);c.fillStyle='rgba(255,255,255,.25)';c.fillRect(X+1,Y+1,S-2,5);c.globalAlpha=1}
+function render(){x.clearRect(0,0,cv.width,cv.height);x.strokeStyle='rgba(255,255,255,.04)';for(let i=0;i<=W;i++){x.beginPath();x.moveTo(i*S,0);x.lineTo(i*S,H*S);x.stroke()}
+  if(!board)return;board.forEach((r,y)=>r.forEach((v,X)=>v&&blk(x,X*S,y*S,COL[v])));
+  if(cur&&!over){let g=0;while(fits(cur,0,g+1))g++;cur.m.forEach((r,i)=>r.forEach((v,j)=>{if(v){blk(x,(cur.x+j)*S,(cur.y+i+g)*S,COL[cur.t],.2);blk(x,(cur.x+j)*S,(cur.y+i)*S,COL[cur.t])}}))}
+  nx.clearRect(0,0,100,100);if(next){const m=P[next],s=22,ox=(100-m[0].length*s)/2,oy=(100-m.length*s)/2;m.forEach((r,i)=>r.forEach((v,j)=>{if(v){nx.fillStyle=COL[next];nx.fillRect(ox+j*s+1,oy+i*s+1,s-2,s-2)}}))}
+  if(over||paused){x.fillStyle='rgba(15,12,36,.75)';x.fillRect(0,0,cv.width,cv.height);x.fillStyle='#fff';x.textAlign='center';x.font='bold 32px Segoe UI, Arial';x.fillText(over?'המשחק נגמר':'הפסקה',cv.width/2,cv.height/2)}}
+addEventListener('keydown',e=>{const m={ArrowLeft:'L',ArrowRight:'R',ArrowDown:'D',ArrowUp:'rot',x:'rot',X:'rot',' ':'drop'}[e.key];
+  if(m){e.preventDefault();if(!running&&e.key===' ')start();else act(m)}else if(e.key==='p'||e.key==='P')togglePause()});
+function togglePause(){if(!running)return;paused=!paused;document.getElementById('pause').textContent=paused?'המשך':'השהה'}
+document.querySelectorAll('.pad button').forEach(b=>b.onclick=()=>act(b.dataset.a));
+document.getElementById('go').onclick=start;document.getElementById('pause').onclick=togglePause;
+let sx,sy,st;cv.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY;st=Date.now()});
+cv.addEventListener('pointerup',e=>{const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)<15&&Math.abs(dy)<15){running?act('rot'):start();return}if(Math.abs(dx)>Math.abs(dy))act(dx<0?'L':'R');else if(dy>0)act(dy>120?'drop':'D')});
+render();
+</script>
+</body>
+</html>

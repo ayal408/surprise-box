@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>סודוקו</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#4cc9f0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 20% 0%,#1d3b7a 0%,transparent 55%),var(--bg);color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:480px;display:flex;flex-direction:column;gap:12px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+h1{margin:0;font-size:2.2rem;color:var(--acc)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+select,button{font:inherit;cursor:pointer;border-radius:10px;padding:7px 12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+button.pri{background:var(--acc);color:#04202b;border:0;font-weight:700}
+.info{margin-inline-start:auto;color:var(--muted);font-variant-numeric:tabular-nums}
+.grid{direction:ltr;display:grid;grid-template-columns:repeat(9,1fr);border:3px solid #cfd6ff;border-radius:8px;overflow:hidden;aspect-ratio:1;user-select:none}
+.c{display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.14);font-size:clamp(1rem,5vw,1.6rem);cursor:pointer;position:relative;background:#171335}
+.c.given{font-weight:800;color:#fff}
+.c.user{color:var(--acc)}
+.c.bx{border-right:2px solid #cfd6ff}.c.by{border-bottom:2px solid #cfd6ff}
+.c.peer{background:#211c48}.c.same{background:#2f3a78}.c.sel{background:#3d58b8}
+.c.err{color:#ff5d73!important}
+.notes{position:absolute;inset:2px;display:grid;grid-template-columns:repeat(3,1fr);font-size:.55rem;color:var(--muted);line-height:1;text-align:center;align-items:center}
+.pad{direction:ltr;display:grid;grid-template-columns:repeat(9,1fr);gap:6px}
+.pad button{padding:10px 0;font-size:1.2rem;font-weight:700}
+.pad button.done{opacity:.3}
+.tools{display:flex;gap:8px}
+.tools button{flex:1}
+.tools button.on{background:var(--acc);color:#04202b}
+.win{text-align:center;font-size:1.4rem;font-weight:800;color:#7cf2c4;min-height:1.6em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>סודוקו</h1>
+  <div class="bar">
+    <select id="level"><option value="38">קל</option><option value="30" selected>בינוני</option><option value="25">קשה</option></select>
+    <button class="pri" id="new">לוח חדש</button>
+    <span class="info">⏱ <span id="time">0:00</span> · טעויות <span id="errs">0</span></span>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="pad" id="pad"></div>
+  <div class="tools">
+    <button id="notes">✏️ הערות</button><button id="erase">⌫ מחיקה</button><button id="hint">💡 רמז</button>
+  </div>
+  <div class="win" id="win"></div>
+</div>
+<script>
+let sol,puz,cur,notes,sel=-1,noteMode=false,errs=0,t0,timer,done=false;
+const G=document.getElementById('grid'),P=document.getElementById('pad');
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function ok(b,i,v){const r=i/9|0,c=i%9,br=r-r%3,bc=c-c%3;for(let k=0;k<9;k++){if(b[r*9+k]===v||b[k*9+c]===v||b[(br+(k/3|0))*9+bc+k%3]===v)return false}return true}
+function fill(b){const i=b.indexOf(0);if(i<0)return true;for(const v of shuffle([1,2,3,4,5,6,7,8,9]))if(ok(b,i,v)){b[i]=v;if(fill(b))return true;b[i]=0}return false}
+function count(b,lim){let bi=-1,bc=null;
+  for(let i=0;i<81;i++)if(!b[i]){const cs=[];for(let v=1;v<=9;v++)if(ok(b,i,v))cs.push(v);if(!cs.length)return 0;if(!bc||cs.length<bc.length){bi=i;bc=cs;if(cs.length===1)break}}
+  if(bi<0)return 1;let n=0;for(const v of bc){if(n>=lim)break;b[bi]=v;n+=count(b,lim-n);b[bi]=0}return n}
+function make(clues){const s=Array(81).fill(0);fill(s);const p=s.slice();let filled=81;
+  for(const i of shuffle([...Array(81).keys()])){if(filled<=clues)break;const k=p[i];p[i]=0;if(count(p.slice(),2)!==1)p[i]=k;else filled--}
+  return[s,p]}
+function newGame(){[sol,puz]=make(+document.getElementById('level').value);cur=puz.slice();notes=[...Array(81)].map(()=>new Set());errs=0;sel=-1;done=false;
+  document.getElementById('win').textContent='';t0=Date.now();clearInterval(timer);timer=setInterval(tick,1000);tick();draw()}
+function tick(){if(done)return;const s=(Date.now()-t0)/1000|0;document.getElementById('time').textContent=(s/60|0)+':'+String(s%60).padStart(2,'0')}
+function draw(){G.innerHTML='';const sv=sel>=0?cur[sel]:0;
+  for(let i=0;i<81;i++){const r=i/9|0,c=i%9,d=document.createElement('div');d.className='c';
+    if(c%3===2&&c<8)d.classList.add('bx');if(r%3===2&&r<8)d.classList.add('by');
+    if(puz[i])d.classList.add('given');else if(cur[i])d.classList.add('user');
+    if(cur[i]&&cur[i]!==sol[i])d.classList.add('err');
+    if(sel>=0){const sr=sel/9|0,sc=sel%9;if(r===sr||c===sc||((r/3|0)===(sr/3|0)&&(c/3|0)===(sc/3|0)))d.classList.add('peer');if(sv&&cur[i]===sv)d.classList.add('same');if(i===sel)d.classList.add('sel')}
+    if(cur[i])d.textContent=cur[i];else if(notes[i].size){const n=document.createElement('div');n.className='notes';for(let v=1;v<=9;v++){const s=document.createElement('span');s.textContent=notes[i].has(v)?v:'';n.appendChild(s)}d.appendChild(n)}
+    d.onclick=()=>{sel=i;draw()};G.appendChild(d)}
+  document.getElementById('errs').textContent=errs;
+  P.querySelectorAll('button').forEach(b=>b.classList.toggle('done',cur.filter(x=>x==+b.textContent).length>=9))}
+function put(v){if(sel<0||puz[sel]||done)return;
+  if(noteMode&&v){cur[sel]=0;notes[sel].has(v)?notes[sel].delete(v):notes[sel].add(v)}
+  else{cur[sel]=v;notes[sel].clear();if(v&&v!==sol[sel])errs++;
+    if(v===sol[sel]){const r=sel/9|0,c=sel%9;for(let k=0;k<81;k++){const kr=k/9|0,kc=k%9;if(kr===r||kc===c||((kr/3|0)===(r/3|0)&&(kc/3|0)===(c/3|0)))notes[k].delete(v)}}}
+  draw();
+  if(cur.every((x,i)=>x===sol[i])){done=true;clearInterval(timer);document.getElementById('win').textContent='🎉 פתרת! '+document.getElementById('time').textContent+' דקות, '+errs+' טעויות'}}
+for(let v=1;v<=9;v++){const b=document.createElement('button');b.textContent=v;b.onclick=()=>put(v);P.appendChild(b)}
+document.getElementById('new').onclick=newGame;
+document.getElementById('notes').onclick=e=>{noteMode=!noteMode;e.currentTarget.classList.toggle('on',noteMode)};
+document.getElementById('erase').onclick=()=>put(0);
+document.getElementById('hint').onclick=()=>{let i=sel>=0&&cur[sel]!==sol[sel]?sel:-1;if(i<0){const e=[...Array(81).keys()].filter(k=>cur[k]!==sol[k]);if(!e.length)return;i=e[Math.random()*e.length|0]}sel=i;const m=noteMode;noteMode=false;put(sol[i]);noteMode=m};
+addEventListener('keydown',e=>{if(e.key>='1'&&e.key<='9')put(+e.key);else if(e.key==='Backspace'||e.key==='Delete'||e.key==='0')put(0);
+  else if(e.key.startsWith('Arrow')){if(sel<0)sel=0;const d={ArrowLeft:-1,ArrowRight:1,ArrowUp:-9,ArrowDown:9}[e.key];sel=(sel+d+81)%81;e.preventDefault();draw()}
+  else if(e.key==='n'||e.key==='N'){document.getElementById('notes').click()}});
+newGame();
+</script>
+</body>
+</html>

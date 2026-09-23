@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>גן תודה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Assistant:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#F3F0E6;--paper:#FFFDF6;--ink:#2B2A22;--muted:#6F6A58;--line:#E0D9C4;--leaf:#3F7D4E;--leaf-soft:#DCEBD9;--petal:#E0567A;
+  --display:"Amatic SC","Segoe Print","Comic Sans MS",cursive;--body:"Assistant","Segoe UI",Arial,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#14170F;--paper:#1C2016;--ink:#EDEBDD;--muted:#A6A38E;--line:#333826;--leaf:#8FD19E;--leaf-soft:#22321F;--petal:#FF8FAE}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#14170F;--paper:#1C2016;--ink:#EDEBDD;--muted:#A6A38E;--line:#333826;--leaf:#8FD19E;--leaf-soft:#22321F;--petal:#FF8FAE}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55}
+.wrap{max-width:1000px;margin:0 auto;padding-inline:18px;padding-block:24px 56px;display:flex;flex-direction:column;gap:18px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(3rem,10vw,4.6rem);line-height:.95;margin:0;color:var(--leaf)}
+p{margin:0}.muted{color:var(--muted)}
+.garden{position:relative;border-radius:22px;overflow:hidden;border:1px solid var(--line);box-shadow:0 12px 40px rgba(0,0,0,.12)}
+#cv{display:block;width:100%;height:min(62vh,520px);touch-action:manipulation;cursor:default}
+.tip{position:absolute;max-width:260px;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:.95rem;box-shadow:0 8px 24px rgba(0,0,0,.18);pointer-events:none;transform:translate(-50%,-110%);transition:opacity .15s}
+.tip small{display:block;color:var(--muted);font-size:.8rem;margin-top:4px}
+.clock{position:absolute;top:12px;inset-inline-start:14px;background:rgba(0,0,0,.25);color:#fff;border-radius:999px;padding:3px 12px;font-size:.85rem;backdrop-filter:blur(4px)}
+form{display:flex;gap:10px;flex-wrap:wrap}
+form input{flex:1 1 260px;font:inherit;padding:14px 16px;border-radius:14px;border:2px solid var(--line);background:var(--paper);color:var(--ink);min-width:0}
+form input:focus{outline:none;border-color:var(--leaf)}
+form button{font:inherit;font-weight:700;border:0;border-radius:14px;padding:14px 22px;background:var(--leaf);color:var(--paper);cursor:pointer;transition:transform .15s}
+form button:active{transform:scale(.96)}
+:focus-visible{outline:3px solid var(--petal);outline-offset:2px}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px 16px;display:flex;align-items:baseline;gap:8px}
+.stat b{font-family:var(--display);font-size:2.2rem;line-height:1;color:var(--petal)}
+.prompts{display:flex;gap:6px;flex-wrap:wrap}
+.prompts button{font:inherit;font-size:.88rem;border:1px dashed var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:4px 12px;cursor:pointer}
+.prompts button:hover{border-color:var(--leaf);color:var(--leaf)}
+ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+li{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;animation:in .5s ease both}
+li i{width:14px;height:14px;border-radius:50%;flex:none;margin-top:6px}
+li small{display:block;color:var(--muted);font-size:.8rem}
+li button{margin-inline-start:auto;border:0;background:none;color:var(--muted);cursor:pointer;font-size:1rem}
+@keyframes in{from{transform:translateY(10px);opacity:.3}}
+.example{font-size:.85rem;background:var(--leaf-soft);color:var(--leaf);border-radius:999px;padding:2px 10px;align-self:flex-start}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:6px">
+    <h1>גן תודה</h1>
+    <p class="muted" style="max-width:58ch">כל דבר קטן שאת מודה עליו מגדל פרח חדש. חוקרים מצאו שכמה דקות של כתיבת הכרת תודה ביום משפרות את מצב הרוח ואת השינה. הגן נשמר בדפדפן, והשמיים משתנים לפי השעה.</p>
+  </header>
+
+  <div class="garden">
+    <canvas id="cv" aria-label="גן פרחים שכל פרח בו הוא דבר שאת מודה עליו"></canvas>
+    <div class="clock" id="clock"></div>
+    <div class="tip" id="tip" style="opacity:0"></div>
+  </div>
+  <span class="example" id="exampleTag" hidden>הפרחים עכשיו הם דוגמה. כשתשתלי את הראשון שלך, הם יפנו לו מקום</span>
+
+  <form id="form">
+    <input id="txt" maxlength="120" placeholder="על מה את מודה היום?" aria-label="על מה את מודה היום" autocomplete="off">
+    <button type="submit">🌱 לשתול פרח</button>
+  </form>
+  <div class="prompts" id="prompts"></div>
+
+  <div class="stats">
+    <div class="stat"><b id="sCount">0</b><span>פרחים בגן</span></div>
+    <div class="stat"><b id="sStreak">0</b><span>ימים ברצף</span></div>
+    <div class="stat"><b id="sToday">0</b><span>היום</span></div>
+  </div>
+
+  <ul id="list"></ul>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const cv=$("cv"), cx=cv.getContext("2d");
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let W=0,H=0;
+function size(){ const d=devicePixelRatio||1, r=cv.getBoundingClientRect(); W=r.width; H=r.height; cv.width=W*d; cv.height=H*d; cx.setTransform(d,0,0,d,0,0); initStars(); }
+addEventListener("resize",size);
+
+const KEY="garden.entries";
+let entries=[]; try{ entries=JSON.parse(localStorage.getItem(KEY)||"[]"); }catch(e){}
+const saveAll=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(entries.filter(e=>!e.example))); }catch(e){} };
+const rnd=(a,b)=>a+Math.random()*(b-a);
+function makeFlower(text, date, example){
+  const xs=entries.map(e=>e.x); let best=.5, bestD=-1;
+  for(let i=0;i<24;i++){ const x=rnd(.05,.95); const d=xs.length?Math.min(...xs.map(v=>Math.abs(v-x))):1; if(d>bestD){bestD=d;best=x;} }
+  return {text,date,x:best,h:rnd(.18,.4),hue:Math.floor(rnd(0,360)),n:Math.floor(rnd(5,9)),r:rnd(13,21),ph:rnd(0,6.28),sp:rnd(.6,1.3),born:performance.now(),example:!!example};
+}
+const EX=["כוס קפה חם בבוקר","חיבוק מהילדים","שיחה טובה עם חברה","השמש אחרי הגשם","בריאות"];
+if(!entries.length){ const d=new Date(); EX.forEach((t,i)=>{ const f=makeFlower(t,new Date(d-i*864e5).toISOString(),true); f.born-=4000; entries.push(f); }); }
+else entries.forEach(e=>e.born=performance.now()-4000-Math.random()*800);
+const hasExamples=()=>entries.some(e=>e.example);
+
+/* prompts */
+["משהו טעים שאכלתי","מישהו שעזר לי","רגע שצחקתי","משהו בגוף שלי שעובד","משהו שלמדתי"].forEach(p=>{
+  const b=document.createElement("button"); b.type="button"; b.textContent=p+"…";
+  b.addEventListener("click",()=>{ $("txt").value=p+": "; $("txt").focus(); }); $("prompts").appendChild(b);
+});
+
+/* sky by time */
+function skyAt(h){
+  if(h>=6&&h<9)  return ["#FFB88C","#FFE3B3",false];
+  if(h>=9&&h<17) return ["#7EC8F2","#D8F0FF",false];
+  if(h>=17&&h<20)return ["#6D4C9C","#FF9E7A",false];
+  return ["#0B1030","#2A2F6A",true];
+}
+let stars=[]; function initStars(){ stars=Array.from({length:70},()=>({x:Math.random()*W,y:Math.random()*H*.6,r:Math.random()*1.4+.3,p:Math.random()*6.28})); }
+const gy=x=>H*.83+Math.sin(x/W*6.28*1.2+1)*H*.03;
+const bugs=Array.from({length:3},()=>({x:Math.random(),y:.4+Math.random()*.2,vx:0,vy:0,c:["#FFB703","#E0567A","#8ECAE6"][Math.floor(Math.random()*3)]}));
+const flies=Array.from({length:22},()=>({x:Math.random(),y:.5+Math.random()*.35,p:Math.random()*6.28}));
+
+function draw(t){
+  const h=new Date().getHours(), [top,bot,night]=skyAt(h);
+  const g=cx.createLinearGradient(0,0,0,H); g.addColorStop(0,top); g.addColorStop(1,bot); cx.fillStyle=g; cx.fillRect(0,0,W,H);
+  if(night){ stars.forEach(s=>{ cx.fillStyle=`rgba(255,255,240,${.4+.6*Math.abs(Math.sin(s.p+t*.001))})`; cx.beginPath(); cx.arc(s.x,s.y,s.r,0,6.283); cx.fill(); });
+    cx.fillStyle="#F4F1D0"; cx.beginPath(); cx.arc(W*.82,H*.18,22,0,6.283); cx.fill(); }
+  else { const sx=W*(.15+.7*((h-6)/14)), sy=H*.2; const sg=cx.createRadialGradient(sx,sy,0,sx,sy,70); sg.addColorStop(0,"rgba(255,244,190,1)"); sg.addColorStop(.35,"rgba(255,220,120,.8)"); sg.addColorStop(1,"rgba(255,220,120,0)"); cx.fillStyle=sg; cx.beginPath(); cx.arc(sx,sy,70,0,6.283); cx.fill(); }
+  // far hill
+  cx.fillStyle=night?"#1D3326":"#8CC084"; cx.beginPath(); cx.moveTo(0,H);
+  for(let x=0;x<=W;x+=10) cx.lineTo(x,H*.72+Math.sin(x/W*6.28*.8)*H*.05); cx.lineTo(W,H); cx.fill();
+  // near ground
+  cx.fillStyle=night?"#24402C":"#5E9F57"; cx.beginPath(); cx.moveTo(0,H);
+  for(let x=0;x<=W;x+=8) cx.lineTo(x,gy(x)); cx.lineTo(W,H); cx.fill();
+  // grass tufts
+  cx.strokeStyle=night?"#2F5238":"#4C8A47"; cx.lineWidth=1.5;
+  for(let x=5;x<W;x+=14){ const y=gy(x), s=reduce?0:Math.sin(t*.002+x)*2; cx.beginPath(); cx.moveTo(x,y); cx.lineTo(x+s,y-8); cx.stroke(); }
+  // flowers (back to front by height)
+  entries.slice().sort((a,b)=>b.h-a.h).forEach(f=>flower(f,t,night));
+  // critters
+  if(night){ flies.forEach(f=>{ const x=(f.x+Math.sin(t*.0003+f.p)*.03)*W, y=(f.y+Math.cos(t*.0004+f.p)*.03)*H, a=.3+.7*Math.abs(Math.sin(t*.002+f.p));
+    const fg=cx.createRadialGradient(x,y,0,x,y,8); fg.addColorStop(0,`rgba(230,255,120,${a})`); fg.addColorStop(1,"rgba(230,255,120,0)"); cx.fillStyle=fg; cx.beginPath(); cx.arc(x,y,8,0,6.283); cx.fill(); }); }
+  else if(!reduce){ bugs.forEach(b=>{ b.vx+=(Math.random()-.5)*.0004; b.vy+=(Math.random()-.5)*.0004; b.vx*=.98; b.vy*=.98; b.x+=b.vx; b.y+=b.vy;
+      if(b.x<.02||b.x>.98) b.vx*=-1; if(b.y<.25||b.y>.7) b.vy*=-1;
+      const x=b.x*W, y=b.y*H, flap=Math.abs(Math.sin(t*.02)); cx.fillStyle=b.c;
+      cx.beginPath(); cx.ellipse(x-5*flap,y,6*flap+1,4,-.4,0,6.283); cx.fill(); cx.beginPath(); cx.ellipse(x+5*flap,y,6*flap+1,4,.4,0,6.283); cx.fill();
+      cx.fillStyle="#333"; cx.fillRect(x-.8,y-4,1.6,8); }); }
+  requestAnimationFrame(draw);
+}
+const ease=k=>1-Math.pow(1-k,3);
+const back=k=>{ const c=1.7; return 1+(c+1)*Math.pow(k-1,3)+c*Math.pow(k-1,2); };
+function head(f,t){
+  const x=f.x*W, y=gy(x), g=reduce?1:Math.min(1,(t-f.born)/2200), stem=f.h*H*ease(g);
+  const sway=reduce?0:Math.sin(t*.001*f.sp+f.ph)*5*(f.h/.3);
+  return {x,y,g,stem,sway,hx:x+sway,hy:y-stem};
+}
+function flower(f,t,night){
+  const {x,y,g,stem,sway,hx,hy}=head(f,t);
+  cx.strokeStyle=night?"#3C6B45":"#3F7D4E"; cx.lineWidth=3; cx.lineCap="round";
+  cx.beginPath(); cx.moveTo(x,y); cx.quadraticCurveTo(x+sway*.2,y-stem*.5,hx,hy); cx.stroke();
+  if(g>.35){ const lk=Math.min(1,(g-.35)/.3); cx.fillStyle=night?"#3C6B45":"#4E9A5C";
+    cx.save(); cx.translate(x+sway*.1,y-stem*.4); cx.rotate(-.7); cx.beginPath(); cx.ellipse(8*lk,0,10*lk,4*lk,0,0,6.283); cx.fill(); cx.restore(); }
+  const b=g<.55?0:back(Math.min(1,(g-.55)/.45)); if(b<=0) return;
+  const r=f.r*b, rot=reduce?0:t*.0002*f.sp;
+  cx.save(); cx.translate(hx,hy); cx.rotate(rot);
+  const light=night?48:66;
+  for(let i=0;i<f.n;i++){ cx.rotate(6.283/f.n); cx.fillStyle=`hsl(${f.hue},78%,${light}%)`; cx.beginPath(); cx.ellipse(r*.75,0,r*.75,r*.38,0,0,6.283); cx.fill(); }
+  cx.fillStyle=night?"#C9A227":"#FFC93C"; cx.beginPath(); cx.arc(0,0,r*.38,0,6.283); cx.fill();
+  cx.restore();
+  f._hx=hx; f._hy=hy; f._r=r;
+}
+
+/* tooltip */
+const tip=$("tip");
+function hit(ev){
+  const r=cv.getBoundingClientRect(), px=ev.clientX-r.left, py=ev.clientY-r.top;
+  let best=null, bd=1e9; entries.forEach(f=>{ if(f._hx==null) return; const d=Math.hypot(f._hx-px,f._hy-py); if(d<Math.max(24,f._r+6)&&d<bd){bd=d;best=f;} });
+  if(best){ tip.innerHTML=""; tip.append(document.createTextNode(best.text)); const s=document.createElement("small");
+    s.textContent=new Date(best.date).toLocaleDateString("he-IL",{day:"numeric",month:"long",year:"numeric"})+(best.example?" · דוגמה":""); tip.appendChild(s);
+    tip.style.left=best._hx+"px"; tip.style.top=(best._hy-best._r)+"px"; tip.style.opacity=1; cv.style.cursor="pointer"; }
+  else { tip.style.opacity=0; cv.style.cursor="default"; }
+}
+cv.addEventListener("pointermove",hit); cv.addEventListener("pointerdown",hit); cv.addEventListener("pointerleave",()=>tip.style.opacity=0);
+
+/* list + stats */
+const dayKey=d=>{ const x=new Date(d); return x.getFullYear()+"-"+x.getMonth()+"-"+x.getDate(); };
+function renderList(){
+  $("exampleTag").hidden=!hasExamples();
+  const real=entries.filter(e=>!e.example);
+  $("sCount").textContent=real.length;
+  const today=dayKey(Date.now()); $("sToday").textContent=real.filter(e=>dayKey(e.date)===today).length;
+  const days=new Set(real.map(e=>dayKey(e.date))); let streak=0, d=new Date();
+  if(!days.has(dayKey(d))) d.setDate(d.getDate()-1);
+  while(days.has(dayKey(d))){ streak++; d.setDate(d.getDate()-1); }
+  $("sStreak").textContent=streak;
+  const ul=$("list"); ul.innerHTML="";
+  entries.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(e=>{
+    const li=document.createElement("li"), dot=document.createElement("i"); dot.style.background=`hsl(${e.hue},78%,62%)`;
+    const t=document.createElement("div"); t.textContent=e.text; const s=document.createElement("small");
+    s.textContent=new Date(e.date).toLocaleDateString("he-IL",{weekday:"long",day:"numeric",month:"long"})+(e.example?" · דוגמה":""); t.appendChild(s);
+    const rm=document.createElement("button"); rm.type="button"; rm.textContent="✕"; rm.title="להסיר את הפרח"; rm.setAttribute("aria-label","להסיר");
+    rm.addEventListener("click",()=>{ entries=entries.filter(x=>x!==e); saveAll(); renderList(); });
+    li.append(dot,t,rm); ul.appendChild(li);
+  });
+}
+$("form").addEventListener("submit",ev=>{
+  ev.preventDefault(); const v=$("txt").value.trim(); if(!v) return;
+  if(hasExamples()) entries=entries.filter(e=>!e.example);
+  entries.push(makeFlower(v,new Date().toISOString(),false)); saveAll(); renderList(); $("txt").value="";
+});
+function clock(){ $("clock").textContent=new Date().toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"}); }
+setInterval(clock,20000); clock();
+size(); renderList(); requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

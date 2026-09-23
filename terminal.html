@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הטרמינל</title>
+<style>
+:root{--g:#33ff66;--dim:#1a8a3a;--bg:#020a04}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:#000;color:var(--g);font-family:"Courier New",Consolas,monospace;font-size:17px;display:flex;justify-content:center;align-items:center;padding:14px}
+.crt{position:relative;width:100%;max-width:900px;height:min(86vh,720px);background:radial-gradient(ellipse at center,#062b10 0%,var(--bg) 75%);border-radius:26px;box-shadow:0 0 0 14px #1b1b17,0 0 0 16px #333,0 0 60px rgba(51,255,102,.25),inset 0 0 90px rgba(0,0,0,.9);overflow:hidden}
+.crt::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 2px,transparent 2px 4px);pointer-events:none;z-index:2}
+.crt::after{content:"";position:absolute;inset:0;background:rgba(51,255,102,.03);animation:flick .12s infinite;pointer-events:none;z-index:2}
+@keyframes flick{50%{opacity:.4}}
+#out{position:absolute;inset:0;padding:26px 30px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;text-shadow:0 0 6px var(--g);line-height:1.45;scrollbar-width:none}
+#out::-webkit-scrollbar{display:none}
+.line{display:flex;gap:8px}
+#cmd{flex:1;background:none;border:0;outline:0;color:var(--g);font:inherit;text-shadow:inherit;caret-color:var(--g);direction:rtl}
+.dim{color:var(--dim)}
+.warn{color:#ffcc33;text-shadow:0 0 6px #ffcc33}
+a{color:var(--g)}
+canvas#rain{position:absolute;inset:0;z-index:3;display:none}
+@media (prefers-reduced-motion:reduce){.crt::after{animation:none}}
+</style>
+</head>
+<body>
+<div class="crt">
+  <div id="out"></div>
+  <canvas id="rain"></canvas>
+</div>
+<script>
+const out=document.getElementById('out');
+let hist=[],hi=0,busy=false;
+const facts=['לדבורה יש חמש עיניים.','הלב של לוויתן כחול שוקל בערך כמו מכונית קטנה.','בנגב יורד בממוצע פחות מ־100 מ״מ גשם בשנה באזור אילת.','תמנון יכול לטעום בעזרת הזרועות שלו.','הדבש לא מתקלקל. נמצא דבש אכיל בקברים במצרים.','ים המלח הוא הנקודה הנמוכה ביותר ביבשה על כדור הארץ.','לחלזונות יש אלפי שיניים זעירות.','אור השמש מגיע אלינו אחרי בערך 8 דקות ו־20 שניות.'];
+const jokes=['למה המתכנת עזב את העבודה? כי הוא לא קיבל מערכים (arrays).','כמה מתכנתים צריך כדי להחליף נורה? אף אחד, זו בעיית חומרה.','רואה חשבון נכנס לבר. בסוף הוא יצא מאוזן.','יש 10 סוגים של אנשים: אלה שמבינים בינארי ואלה שלא.','למה הסקלטון לא הלך למסיבה? לא היה לו אף גוף ללכת איתו.'];
+const fortunes=['היום תמצא משהו שחיפשת מזמן. כנראה את המפתחות.','הצעד הקטן של היום הוא הקפיצה של מחר.','מישהו חושב עליך עכשיו. אולי זה השכן עם המקדחה.','סבלנות היא מפתח. וגם Ctrl+Z.','ההצלחה נמצאת במרחק של קפה אחד.'];
+const fs={'readme.txt':'ברוכים הבאים לטרמינל של קופסת ההפתעות.\nנסו: help','סוד.txt':'הסוד הוא שאין סוד. אבל נסו matrix.','רשימת קניות.txt':'חלב\nלחם\nעוד 10 דברים חדשים'};
+function print(t,cls){const d=document.createElement('div');if(cls)d.className=cls;d.textContent=t;out.insertBefore(d,out.lastChild);out.scrollTop=out.scrollHeight}
+async function type(t,cls,sp=14){const d=document.createElement('div');if(cls)d.className=cls;out.insertBefore(d,out.lastChild);for(const ch of t){d.textContent+=ch;out.scrollTop=out.scrollHeight;if(sp)await new Promise(r=>setTimeout(r,sp))}}
+const pick=a=>a[Math.random()*a.length|0];
+const C={
+  help:async()=>{await type('פקודות זמינות:\n  help        - הרשימה הזו\n  date        - תאריך ושעה\n  calc 2*3+1  - מחשבון\n  fact        - עובדה מעניינת\n  joke        - בדיחה\n  fortune     - עוגיית מזל\n  ls / cat    - קבצים\n  roll 2d6    - הטלת קוביות\n  guess       - משחק ניחוש מספר\n  matrix      - גשם דיגיטלי\n  color amber - צבע מסך (green/amber/blue/white)\n  whoami, clear, exit',null,2)},
+  date:async()=>type(new Date().toLocaleString('he-IL',{dateStyle:'full',timeStyle:'medium'})),
+  calc:async a=>{const e=a.join('');if(!/^[\d+\-*/().%\s^]+$/.test(e)||!e)return type('שגיאה: רק מספרים ופעולות','warn');try{const v=Function('"use strict";return('+e.replace(/\^/g,'**')+')')();type(e+' = '+(+v.toFixed(10)))}catch{type('שגיאה בביטוי','warn')}},
+  fact:async()=>type('💡 '+pick(facts)),
+  joke:async()=>type('😄 '+pick(jokes)),
+  fortune:async()=>type('🥠 '+pick(fortunes)),
+  ls:async()=>type(Object.keys(fs).join('   ')),
+  cat:async a=>{const f=fs[a.join(' ')];f?type(f):type('cat: הקובץ לא נמצא','warn')},
+  whoami:async()=>type('אורח/ת מכובד/ת של קופסת ההפתעות'),
+  roll:async a=>{const m=/^(\d*)d(\d+)$/.exec(a[0]||'1d6');if(!m)return type('שימוש: roll 2d6','warn');const n=Math.min(+m[1]||1,50),s=+m[2];const r=Array.from({length:n},()=>1+Math.random()*s|0);type('🎲 '+r.join(' + ')+(n>1?' = '+r.reduce((a,b)=>a+b):''))},
+  guess:async()=>{secret=1+Math.random()*100|0;tries=0;await type('חשבתי על מספר בין 1 ל־100. הקלידו ניחוש.')},
+  matrix:async()=>matrix(),
+  color:async a=>{const c={green:['#33ff66','#1a8a3a'],amber:['#ffb000','#8a6000'],blue:['#4cc9ff','#1b6a8a'],white:['#e8e8e8','#777']}[a[0]];if(!c)return type('צבעים: green amber blue white','warn');document.documentElement.style.setProperty('--g',c[0]);document.documentElement.style.setProperty('--dim',c[1])},
+  clear:async()=>{while(out.childNodes.length>1)out.removeChild(out.firstChild)},
+  exit:async()=>{await type('מתנתק... להתראות 👋');setTimeout(()=>location.href='התחל כאן.html',900)},
+  sudo:async()=>type('נחמד שניסית. אין כאן sudo 😏','warn'),
+};
+let secret=0,tries=0;
+async function run(line){const [c,...a]=line.trim().split(/\s+/);if(!c)return;
+  if(secret&&/^\d+$/.test(c)){tries++;const n=+c;if(n===secret){await type(`🎉 בדיוק! ${tries} ניחושים.`);secret=0}else await type(n<secret?'⬆ גבוה יותר':'⬇ נמוך יותר');return}
+  const f=C[c.toLowerCase()];f?await f(a):await type(`פקודה לא מוכרת: ${c}. נסו help`,'warn')}
+function prompt(){const l=document.createElement('div');l.className='line';l.innerHTML='<span>guest@surprise:~$</span><input id="cmd" autocomplete="off" spellcheck="false">';out.appendChild(l);const i=l.querySelector('input');i.focus();
+  i.addEventListener('keydown',async e=>{if(e.key==='Enter'&&!busy){busy=true;const v=i.value;l.replaceWith(Object.assign(document.createElement('div'),{textContent:'guest@surprise:~$ '+v}));out.appendChild(document.createElement('span'));if(v.trim()){hist.push(v);hi=hist.length}await run(v);out.lastChild.remove();busy=false;prompt()}
+    else if(e.key==='ArrowUp'){hi=Math.max(0,hi-1);i.value=hist[hi]||'';e.preventDefault()}else if(e.key==='ArrowDown'){hi=Math.min(hist.length,hi+1);i.value=hist[hi]||''}});}
+document.querySelector('.crt').addEventListener('click',()=>{const i=document.getElementById('cmd');i&&i.focus()});
+function matrix(){return new Promise(res=>{const cv=document.getElementById('rain'),x=cv.getContext('2d');cv.style.display='block';cv.width=cv.offsetWidth;cv.height=cv.offsetHeight;const fsz=16,cols=cv.width/fsz|0,drops=Array(cols).fill(0).map(()=>Math.random()*-40);const ch='אבגדהוזחטיכלמנסעפצקרשת0123456789';const g=getComputedStyle(document.documentElement).getPropertyValue('--g');let f=0;
+  const tick=()=>{x.fillStyle='rgba(0,0,0,.08)';x.fillRect(0,0,cv.width,cv.height);x.fillStyle=g;x.font=fsz+'px monospace';drops.forEach((d,i)=>{x.fillText(ch[Math.random()*ch.length|0],i*fsz,d*fsz);drops[i]=d*fsz>cv.height&&Math.random()>.97?0:d+1});
+    if(++f<260)requestAnimationFrame(tick);else{cv.style.display='none';res()}};tick()})}
+(async()=>{out.appendChild(document.createElement('span'));
+  await type('SURPRISE-OS v1.0  (c) קופסת ההפתעות','dim',8);
+  await type('בודק זיכרון... 640K זה מספיק לכולם. OK','dim',8);
+  await type('טוען הפתעות........ OK','dim',25);
+  await type('\nשלום! הקלידו help כדי לראות מה אפשר לעשות כאן.\n',null,18);
+  out.lastChild.remove();prompt()})();
+</script>
+</body>
+</html>

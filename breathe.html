@@ -1,0 +1,120 @@
+<title>רגע של נשימה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Karantina:wght@700&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#E9F0EE; --surface:#F7FAF9; --ink:#12302B; --muted:#557570; --line:#CFDDD9;
+  --in:#2E8C7E; --hold:#6C7FB8; --out:#C98F5A; --glow:#D6EBE6;
+  --display:"Karantina","Arial Hebrew",Arial,sans-serif;
+  --body:"Assistant","Segoe UI",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ color-scheme:dark;
+    --bg:#0C1716; --surface:#12201F; --ink:#DCEDE9; --muted:#8AA8A2; --line:#22403B;
+    --in:#57C2B1; --hold:#98A8DE; --out:#E3AE7C; --glow:#153230; }
+}
+:root[data-theme="dark"]{ color-scheme:dark;
+  --bg:#0C1716; --surface:#12201F; --ink:#DCEDE9; --muted:#8AA8A2; --line:#22403B;
+  --in:#57C2B1; --hold:#98A8DE; --out:#E3AE7C; --glow:#153230; }
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;margin:0}
+.wrap{max-width:760px;margin:0 auto;padding-inline:18px;padding-block:22px 56px;display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(2.8rem,9vw,4rem);line-height:1;margin:0;letter-spacing:.01em}
+p{margin:0}
+.muted{color:var(--muted)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--in);outline-offset:2px}
+.modes{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.modes button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 16px;font-weight:700}
+.modes button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.desc{max-width:48ch;min-height:3.1em}
+.stage{position:relative;width:min(340px,80vw);aspect-ratio:1;max-width:100%;display:grid;place-items:center}
+.orb{position:absolute;width:100%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 45%, var(--glow), transparent 70%)}
+.ball{width:42%;aspect-ratio:1;border-radius:50%;background:var(--in);transform:scale(1);transition-property:transform,background-color;transition-timing-function:cubic-bezier(.45,0,.55,1);box-shadow:0 0 0 12px color-mix(in srgb,var(--in) 18%,transparent)}
+.label{position:absolute;display:flex;flex-direction:column;align-items:center;gap:0;pointer-events:none}
+.label b{font-family:var(--display);font-size:2.6rem;line-height:1;color:var(--ink)}
+.label span{font-family:var(--mono);font-size:1.4rem;color:var(--muted)}
+.go{border:0;background:var(--ink);color:var(--bg);border-radius:999px;padding:13px 34px;font-size:1.15rem;font-weight:700;min-width:190px}
+.row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:center;color:var(--muted);font-size:.95rem}
+.row label{display:flex;gap:6px;align-items:center}
+.row select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:4px 8px}
+.done{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px;max-width:46ch}
+.help{font-size:.9rem;color:var(--muted);max-width:52ch;border-top:1px solid var(--line);padding-top:14px}
+.help b{color:var(--ink);font-family:var(--mono)}
+@media (prefers-reduced-motion:reduce){ .ball{transition-duration:0s!important} }
+</style>
+
+<div class="wrap" dir="rtl" lang="he">
+  <div>
+    <h1>רגע של נשימה</h1>
+    <p class="muted">כמה דקות של נשימה איטית מאטות את הדופק ומרגיעות את הגוף.</p>
+  </div>
+  <div class="modes" role="group" aria-label="סוג תרגיל">
+    <button type="button" data-m="box" aria-pressed="true">נשימת קופסה</button>
+    <button type="button" data-m="478" aria-pressed="false">4‑7‑8 להירדם</button>
+    <button type="button" data-m="sigh" aria-pressed="false">אנחה כפולה, להרגעה מהירה</button>
+    <button type="button" data-m="even" aria-pressed="false">נשימה שקטה</button>
+  </div>
+  <p class="desc" id="desc"></p>
+  <div class="stage">
+    <div class="orb"></div>
+    <div class="ball" id="ball"></div>
+    <div class="label"><b id="phase">מוכנה?</b><span id="sec"></span></div>
+  </div>
+  <button class="go" id="go" type="button">להתחיל</button>
+  <div class="row">
+    <label for="dur">משך <select id="dur"><option value="60">דקה</option><option value="180" selected>3 דקות</option><option value="300">5 דקות</option><option value="600">10 דקות</option></select></label>
+    <label for="snd"><input type="checkbox" id="snd" checked> צליל עדין במעבר</label>
+    <span id="left"></span>
+  </div>
+  <div class="done" id="done" hidden>סיימת. שימי לב איך הגוף מרגיש עכשיו לעומת קודם.</div>
+  <p class="help">אם הקושי לא עובר, מדברים עם מישהו. ער"ן, עזרה ראשונה נפשית: <b>1201</b>, 24 שעות ביממה. בסכנה מיידית מתקשרים ל־<b>101</b>.</p>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const MODES={
+  box:{d:'שואפים 4 שניות, מחזיקים 4, נושפים 4 ומחזיקים 4. בשיטה הזאת משתמשים גם חיילים וטייסים כדי להירגע במצבי לחץ.',
+       p:[['שאיפה',4,'in'],['להחזיק',4,'hold'],['נשיפה',4,'out'],['להחזיק',4,'hold2']]},
+  '478':{d:'שואפים באף 4 שניות, מחזיקים 7 ונושפים לאט בפה 8. מתאים לפני השינה. אם מרגישים סחרחורת, חוזרים לנשום רגיל.',
+       p:[['שאיפה',4,'in'],['להחזיק',7,'hold'],['נשיפה',8,'out']]},
+  sigh:{d:'שתי שאיפות באף, ארוכה ואחריה קצרה, ואז נשיפה ארוכה ואיטית בפה. זו הדרך הכי מהירה להוריד מתח, ומספיקים כמה סבבים.',
+       p:[['שאיפה',2.5,'in'],['עוד קצת',1,'in2'],['נשיפה ארוכה',6,'out']]},
+  even:{d:'שואפים 5.5 שניות ונושפים 5.5, בערך 5.5 נשימות בדקה. זה קצב שמאזן את הדופק, וטוב לתרגול יומי.',
+       p:[['שאיפה',5.5,'in'],['נשיפה',5.5,'out']]}
+};
+let mode='box', running=false, t=null, endAt=0, idx=0, ctx=null, tick=null, phaseEnd=0;
+function setMode(m){ mode=m; document.querySelectorAll('[data-m]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m)); $('desc').textContent=MODES[m].d; if(running) stop(); }
+document.querySelectorAll('[data-m]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
+function chime(f){ if(!$('snd').checked||!ctx) return; const o=ctx.createOscillator(),g=ctx.createGain(),n=ctx.currentTime;
+  o.type='sine'; o.frequency.value=f; g.gain.setValueAtTime(0,n); g.gain.linearRampToValueAtTime(.12,n+.05); g.gain.exponentialRampToValueAtTime(.0001,n+1.2);
+  o.connect(g).connect(ctx.destination); o.start(n); o.stop(n+1.3); }
+const col=k=>getComputedStyle(document.documentElement).getPropertyValue(k==='out'?'--out':k.startsWith('hold')?'--hold':'--in');
+function step(){
+  const ph=MODES[mode].p[idx%MODES[mode].p.length]; const [name,sec,kind]=ph;
+  if(Date.now()>=endAt && idx%MODES[mode].p.length===0 && idx>0){ finish(); return; }
+  const b=$('ball'); b.style.transitionDuration=sec+'s';
+  const scale = kind==='in'?2:kind==='in2'?2.25:kind==='out'?1:null;
+  if(scale!==null) b.style.transform=`scale(${scale})`;
+  b.style.backgroundColor=col(kind);
+  $('phase').textContent=name; chime(kind==='out'?392:kind.startsWith('hold')?494:523);
+  phaseEnd=Date.now()+sec*1000; idx++;
+  t=setTimeout(step,sec*1000);
+}
+function upd(){ const r=Math.max(0,(phaseEnd-Date.now())/1000); $('sec').textContent=Math.ceil(r);
+  const l=Math.max(0,Math.ceil((endAt-Date.now())/1000)); $('left').textContent=`נשארו ${Math.floor(l/60)}:${String(l%60).padStart(2,'0')}`; }
+async function start(){ ctx=ctx||new (window.AudioContext||window.webkitAudioContext)(); if(ctx.state==='suspended') await ctx.resume();
+  running=true; idx=0; endAt=Date.now()+(+$('dur').value)*1000; $('done').hidden=true; $('go').textContent='לעצור';
+  step(); tick=setInterval(upd,200); }
+function stop(){ running=false; clearTimeout(t); clearInterval(tick); $('go').textContent='להתחיל';
+  const b=$('ball'); b.style.transitionDuration='1.2s'; b.style.transform='scale(1)'; b.style.backgroundColor=col('in');
+  $('phase').textContent='מוכנה?'; $('sec').textContent=''; $('left').textContent=''; }
+function finish(){ stop(); $('done').hidden=false; chime(659); }
+$('go').addEventListener('click',()=>running?stop():start());
+setMode('box');
+})();
+</script>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>חיים מלאכותיים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;500;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* a deliberately dark, single-theme "petri dish" */
+:root{color-scheme:dark;--ink:#EAF0FF;--muted:#98A2C6;--glass:rgba(10,14,32,.74);--line:rgba(150,170,255,.18);--acc:#7CF2C4}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#03040B;color:var(--ink);font-family:"Heebo","Segoe UI",Arial,sans-serif;overflow:hidden}
+#cv{position:fixed;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.panel{position:fixed;background:var(--glass);border:1px solid var(--line);border-radius:18px;backdrop-filter:blur(10px);padding:14px 16px}
+.top{top:14px;inset-inline-start:14px;width:min(360px,calc(100vw - 28px));display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 28px);overflow:auto}
+h1{margin:0;font-weight:800;font-size:1.6rem;background:linear-gradient(90deg,#7CF2C4,#6FB8FF,#FF7AD9);-webkit-background-clip:text;background-clip:text;color:transparent}
+p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.55}
+.btns{display:flex;flex-wrap:wrap;gap:6px}
+.btns button{font:inherit;font-size:.88rem;color:var(--ink);background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:7px 11px;cursor:pointer}
+.btns button:hover{border-color:var(--acc)}
+.btns button.main{background:var(--acc);color:#04120d;border-color:var(--acc);font-weight:800}
+label.s{display:flex;flex-direction:column;gap:2px;font-size:.82rem;color:var(--muted)}
+label.s span{display:flex;justify-content:space-between}
+label.s b{font-family:"JetBrains Mono",monospace;color:var(--ink);font-weight:500}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.matrix{display:grid;gap:3px;direction:ltr;align-self:flex-start}
+.matrix div{width:30px;height:30px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-family:"JetBrains Mono",monospace;color:rgba(255,255,255,.85);user-select:none}
+.matrix .h{cursor:default;background:none!important}
+.matrix .h i{width:14px;height:14px;border-radius:50%;display:block}
+.fold{position:fixed;top:14px;inset-inline-start:14px;display:none}
+.collapsed .top{display:none}.collapsed .fold{display:block}
+.stat{position:fixed;bottom:12px;inset-inline-end:14px;font-family:"JetBrains Mono",monospace;font-size:.8rem;color:var(--muted)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+</style>
+</head>
+<body>
+<canvas id="cv" aria-label="סימולציית חלקיקים"></canvas>
+<div class="panel top" id="panel">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h1>חיים מלאכותיים</h1><button id="hide" title="הסתרת הפאנל" style="background:none;border:0;color:var(--muted);font-size:1.1rem;cursor:pointer">✕</button></div>
+  <p>בכל צבע יש חלקיקים, וכל צבע נמשך או נדחה מכל צבע אחר לפי כמה חוקים פשוטים. מהחוקים האלה נוצרים מעצמם תאים, נחשים ומושבות שזזים וטורפים. ככה נראית "התהוות", אחד הרעיונות המרתקים במדע.</p>
+  <div class="btns">
+    <button class="main" id="rnd">🎲 עולם חדש</button>
+    <button id="reset">↺ לפזר מחדש</button>
+    <button id="pause">⏸ עצירה</button>
+  </div>
+  <div class="btns" id="presets"></div>
+  <label class="s" for="n"><span>מספר חלקיקים <b id="nv"></b></span><input type="range" id="n" min="300" max="4000" step="100" value="1800"></label>
+  <label class="s" for="k"><span>מספר צבעים <b id="kv"></b></span><input type="range" id="k" min="2" max="6" step="1" value="5"></label>
+  <label class="s" for="rad"><span>טווח השפעה <b id="radv"></b></span><input type="range" id="rad" min="30" max="140" step="5" value="80"></label>
+  <label class="s" for="fr"><span>חיכוך <b id="frv"></b></span><input type="range" id="fr" min="0.02" max="0.4" step="0.01" value="0.12"></label>
+  <p>טבלת החוקים: שורה היא הצבע שזז, עמודה היא הצבע שמשפיע עליו. ירוק מושך, אדום דוחה. לוחצים על משבצת כדי לשנות אותה (Shift ולחיצה לכיוון ההפוך).</p>
+  <div class="matrix" id="matrix"></div>
+  <p>💡 לחיצה על המסך יוצרת פיצוץ שמפזר חלקיקים.</p>
+</div>
+<button class="panel fold btns" id="show" style="padding:8px 12px;color:var(--ink);font:inherit;cursor:pointer">⚙️ הגדרות</button>
+<div class="stat" id="stat"></div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const cv=$("cv"), cx=cv.getContext("2d");
+const COLORS=["#FF5D8F","#7CF2C4","#6FB8FF","#FFD23F","#B388FF","#FF9F45"];
+let W=0,H=0,dpr=1;
+function size(){ dpr=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight; cv.width=W*dpr; cv.height=H*dpr; cx.setTransform(dpr,0,0,dpr,0,0); }
+addEventListener("resize",size); size();
+
+let N=1800, K=5, R=80, FR=.12, paused=false;
+let X,Y,VX,VY,T, M=[];
+const rnd=(a,b)=>a+Math.random()*(b-a);
+function randomRules(){ M=Array.from({length:K},()=>Array.from({length:K},()=>Math.round(rnd(-1,1)*10)/10)); }
+function spawn(){
+  X=new Float32Array(N); Y=new Float32Array(N); VX=new Float32Array(N); VY=new Float32Array(N); T=new Uint8Array(N);
+  for(let i=0;i<N;i++){ X[i]=Math.random()*W; Y[i]=Math.random()*H; T[i]=i%K; }
+}
+const PRESETS={
+  "🦠 תאים":()=>{ K=4; M=[[.8,-.4,.3,-.2],[.6,.4,-.6,.1],[-.3,.7,.5,-.5],[.2,-.2,.6,.3]]; },
+  "🐍 נחשים":()=>{ K=3; M=[[.5,.9,-.4],[-.9,.4,.8],[.7,-.8,.3]]; },
+  "🌌 גלקסיות":()=>{ K=5; M=Array.from({length:5},(_,i)=>Array.from({length:5},(_,j)=>i===j?.9:j===(i+1)%5?.4:-.2)); },
+  "🎆 כאוס":()=>{ K=6; M=Array.from({length:6},()=>Array.from({length:6},()=>Math.round(rnd(-1,1)*10)/10)); }
+};
+Object.keys(PRESETS).forEach(name=>{ const b=document.createElement("button"); b.type="button"; b.textContent=name;
+  b.addEventListener("click",()=>{ PRESETS[name](); $("k").value=K; spawn(); renderMatrix(); labels(); }); $("presets").appendChild(b); });
+
+function renderMatrix(){
+  const m=$("matrix"); m.style.gridTemplateColumns=`repeat(${K+1},30px)`; m.innerHTML="";
+  const h=document.createElement("div"); h.className="h"; m.appendChild(h);
+  for(let j=0;j<K;j++){ const d=document.createElement("div"); d.className="h"; d.innerHTML=`<i style="background:${COLORS[j]}"></i>`; m.appendChild(d); }
+  for(let i=0;i<K;i++){
+    const d=document.createElement("div"); d.className="h"; d.innerHTML=`<i style="background:${COLORS[i]}"></i>`; m.appendChild(d);
+    for(let j=0;j<K;j++){
+      const c=document.createElement("div"), v=M[i][j];
+      c.style.background=v>=0?`rgba(80,220,140,${.15+Math.abs(v)*.75})`:`rgba(255,80,100,${.15+Math.abs(v)*.75})`;
+      c.textContent=v.toFixed(1); c.title=`${v>=0?"מושך":"דוחה"} ${Math.abs(v).toFixed(1)}`;
+      c.addEventListener("click",e=>{ let nv=M[i][j]+(e.shiftKey?-.2:.2); if(nv>1.01) nv=-1; if(nv<-1.01) nv=1; M[i][j]=Math.round(nv*10)/10; renderMatrix(); });
+      m.appendChild(c);
+    }
+  }
+}
+function labels(){ $("nv").textContent=N; $("kv").textContent=K; $("radv").textContent=R; $("frv").textContent=FR.toFixed(2); }
+
+/* physics with a spatial grid; wrap-around world */
+let cellHead, cellNext, cols, rows;
+function step(){
+  cols=Math.max(1,Math.floor(W/R)); rows=Math.max(1,Math.floor(H/R));
+  const cw=W/cols, ch=H/rows, nc=cols*rows;
+  if(!cellHead||cellHead.length!==nc) cellHead=new Int32Array(nc);
+  if(!cellNext||cellNext.length!==N) cellNext=new Int32Array(N);
+  cellHead.fill(-1);
+  for(let i=0;i<N;i++){ const c=Math.min(cols-1,(X[i]/cw)|0)+Math.min(rows-1,(Y[i]/ch)|0)*cols; cellNext[i]=cellHead[c]; cellHead[c]=i; }
+  const R2=R*R, beta=.3, force=R*.9, damp=1-FR;
+  for(let i=0;i<N;i++){
+    let fx=0, fy=0; const xi=X[i], yi=Y[i], row=M[T[i]];
+    const ci=Math.min(cols-1,(xi/cw)|0), cj=Math.min(rows-1,(yi/ch)|0);
+    for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){
+      const cc=((ci+dx+cols)%cols)+((cj+dy+rows)%rows)*cols;
+      for(let j=cellHead[cc]; j!==-1; j=cellNext[j]){
+        if(j===i) continue;
+        let rx=X[j]-xi, ry=Y[j]-yi;
+        if(rx>W/2) rx-=W; else if(rx<-W/2) rx+=W;
+        if(ry>H/2) ry-=H; else if(ry<-H/2) ry+=H;
+        const d2=rx*rx+ry*ry; if(d2>=R2||d2===0) continue;
+        const d=Math.sqrt(d2), r=d/R;
+        const f = r<beta ? r/beta-1 : row[T[j]]*(1-Math.abs(2*r-1-beta)/(1-beta));
+        fx+=rx/d*f; fy+=ry/d*f;
+      }
+    }
+    VX[i]=VX[i]*damp+fx*force*.012; VY[i]=VY[i]*damp+fy*force*.012;
+  }
+  for(let i=0;i<N;i++){ X[i]+=VX[i]; Y[i]+=VY[i]; if(X[i]<0) X[i]+=W; else if(X[i]>=W) X[i]-=W; if(Y[i]<0) Y[i]+=H; else if(Y[i]>=H) Y[i]-=H; }
+}
+/* pre-rendered glowing dots */
+const sprites=COLORS.map(c=>{ const s=document.createElement("canvas"); s.width=s.height=24; const g=s.getContext("2d"), gr=g.createRadialGradient(12,12,0,12,12,12);
+  gr.addColorStop(0,"#ffffff"); gr.addColorStop(.25,c); gr.addColorStop(1,"rgba(0,0,0,0)"); g.fillStyle=gr; g.fillRect(0,0,24,24); return s; });
+let last=performance.now(), fps=60, frames=0, acc=0;
+function frame(now){
+  const dt=now-last; last=now; acc+=dt; frames++; if(acc>500){ fps=Math.round(frames*1000/acc); frames=0; acc=0; $("stat").textContent=`${N} חלקיקים · ${fps} FPS`; }
+  if(!paused) step();
+  cx.globalCompositeOperation="source-over"; cx.fillStyle="rgba(3,4,11,.28)"; cx.fillRect(0,0,W,H);
+  cx.globalCompositeOperation="lighter";
+  for(let i=0;i<N;i++) cx.drawImage(sprites[T[i]],X[i]-6,Y[i]-6,12,12);
+  cx.globalCompositeOperation="source-over";
+  requestAnimationFrame(frame);
+}
+/* explosion on click */
+cv.addEventListener("pointerdown",e=>{
+  for(let i=0;i<N;i++){ let rx=X[i]-e.clientX, ry=Y[i]-e.clientY; const d=Math.hypot(rx,ry); if(d<160&&d>0){ const f=(1-d/160)*18; VX[i]+=rx/d*f; VY[i]+=ry/d*f; } }
+});
+$("rnd").addEventListener("click",()=>{ randomRules(); spawn(); renderMatrix(); });
+$("reset").addEventListener("click",spawn);
+$("pause").addEventListener("click",()=>{ paused=!paused; $("pause").textContent=paused?"▶ המשך":"⏸ עצירה"; });
+$("n").addEventListener("input",e=>{ N=+e.target.value; spawn(); labels(); });
+$("k").addEventListener("input",e=>{ K=+e.target.value; randomRules(); spawn(); renderMatrix(); labels(); });
+$("rad").addEventListener("input",e=>{ R=+e.target.value; labels(); });
+$("fr").addEventListener("input",e=>{ FR=+e.target.value; labels(); });
+$("hide").addEventListener("click",()=>document.body.classList.add("collapsed"));
+$("show").addEventListener("click",()=>document.body.classList.remove("collapsed"));
+if(innerWidth<640) document.body.classList.add("collapsed");
+PRESETS["🦠 תאים"](); $("k").value=K; spawn(); renderMatrix(); labels();
+cx.fillStyle="#03040B"; cx.fillRect(0,0,W,H);
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

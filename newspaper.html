@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>העיתון שלך</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700;900&family=David+Libre:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f4ecd8;--ink:#1d1a16;--rule:#2b2620;--fade:#6b6152}
+*{box-sizing:border-box}
+body{margin:0;background:#cfc4ab;color:var(--ink);font-family:"David Libre","Frank Ruhl Libre",Georgia,serif;padding:20px 12px}
+.form{max-width:980px;margin:0 auto 18px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-family:"Frank Ruhl Libre",serif}
+.form a{color:var(--ink);margin-inline-end:auto}
+.form input{font:inherit;padding:6px 10px;border:2px solid var(--ink);background:var(--paper);min-width:0}
+.form button{font:inherit;font-weight:700;padding:6px 14px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer}
+.paper{max-width:980px;margin:0 auto;background:var(--paper);padding:28px 32px 40px;box-shadow:0 10px 40px rgba(0,0,0,.35);background-image:radial-gradient(rgba(120,90,40,.08) 1px,transparent 1px);background-size:3px 3px;position:relative}
+.top{display:flex;justify-content:space-between;font-size:.85rem;border-bottom:1px solid var(--rule);padding-bottom:6px;color:var(--fade)}
+.mast{text-align:center;font-family:"Frank Ruhl Libre",serif;font-weight:900;font-size:clamp(2.4rem,8vw,5.2rem);line-height:1;margin:10px 0 4px;letter-spacing:-1px}
+.sub{display:flex;justify-content:space-between;border-top:3px double var(--rule);border-bottom:3px double var(--rule);padding:5px 0;font-size:.9rem;font-weight:700}
+.head{font-family:"Frank Ruhl Libre",serif;font-weight:900;font-size:clamp(1.8rem,5vw,3.2rem);text-align:center;line-height:1.1;margin:18px 0 6px}
+.deck{text-align:center;font-style:italic;font-size:1.15rem;color:var(--fade);margin:0 0 14px}
+.cols{display:grid;grid-template-columns:2fr 1fr;gap:22px;border-top:1px solid var(--rule);padding-top:14px}
+.main{column-count:2;column-gap:22px;column-rule:1px solid rgba(0,0,0,.25);text-align:justify;line-height:1.55;font-size:1.02rem}
+.main p{margin:0 0 .8em}
+.main p:first-child::first-letter{float:right;font-family:"Frank Ruhl Libre";font-weight:900;font-size:3.6em;line-height:.8;margin:6px 0 0 8px}
+.photo{break-inside:avoid;border:1px solid var(--rule);padding:6px;margin-bottom:10px}
+.photo canvas{width:100%;display:block;filter:grayscale(1) contrast(1.2)}
+.photo small{display:block;font-style:italic;color:var(--fade);margin-top:4px}
+aside{border-inline-start:1px solid var(--rule);padding-inline-start:18px;display:flex;flex-direction:column;gap:14px}
+aside h3{font-family:"Frank Ruhl Libre";font-weight:900;margin:0 0 4px;font-size:1.2rem;border-bottom:2px solid var(--rule)}
+aside p{margin:0;line-height:1.45;font-size:.97rem}
+.box{border:2px solid var(--rule);padding:10px}
+.wx{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;gap:4px;font-size:.9rem}
+.wx b{display:block;font-size:1.5rem}
+.ad{border:3px double var(--rule);text-align:center;padding:12px;font-family:"Frank Ruhl Libre";transform:rotate(-1deg)}
+.ad b{font-size:1.4rem;display:block}
+.bottom{margin-top:18px;border-top:3px double var(--rule);padding-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.bottom h4{font-family:"Frank Ruhl Libre";font-weight:900;margin:0 0 4px;font-size:1.1rem}
+.bottom p{margin:0;font-size:.93rem;line-height:1.45}
+@media(max-width:720px){.paper{padding:18px 16px}.cols{grid-template-columns:1fr}.main{column-count:1}aside{border:0;padding:0}.bottom{grid-template-columns:1fr}}
+@media print{body{background:none;padding:0}.form{display:none}.paper{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="form">
+  <a href="התחל כאן.html">→ לקופסת ההפתעות</a>
+  <input id="name" placeholder="שם הגיבור/ה" value="">
+  <input id="city" placeholder="עיר" value="">
+  <button id="go">📰 הדפיסו גיליון חדש</button>
+  <button onclick="print()">🖨️ הדפסה</button>
+</div>
+<div class="paper" id="paper"></div>
+<script>
+const $=id=>document.getElementById(id);
+const pick=a=>a[Math.random()*a.length|0];
+const hebDate=d=>{try{return new Intl.DateTimeFormat('he-u-ca-hebrew',{day:'numeric',month:'long',year:'numeric'}).format(d)}catch{return''}};
+const feats=[
+ ['{n} מצא/ה את השלט של הטלוויזיה אחרי שלושה שבועות','"הוא היה בין הכריות כל הזמן", אמר/ה בהתרגשות למול עשרות כתבים'],
+ ['{n} סיים/ה את כל רשימת המשימות לפני הצהריים','מומחים: "לא נרשם מקרה כזה מאז 1987"'],
+ ['חשיפה: {n} הכין/ה את הקפה הטוב ביותר ב{c}','תור של שכנים השתרך עד קצה הרחוב; הבריסטות בעיר מודאגים'],
+ ['{n} הצליח/ה לקפל סדין עם גומי בניסיון הראשון','פיזיקאים מכל העולם מבקשים לבחון את השיטה'],
+ ['{n} נבחר/ה לאדם הכי נחמד ב{c}','"פשוט אמרתי תודה לנהג האוטובוס", סיפר/ה בצניעות'],
+ ['ב{c} מתכוננים: {n} מתכנן/ת ארוחת שישי חגיגית','הסופרמרקטים מדווחים על מחסור זמני בחומוס'],
+];
+const body=[
+ 'לדברי עדי ראייה, האירוע התחיל כבוקר רגיל לכל דבר. "היה נראה כמו עוד יום", סיפרה שכנה שביקשה להישאר בעילום שם, "ואז פתאום הבנו שמשהו היסטורי קורה".',
+ 'גורמים בעירייה אישרו כי ישקלו להציב שלט הנצחה במקום, ואף הוזכרה האפשרות לקרוא לכיכר המקומית על שם הגיבור/ה.',
+ 'ברשתות החברתיות הגיבו אלפים. "סוף סוף חדשות טובות", כתב גולש אחד, ואחר הוסיף: "מישהו צריך לעשות מזה סרט".',
+ 'בני המשפחה, שהתכנסו בסלון לצפות בשידור החי, סיפרו כי "תמיד ידענו שזה יקרה, רק לא ידענו מתי".',
+ 'בשעות הערב צפויה חגיגה ספונטנית ברחבי העיר. המשטרה ממליצה להגיע מוקדם ולהביא כיבוד.',
+ 'מומחים שנשאלו על כך מסרו כי מדובר ב"תופעה נדירה אך מבורכת", והוסיפו כי יש סיכוי טוב שהיא תחזור על עצמה בקרוב.'];
+const shorts=[['כלכלה','מדד הקפה עלה ב־3% מאז הבוקר. אנליסטים ממליצים על עוגייה ליד.'],['ספורט','קבוצת השכונה ניצחה 3:2 אחרי שהכדור נתקע בעץ ושוחרר בידי ילד בן 7.'],['מדע','מחקר חדש: חיבוק של 20 שניות משפר מצב רוח. החוקרים ממשיכים בניסויים.'],['תרבות','מופע ההפתעות נמכר עד הכרטיס האחרון. הוספו הופעות גם לשבוע הבא.'],['תחבורה','נהג מונית ויתר על עקיפה. התנועה בעיר הושבתה לרגע של תדהמה.'],['חינוך','תלמידי כיתה ה׳ ביקשו עוד שיעורי בית. המורה עדיין בהלם.'],['טכנולוגיה','גאדג׳ט חדש יודע למצוא גרביים בודדות. הכיסא בחדר השינה הודיע על פרישה.']];
+const ads=[['למכירה: מכונת זמן','מצב כמעט חדש. נוסעת רק קדימה, דקה בכל דקה.'],['דרוש/ה: מלטף/ת חתולים','משרה מלאה, תנאים מצוינים, גרגורים בשפע.'],['שיעורי שקט','למתחילים ולמתקדמים. אין צורך להביא דבר.']];
+function photo(cv){const x=cv.getContext('2d'),w=cv.width=600,h=cv.height=360;const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#ddd');g.addColorStop(1,'#777');x.fillStyle=g;x.fillRect(0,0,w,h);
+  x.fillStyle='#555';for(let i=0;i<9;i++){const bw=40+Math.random()*60,bh=80+Math.random()*180,bx=i*70-20;x.fillRect(bx,h-bh-60,bw,bh);x.fillStyle='#ccc';for(let yy=h-bh-50;yy<h-70;yy+=18)for(let xx=bx+6;xx<bx+bw-8;xx+=14)if(Math.random()>.4)x.fillRect(xx,yy,6,9);x.fillStyle='#555'}
+  x.fillStyle='#333';x.fillRect(0,h-60,w,60);x.fillStyle='#111';const px=w/2;x.beginPath();x.arc(px,h-150,22,0,7);x.fill();x.fillRect(px-20,h-128,40,70);x.lineWidth=10;x.strokeStyle='#111';x.beginPath();x.moveTo(px-20,h-120);x.lineTo(px-55,h-170);x.moveTo(px+20,h-120);x.lineTo(px+55,h-170);x.stroke();
+  for(let i=0;i<9000;i++){x.fillStyle=`rgba(0,0,0,${Math.random()*.12})`;x.fillRect(Math.random()*w,Math.random()*h,2,2)}}
+function make(){const n=$('name').value.trim()||'אורח/ת מסתורי/ת',c=$('city').value.trim()||'העיר';localStorage.setItem('np',JSON.stringify([n,c]));
+  const d=new Date(),f=pick(feats),fill=s=>s.replace(/\{n\}/g,n).replace(/\{c\}/g,c);
+  const bs=[...body].sort(()=>Math.random()-.5).slice(0,4).map(fill);
+  const sh=[...shorts].sort(()=>Math.random()-.5);const ad=pick(ads);const t=()=>18+Math.random()*14|0;
+  $('paper').innerHTML=`
+  <div class="top"><span>גיליון מס׳ ${1000+Math.random()*9000|0}</span><span>מחיר: חיוך אחד</span></div>
+  <div class="mast">הַבְּשׂוֹרָה</div>
+  <div class="sub"><span>${d.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</span><span>${hebDate(d)}</span><span>מהדורת ${c}</span></div>
+  <div class="head">${fill(f[0])}</div>
+  <p class="deck">${fill(f[1])}</p>
+  <div class="cols">
+    <div class="main"><div class="photo"><canvas id="ph"></canvas><small>${n} ברגע ההיסטורי. צילום: כתבנו בשטח</small></div>${bs.map(p=>`<p>${p}</p>`).join('')}</div>
+    <aside>
+      <div class="box"><h3>מזג האוויר ב${c}</h3><div class="wx"><div>היום<b>☀️</b>${t()}°</div><div>מחר<b>${pick(['⛅','🌤️','🌧️'])}</b>${t()}°</div><div>מחרתיים<b>${pick(['☀️','⛅','🌬️'])}</b>${t()}°</div></div></div>
+      <div><h3>${sh[0][0]}</h3><p>${sh[0][1]}</p></div>
+      <div><h3>${sh[1][0]}</h3><p>${sh[1][1]}</p></div>
+      <div class="ad"><b>${ad[0]}</b>${ad[1]}</div>
+    </aside>
+  </div>
+  <div class="bottom">${sh.slice(2,5).map(s=>`<div><h4>${s[0]}</h4><p>${s[1]}</p></div>`).join('')}</div>`;
+  photo($('ph'))}
+try{const s=JSON.parse(localStorage.getItem('np'));if(s){$('name').value=s[0];$('city').value=s[1]}}catch{}
+$('go').onclick=make;make();
+</script>
+</body>
+</html>

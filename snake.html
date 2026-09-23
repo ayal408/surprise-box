@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הנחש</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#7cf2c4}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% 0%,#14524a 0%,transparent 55%),var(--bg);color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:480px;display:flex;flex-direction:column;gap:12px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+h1{margin:0;font-size:2.2rem;color:var(--acc)}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select,button{font:inherit;cursor:pointer;border-radius:10px;padding:7px 12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+button.pri{background:var(--acc);color:#04201a;border:0;font-weight:700}
+.info{margin-inline-start:auto;font-variant-numeric:tabular-nums}
+canvas{width:100%;aspect-ratio:1;background:#120f2c;border-radius:14px;border:1px solid var(--line);touch-action:none;display:block}
+.pad{direction:ltr;display:grid;grid-template-columns:repeat(3,64px);gap:6px;justify-content:center}
+.pad button{height:54px;font-size:1.4rem}
+p.hint{color:var(--muted);margin:0;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🐍 הנחש</h1>
+  <div class="bar">
+    <select id="spd"><option value="150">איטי</option><option value="100" selected>רגיל</option><option value="65">מהיר</option></select>
+    <select id="walls"><option value="0">קירות עוברים</option><option value="1">קירות הורגים</option></select>
+    <button class="pri" id="go">התחל</button>
+    <span class="info">🍎 <b id="score">0</b> · שיא <b id="best">0</b></span>
+  </div>
+  <canvas id="cv" width="480" height="480"></canvas>
+  <div class="pad"><span></span><button data-d="0,-1">▲</button><span></span><button data-d="-1,0">◀</button><button data-d="0,1">▼</button><button data-d="1,0">▶</button></div>
+  <p class="hint">חצים או WASD, החלקה באצבע או הכפתורים. רווח עוצר. תפוח זהב שווה 5 ונעלם אחרי כמה שניות.</p>
+</div>
+<script>
+const cv=document.getElementById('cv'),x=cv.getContext('2d'),N=24,S=cv.width/N;
+const L=k=>{try{return localStorage.getItem(k)}catch(e){return null}},SV=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let snake,dir,queue,food,gold,score,best=+L('snakebest')||0,loop,alive=false,paused=false;
+document.getElementById('best').textContent=best;
+function free(){let p;do p={x:Math.random()*N|0,y:Math.random()*N|0};while(snake.some(s=>s.x===p.x&&s.y===p.y)||(food&&food.x===p.x&&food.y===p.y));return p}
+function start(){snake=[{x:12,y:12},{x:11,y:12},{x:10,y:12}];dir={x:1,y:0};queue=[];food=null;food=free();gold=null;score=0;alive=true;paused=false;
+  document.getElementById('score').textContent=0;clearInterval(loop);loop=setInterval(step,+document.getElementById('spd').value);draw()}
+function turn(dx,dy){if(!alive){start();return}const last=queue.length?queue[queue.length-1]:dir;if(last.x===-dx&&last.y===-dy||last.x===dx&&last.y===dy)return;if(queue.length<3)queue.push({x:dx,y:dy})}
+function step(){if(paused)return;if(queue.length)dir=queue.shift();
+  let h={x:snake[0].x+dir.x,y:snake[0].y+dir.y};const walls=document.getElementById('walls').value==='1';
+  if(walls&&(h.x<0||h.y<0||h.x>=N||h.y>=N))return die();h.x=(h.x+N)%N;h.y=(h.y+N)%N;
+  if(snake.slice(0,-1).some(s=>s.x===h.x&&s.y===h.y))return die();
+  snake.unshift(h);let grow=false;
+  if(h.x===food.x&&h.y===food.y){score++;grow=true;food=free();if(!gold&&Math.random()<.2)gold={...free(),t:40}}
+  if(gold&&h.x===gold.x&&h.y===gold.y){score+=5;grow=true;gold=null}
+  if(!grow)snake.pop();if(gold&&--gold.t<=0)gold=null;
+  document.getElementById('score').textContent=score;draw()}
+function die(){alive=false;clearInterval(loop);if(score>best){best=score;SV('snakebest',best);document.getElementById('best').textContent=best}draw();
+  x.fillStyle='rgba(15,12,36,.75)';x.fillRect(0,0,cv.width,cv.height);x.fillStyle='#fff';x.textAlign='center';x.font='bold 40px Segoe UI, Arial';x.fillText('נפסלת! '+score,cv.width/2,cv.height/2);x.font='20px Segoe UI, Arial';x.fillText('כל כיוון מתחיל מחדש',cv.width/2,cv.height/2+40)}
+function cell(p,c,r=.3){x.fillStyle=c;x.beginPath();x.roundRect(p.x*S+1,p.y*S+1,S-2,S-2,S*r);x.fill()}
+function draw(){x.clearRect(0,0,cv.width,cv.height);x.fillStyle='rgba(255,255,255,.03)';for(let i=0;i<N;i++)for(let j=(i%2);j<N;j+=2)x.fillRect(i*S,j*S,S,S);
+  cell(food,'#ff4d6d',.5);if(gold)cell(gold,'#ffd60a',.5);
+  snake.forEach((s,i)=>cell(s,`hsl(${160-i*2},80%,${i?55:70}%)`));
+  const h=snake[0];x.fillStyle='#0f0c24';x.beginPath();x.arc(h.x*S+S/2+dir.x*4-dir.y*4,h.y*S+S/2+dir.y*4+dir.x*4,2.5,0,7);x.arc(h.x*S+S/2+dir.x*4+dir.y*4,h.y*S+S/2+dir.y*4-dir.x*4,2.5,0,7);x.fill()}
+const K={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],s:[0,1],a:[-1,0],d:[1,0]};
+addEventListener('keydown',e=>{const k=K[e.key]||K[e.key.toLowerCase()];if(k){e.preventDefault();turn(...k)}else if(e.key===' '){e.preventDefault();if(alive)paused=!paused;else start()}});
+document.querySelectorAll('.pad button').forEach(b=>b.onclick=()=>turn(...b.dataset.d.split(',').map(Number)));
+let sx,sy;cv.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY});cv.addEventListener('pointerup',e=>{const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.max(Math.abs(dx),Math.abs(dy))<20){if(!alive)start();return}Math.abs(dx)>Math.abs(dy)?turn(Math.sign(dx),0):turn(0,Math.sign(dy))});
+document.getElementById('go').onclick=start;
+snake=[{x:12,y:12},{x:11,y:12},{x:10,y:12}];dir={x:1,y:0};food={x:18,y:12};draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2048</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffb703}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),var(--bg);color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:460px;display:flex;flex-direction:column;gap:14px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+h1{margin:0;font-size:2.6rem;color:var(--acc)}
+.bar{display:flex;gap:8px;align-items:stretch}
+.stat{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.75rem}
+.stat b{font-size:1.3rem}
+button{font:inherit;cursor:pointer;background:var(--acc);color:#1b1300;border:0;border-radius:12px;padding:8px 14px;font-weight:700}
+button.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.board{position:relative;direction:ltr;background:#2a2346;border-radius:14px;padding:10px;aspect-ratio:1;touch-action:none;user-select:none}
+.cells,.tiles{position:absolute;inset:10px;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:10px}
+.cells div{background:rgba(255,255,255,.07);border-radius:8px}
+.tile{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:8px;font-weight:800;transition:left .1s,top .1s;width:calc((100% - 30px)/4);height:calc((100% - 30px)/4)}
+.tile.new{animation:pop .18s}
+.tile.merged{animation:bump .18s}
+@keyframes pop{from{transform:scale(0)}}
+@keyframes bump{50%{transform:scale(1.15)}}
+.msg{position:absolute;inset:0;background:rgba(15,12,36,.82);border-radius:14px;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-size:1.8rem;font-weight:800;direction:rtl}
+.msg.show{display:flex}
+p.hint{color:var(--muted);margin:0;font-size:.9rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>2048</h1>
+  <div class="bar">
+    <div class="stat"><small>ניקוד</small><b id="score">0</b></div>
+    <div class="stat"><small>שיא</small><b id="best">0</b></div>
+    <button class="ghost" id="undo" title="ביטול מהלך">↶</button>
+    <button id="new">משחק חדש</button>
+  </div>
+  <div class="board" id="board">
+    <div class="cells"></div>
+    <div class="tiles" id="tiles" style="display:block"></div>
+    <div class="msg" id="msg"><span id="msgText"></span><button id="again">עוד פעם</button><button class="ghost" id="keep" style="display:none">להמשיך לשחק</button></div>
+  </div>
+  <p class="hint">מזיזים עם החצים או WASD, או מחליקים באצבע. שני אריחים זהים שנפגשים מתאחדים. המטרה: להגיע ל־2048.</p>
+</div>
+<script>
+const N=4,colors={2:['#eee4da','#3a2f24'],4:['#ede0c8','#3a2f24'],8:['#f2b179','#fff'],16:['#f59563','#fff'],32:['#f67c5f','#fff'],64:['#f65e3b','#fff'],128:['#edcf72','#fff'],256:['#edcc61','#fff'],512:['#edc850','#fff'],1024:['#edc53f','#fff'],2048:['#edc22e','#fff']};
+let grid,score,won,keepGoing,history=[],idc=0;
+const tilesEl=document.getElementById('tiles'),S=k=>{try{return localStorage.getItem(k)}catch(e){return null}},W=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let best=+S('g2048best')||0;document.getElementById('best').textContent=best;
+function empty(){const e=[];for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(!grid[r][c])e.push([r,c]);return e}
+function add(){const e=empty();if(!e.length)return;const[r,c]=e[Math.random()*e.length|0];grid[r][c]={v:Math.random()<.9?2:4,id:++idc,isNew:true}}
+function start(){grid=[...Array(N)].map(()=>Array(N).fill(null));score=0;won=false;keepGoing=false;history=[];add();add();render();hideMsg()}
+function snapshot(){return{g:grid.map(r=>r.map(t=>t&&{v:t.v,id:t.id})),s:score}}
+function render(){
+  tilesEl.innerHTML='';
+  const pct=i=>`calc(${i}*((100% - 30px)/4 + 10px))`;
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){const t=grid[r][c];if(!t)continue;
+    const d=document.createElement('div');d.className='tile'+(t.isNew?' new':'')+(t.merged?' merged':'');
+    const col=colors[t.v]||['#3c3a32','#fff'];d.style.background=col[0];d.style.color=col[1];
+    d.style.left=pct(c);d.style.top=pct(r);d.style.fontSize=t.v<100?'2.2rem':t.v<1000?'1.8rem':'1.4rem';d.textContent=t.v;tilesEl.appendChild(d);t.isNew=t.merged=false}
+  document.getElementById('score').textContent=score;
+  if(score>best){best=score;W('g2048best',best);document.getElementById('best').textContent=best}
+}
+function move(dir){ // 0 left 1 right 2 up 3 down
+  const before=snapshot();let moved=false;
+  for(let i=0;i<N;i++){
+    let line=[];for(let j=0;j<N;j++){const[r,c]=pos(dir,i,j);line.push(grid[r][c])}
+    const tiles=line.filter(Boolean),out=[];
+    for(let k=0;k<tiles.length;k++){
+      if(k+1<tiles.length&&tiles[k].v===tiles[k+1].v){const v=tiles[k].v*2;out.push({v,id:++idc,merged:true});score+=v;if(v===2048&&!keepGoing)won=true;k++}
+      else out.push(tiles[k])}
+    while(out.length<N)out.push(null);
+    for(let j=0;j<N;j++){const[r,c]=pos(dir,i,j);if(grid[r][c]!==out[j])moved=true;grid[r][c]=out[j]}
+  }
+  if(!moved)return;
+  history.push(before);if(history.length>20)history.shift();
+  add();render();
+  if(won&&!keepGoing)showMsg('🎉 הגעת ל־2048!',true);
+  else if(!canMove())showMsg('אין יותר מהלכים 😅',false);
+}
+function pos(dir,i,j){if(dir===0)return[i,j];if(dir===1)return[i,N-1-j];if(dir===2)return[j,i];return[N-1-j,i]}
+function canMove(){if(empty().length)return true;for(let r=0;r<N;r++)for(let c=0;c<N;c++){const v=grid[r][c].v;if(c+1<N&&grid[r][c+1].v===v)return true;if(r+1<N&&grid[r+1][c].v===v)return true}return false}
+function showMsg(t,win){document.getElementById('msgText').textContent=t;document.getElementById('keep').style.display=win?'':'none';document.getElementById('msg').classList.add('show')}
+function hideMsg(){document.getElementById('msg').classList.remove('show')}
+document.getElementById('new').onclick=start;document.getElementById('again').onclick=start;
+document.getElementById('keep').onclick=()=>{keepGoing=true;won=false;hideMsg()};
+document.getElementById('undo').onclick=()=>{const h=history.pop();if(!h)return;grid=h.g;score=h.s;hideMsg();render()};
+const keys={ArrowLeft:0,ArrowRight:1,ArrowUp:2,ArrowDown:3,a:0,d:1,w:2,s:3,A:0,D:1,W:2,S:3};
+addEventListener('keydown',e=>{if(e.key in keys&&!document.getElementById('msg').classList.contains('show')){e.preventDefault();move(keys[e.key])}});
+let sx,sy;const b=document.getElementById('board');
+b.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY});
+b.addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx,dy=e.clientY-sy;sx=null;if(Math.max(Math.abs(dx),Math.abs(dy))<25)return;if(document.getElementById('msg').classList.contains('show'))return;move(Math.abs(dx)>Math.abs(dy)?(dx<0?0:1):(dy<0?2:3))});
+start();
+</script>
+</body>
+</html>

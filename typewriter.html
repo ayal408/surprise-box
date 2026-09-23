@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מכונת הכתיבה</title>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=Frank+Ruhl+Libre:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--wood:#5a3a22;--paper:#fbf7ee;--ink:#231f1c;--red:#9b2226}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#3a2616 repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 3px,transparent 3px 9px);color:var(--ink);font-family:"Courier Prime","Courier New",monospace;padding:18px 12px 40px}
+.top{max-width:820px;margin:0 auto 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;color:#e9dcc3;font-family:"Frank Ruhl Libre",serif}
+.top a{color:#e9dcc3;margin-inline-end:auto}
+.top button,.top select{font:inherit;background:#e9dcc3;color:var(--ink);border:0;border-radius:3px;padding:6px 12px;cursor:pointer;box-shadow:0 3px 0 #1d130b}
+.top button:active{transform:translateY(3px);box-shadow:none}
+.top label{display:flex;gap:6px;align-items:center}
+.sheet{max-width:820px;margin:0 auto;background:var(--paper);min-height:80vh;padding:70px 72px;box-shadow:0 20px 50px rgba(0,0,0,.6);position:relative;background-image:linear-gradient(transparent 95%,rgba(0,0,0,.02) 95%);background-size:100% 30px}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;right:52px;border-right:2px solid rgba(155,34,38,.35)}
+#txt{width:100%;min-height:62vh;border:0;outline:0;background:transparent;resize:none;font:inherit;font-size:1.2rem;line-height:30px;color:var(--ink);text-shadow:0 0 1px rgba(0,0,0,.4);caret-color:var(--red);overflow:hidden}
+.meta{display:flex;justify-content:space-between;font-size:.85rem;color:#8a7b66;border-top:1px dashed #cbbfa7;padding-top:8px;margin-top:10px;flex-wrap:wrap;gap:6px}
+.stamp{position:absolute;left:40px;top:28px;color:var(--red);border:3px solid var(--red);padding:4px 10px;transform:rotate(-8deg);font-weight:700;opacity:.75;font-family:"Frank Ruhl Libre",serif}
+.tpl{max-width:820px;margin:0 auto 12px;display:flex;gap:8px;flex-wrap:wrap}
+.tpl button{font:inherit;font-size:.85rem;background:transparent;border:1px solid #e9dcc3;color:#e9dcc3;padding:4px 10px;border-radius:20px;cursor:pointer}
+body.focus .top,body.focus .tpl{opacity:.12;transition:opacity .4s}
+body.focus .top:hover,body.focus .tpl:hover{opacity:1}
+@media(max-width:640px){.sheet{padding:50px 22px 40px 22px}.sheet::before{right:12px}.stamp{display:none}}
+@media print{body{background:none;padding:0}.top,.tpl,.meta,.stamp{display:none}.sheet{box-shadow:none;padding:30px}}
+</style>
+</head>
+<body>
+<div class="top">
+  <a href="התחל כאן.html">↩ לקופסת ההפתעות</a>
+  <label><input type="checkbox" id="snd" checked> צליל הקשה</label>
+  <button id="focus">🕯️ מצב ריכוז</button>
+  <button id="dl">💾 הורד טקסט</button>
+  <button onclick="print()">🖨️ הדפס</button>
+  <button id="clr">📄 דף חדש</button>
+</div>
+<div class="tpl">
+  <button data-t="letter">✉️ מכתב אישי</button>
+  <button data-t="thanks">🙏 מכתב תודה</button>
+  <button data-t="formal">🏛️ פנייה רשמית</button>
+  <button data-t="diary">📓 יומן</button>
+</div>
+<div class="sheet">
+  <div class="stamp">נכתב ביד אדם</div>
+  <textarea id="txt" spellcheck="false" placeholder="מתחילים להקליד..."></textarea>
+  <div class="meta"><span id="wc">0 מילים</span><span id="rt">זמן קריאה: 0 דק׳</span><span id="goal"></span><span id="saved">נשמר אוטומטית</span></div>
+</div>
+<script>
+const T=document.getElementById('txt'),$=id=>document.getElementById(id);
+const today=new Date().toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'});
+const TPL={letter:`${today}\n\nלכבוד ___ היקר/ה,\n\nרציתי לכתוב לך כמה מילים...\n\n\nבאהבה,\n___`,
+thanks:`${today}\n\n___ שלום רב,\n\nאני רוצה להודות לך מכל הלב על ___.\nזה היה חשוב לי מאוד, כי ___.\n\nתודה רבה,\n___`,
+formal:`${today}\n\nלכבוד\n___\n___\n\nהנדון: ___\n\n1. ___\n2. ___\n3. ___\n\nאודה לטיפולכם.\n\nבכבוד רב,\n___\nטלפון: ___`,
+diary:`${today}\n\nיומן יקר,\n\nהיום ___.\n\nדבר אחד טוב שקרה: ___\nמה למדתי: ___\nמחר אני רוצה: ___`};
+let AC;
+function clack(k){if(!$('snd').checked)return;try{AC=AC||new AudioContext();const t=AC.currentTime,len=k==='Enter'?.35:.05;
+  const b=AC.createBuffer(1,AC.sampleRate*len,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,k==='Enter'?2:6);
+  const s=AC.createBufferSource();s.buffer=b;const f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=k==='Enter'?1400:2200+Math.random()*800;f.Q.value=1.4;const g=AC.createGain();g.gain.value=.5;s.connect(f).connect(g).connect(AC.destination);s.start(t);
+  if(k==='Enter'){const o=AC.createOscillator(),gg=AC.createGain();o.frequency.value=2600;gg.gain.setValueAtTime(.08,t+.25);gg.gain.exponentialRampToValueAtTime(.001,t+.9);o.connect(gg).connect(AC.destination);o.start(t+.25);o.stop(t+.9)}}catch{}}
+function grow(){T.style.height='auto';T.style.height=Math.max(T.scrollHeight,innerHeight*.62)+'px'}
+function stats(){const w=(T.value.match(/\S+/g)||[]).length;$('wc').textContent=w+' מילים · '+T.value.length+' תווים';$('rt').textContent='זמן קריאה: '+Math.max(1,Math.round(w/200))+' דק׳';
+  $('goal').textContent=w>=500?'🏅 עברת 500 מילים!':w>=250?'✨ 250 מילים!':'';try{localStorage.setItem('typewriter',T.value)}catch{}grow()}
+T.addEventListener('keydown',e=>{if(e.key.length===1||e.key==='Enter'||e.key==='Backspace')clack(e.key)});
+T.addEventListener('input',stats);
+document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{if(T.value.trim()&&!confirm('להחליף את הטקסט הקיים בתבנית?'))return;T.value=TPL[b.dataset.t];stats();T.focus();const i=T.value.indexOf('___');if(i>=0)T.setSelectionRange(i,i+3)});
+$('focus').onclick=()=>{document.body.classList.toggle('focus');T.focus()};
+$('clr').onclick=()=>{if(!T.value.trim()||confirm('לפתוח דף חדש? הטקסט הנוכחי יימחק.')){T.value='';stats();T.focus()}};
+$('dl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+T.value],{type:'text/plain;charset=utf-8'}));a.download='מכתב.txt';a.click()};
+T.addEventListener('keydown',e=>{if(e.key==='Tab'){const i=T.value.indexOf('___',T.selectionEnd);if(i>=0){e.preventDefault();T.setSelectionRange(i,i+3)}}});
+try{T.value=localStorage.getItem('typewriter')||''}catch{}
+stats();T.focus();
+</script>
+</body>
+</html>

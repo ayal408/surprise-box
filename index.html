@@ -1,0 +1,438 @@
+<title>יד על הלב</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@400;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#F5F1F0; --surface:#FFFFFF; --surface2:#FAF6F5; --ink:#1C1416; --muted:#6B5D60; --line:#E4D9DA;
+  --pulse:#C8102E; --pulse-ink:#FFFFFF; --pulse-soft:#FBE3E6;
+  --ok:#17744A; --ok-soft:#DDF1E6; --warn:#9A5A00; --warn-soft:#FBEED6;
+  --display:"Secular One","Arial Hebrew","Segoe UI",Arial,sans-serif;
+  --body:"Assistant","Segoe UI","Arial Hebrew",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#110C0D; --surface:#1B1416; --surface2:#221A1C; --ink:#F3EAEB; --muted:#A8989B; --line:#35292B;
+    --pulse:#FF4A60; --pulse-ink:#1A0508; --pulse-soft:#3D161C;
+    --ok:#5DD39D; --ok-soft:#133426; --warn:#F2B24C; --warn-soft:#3A2B12;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#110C0D; --surface:#1B1416; --surface2:#221A1C; --ink:#F3EAEB; --muted:#A8989B; --line:#35292B;
+  --pulse:#FF4A60; --pulse-ink:#1A0508; --pulse-soft:#3D161C;
+  --ok:#5DD39D; --ok-soft:#133426; --warn:#F2B24C; --warn-soft:#3A2B12;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:18px;padding-block:20px 60px;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;line-height:1.15;text-wrap:balance}
+h1{font-size:clamp(2rem,6vw,2.9rem)}
+h2{font-size:1.5rem}
+h3{font-size:1.15rem}
+p{margin:0}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--pulse);outline-offset:2px}
+
+/* header */
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.head .sub{color:var(--muted);max-width:48ch}
+.nums{display:flex;gap:8px;flex-wrap:wrap}
+.nums div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 12px;display:flex;flex-direction:column;align-items:center;min-width:72px}
+.nums b{font-family:var(--mono);font-size:1.35rem;line-height:1.2;user-select:all}
+.nums span{font-size:.78rem;color:var(--muted);white-space:nowrap}
+.nums .mda{border-color:var(--pulse);background:var(--pulse-soft)}
+.nums .mda b{color:var(--pulse)}
+
+/* console */
+.console{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:24px}
+.heart{display:flex;flex-direction:column;align-items:center;gap:14px}
+.ring{position:relative;width:min(300px,72vw);aspect-ratio:1;max-width:100%;display:grid;place-items:center}
+.ring .halo{position:absolute;inset:0;border-radius:50%;background:var(--pulse-soft)}
+.ring .core{position:relative;width:74%;aspect-ratio:1;border-radius:50%;background:var(--pulse);color:var(--pulse-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform 90ms ease-out}
+.ring .core.beat{transform:scale(.86)}
+.ring .count{font-family:var(--mono);font-size:clamp(3.2rem,11vw,4.6rem);line-height:1}
+.ring .unit{font-weight:700;font-size:.95rem;opacity:.9}
+.ring.breath .core{background:var(--ok);color:var(--surface)}
+.ring.idle .core{background:var(--surface2);color:var(--ink);border:2px solid var(--line)}
+.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.go{background:var(--pulse);color:var(--pulse-ink);border:0;border-radius:999px;padding:14px 30px;font-size:1.2rem;font-weight:800;min-width:210px}
+.go.stop{background:var(--ink);color:var(--bg)}
+.ghost{background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:10px 18px;font-weight:700}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface2)}
+.seg button{border:0;background:transparent;padding:8px 14px;font-weight:700;font-size:.92rem}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.clocks{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.clocks div{background:var(--surface2);padding:10px 12px;display:flex;flex-direction:column}
+.clocks b{font-family:var(--mono);font-size:1.5rem;font-weight:500;direction:ltr;text-align:right}
+.clocks span{font-size:.8rem;color:var(--muted)}
+.banner{border-radius:12px;padding:10px 14px;font-weight:700;background:var(--warn-soft);color:var(--warn)}
+.steps{margin:0;padding-inline-start:22px;display:flex;flex-direction:column;gap:6px}
+.steps li::marker{font-family:var(--mono);color:var(--pulse);font-weight:500}
+.steps strong{font-weight:800}
+
+.log{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:10px}
+.logbtns{display:flex;gap:8px;flex-wrap:wrap}
+.logbtns button{background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-weight:600;font-size:.92rem}
+.logbtns button:hover{border-color:var(--pulse)}
+.loglist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px;max-height:180px;overflow:auto;font-size:.95rem}
+.loglist li{display:flex;gap:12px}
+.loglist time{font-family:var(--mono);color:var(--muted);direction:ltr;unicode-bidi:isolate;min-width:4.5em}
+
+/* guides */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:0}
+.tabs button{border:0;background:transparent;padding:10px 14px;font-weight:700;border-bottom:3px solid transparent;margin-bottom:-1px;color:var(--muted)}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--pulse)}
+.panel{display:flex;flex-direction:column;gap:16px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.card ol,.card ul{margin:0;padding-inline-start:22px;display:flex;flex-direction:column;gap:6px}
+.never{background:var(--pulse-soft);border-radius:10px;padding:10px 14px;font-size:.95rem}
+.never strong{color:var(--pulse)}
+.fast{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.fast div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.fast .l{font-family:var(--display);font-size:1.6rem;color:var(--pulse);line-height:1}
+
+/* practice */
+.practice{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center}
+.pad{width:190px;aspect-ratio:1;max-width:100%;border-radius:50%;border:0;background:var(--pulse);color:var(--pulse-ink);font-family:var(--display);font-size:1.4rem;touch-action:manipulation;user-select:none;transition:transform 70ms}
+.pad:active{transform:scale(.93)}
+.meter{display:flex;flex-direction:column;gap:10px;min-width:0}
+.rate{font-family:var(--mono);font-size:3rem;line-height:1;direction:ltr;text-align:right}
+.gauge{position:relative;height:18px;border-radius:9px;background:var(--surface2);border:1px solid var(--line);direction:ltr}
+.gauge .band{position:absolute;top:0;bottom:0;background:var(--ok-soft);border-inline:2px solid var(--ok)}
+.gauge .mark{position:absolute;top:-5px;width:4px;height:26px;border-radius:2px;background:var(--ink);transform:translateX(-2px);transition:left .15s}
+.gscale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.78rem;color:var(--muted);direction:ltr}
+.verdict{font-weight:800;font-size:1.15rem}
+.verdict.ok{color:var(--ok)} .verdict.bad{color:var(--pulse)}
+
+footer{font-size:.88rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:4px}
+footer a{color:var(--ink)}
+.toast{position:fixed;inset-inline:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));margin:auto;width:max-content;max-width:90vw;background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-weight:700}
+
+@media (max-width:820px){
+  .console,.cols{grid-template-columns:1fr}
+  .fast{grid-template-columns:repeat(2,1fr)}
+  .practice{grid-template-columns:1fr;justify-items:center}
+  .meter{width:100%}
+}
+@media (prefers-reduced-motion:reduce){ .ring .core,.pad,.gauge .mark{transition:none} }
+</style>
+
+<div class="wrap" dir="rtl" lang="he">
+  <header class="head">
+    <div>
+      <h1>יד על הלב</h1>
+      <p class="sub">מדריך החייאה עם קצב מושמע, שעון ויומן אירוע, והנחיות קצרות למצבי חירום נפוצים.</p>
+    </div>
+    <div class="nums" aria-label="מספרי חירום">
+      <div class="mda"><b>101</b><span>מד"א</span></div>
+      <div><b>100</b><span>משטרה</span></div>
+      <div><b>102</b><span>כבאות</span></div>
+      <div><b>1201</b><span>ער"ן, סיוע נפשי</span></div>
+    </div>
+  </header>
+
+  <section class="console" aria-label="מדריך החייאה">
+    <div class="heart">
+      <div class="ring idle" id="ring" aria-live="polite">
+        <div class="halo"></div>
+        <div class="core" id="core"><span class="count" id="count">110</span><span class="unit" id="unit">לחיצות בדקה</span></div>
+      </div>
+      <div class="controls">
+        <button class="go" id="go" type="button">התחלת עיסויים</button>
+      </div>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="שיטה">
+          <button type="button" id="mHands" aria-pressed="true">עיסויים בלבד</button>
+          <button type="button" id="m302" aria-pressed="false">30 עיסויים : 2 נשימות</button>
+        </div>
+        <button class="ghost" id="reset" type="button">איפוס</button>
+      </div>
+      <p class="muted" style="font-size:.88rem;text-align:center;max-width:36ch">לא עברת הכשרה בהנשמה? עיסויים בלבד זו בחירה טובה. העיקר לא להפסיק.</p>
+    </div>
+
+    <div class="side">
+      <div class="clocks">
+        <div><b id="tTotal">00:00</b><span>זמן החייאה</span></div>
+        <div><b id="tSwap">02:00</b><span>עד החלפת מעסה</span></div>
+        <div><b id="tCount">0</b><span>סה"כ לחיצות</span></div>
+      </div>
+      <div class="banner" id="banner" hidden></div>
+      <ol class="steps">
+        <li><strong>בודקים שהמקום בטוח</strong>, ואז קוראים לאדם בקול ומטלטלים בעדינות בכתפיים.</li>
+        <li><strong>אין תגובה ואין נשימה תקינה?</strong> גם התנשמויות נדירות וחרחורים הם לא נשימה תקינה.</li>
+        <li><strong>מתקשרים ל־101 ושמים על רמקול.</strong> המוקדן ידריך אותך. שולחים מישהו להביא מפעם (דפיברילטור).</li>
+        <li><strong>לוחצים במרכז בית החזה</strong>: שתי ידיים אחת על השנייה, מרפקים ישרים, עומק 5–6 ס"מ. אחרי כל לחיצה נותנים לחזה לחזור למקום.</li>
+        <li><strong>המפעם הגיע?</strong> מדליקים אותו ועושים מה שהוא אומר. ממשיכים ללחוץ עד שהוא מבקש להתרחק.</li>
+        <li><strong>לא מפסיקים</strong> עד שצוות מד"א מגיע או שהאדם מתחיל לנשום ולזוז.</li>
+      </ol>
+      <div class="log">
+        <h3>יומן אירוע <span class="muted" style="font-family:var(--body);font-size:.85rem;font-weight:400">(לצוות מד"א)</span></h3>
+        <div class="logbtns">
+          <button type="button" data-ev="התקשרנו ל־101">התקשרנו ל־101</button>
+          <button type="button" data-ev="המפעם חובר">המפעם חובר</button>
+          <button type="button" data-ev="ניתן שוק">ניתן שוק ⚡</button>
+          <button type="button" data-ev="האדם מתחיל לנשום">האדם נושם</button>
+          <button type="button" data-ev="צוות מד״א הגיע">צוות מד"א הגיע</button>
+          <button type="button" id="copyLog">העתקת היומן</button>
+        </div>
+        <ul class="loglist" id="log"><li class="muted">כשמתחילים, כאן ייכתבו אוטומטית השעה והאירועים.</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <nav class="tabs" role="tablist" aria-label="מדריכים">
+    <button role="tab" id="tab-practice" aria-selected="true" aria-controls="p-practice">תרגול קצב</button>
+    <button role="tab" id="tab-choke" aria-selected="false" aria-controls="p-choke">חנק</button>
+    <button role="tab" id="tab-stroke" aria-selected="false" aria-controls="p-stroke">שבץ</button>
+    <button role="tab" id="tab-bleed" aria-selected="false" aria-controls="p-bleed">דימום חזק</button>
+    <button role="tab" id="tab-kids" aria-selected="false" aria-controls="p-kids">ילדים ותינוקות</button>
+  </nav>
+
+  <section class="panel" id="p-practice" role="tabpanel" aria-labelledby="tab-practice">
+    <div>
+      <h2>מתאמנים עכשיו, כשאין לחץ</h2>
+      <p class="muted">הקצב הנכון הוא 100–120 לחיצות בדקה, מהר יותר ממה שרוב האנשים חושבים. הקישי על הכפתור בקצב שנראה לך נכון (או לחצי על מקש הרווח) ותראי אם את בטווח.</p>
+    </div>
+    <div class="card practice">
+      <button class="pad" id="pad" type="button">הקישי כאן</button>
+      <div class="meter">
+        <div class="rate" id="rate">—</div>
+        <div class="gauge" aria-hidden="true"><div class="band" style="left:40%;width:20%"></div><div class="mark" id="mark" style="left:50%"></div></div>
+        <div class="gscale"><span>60</span><span>80</span><span>100</span><span>120</span><span>140</span><span>160</span></div>
+        <p class="verdict" id="verdict">מתחילים להקיש…</p>
+        <p class="muted" style="font-size:.92rem">טיפ: מזמזמים בראש את "Stayin' Alive" של הבי ג'יז. הקצב שלו כ־104 פעימות בדקה.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-choke" role="tabpanel" aria-labelledby="tab-choke" hidden>
+    <h2>חנק: משהו נתקע בקנה הנשימה</h2>
+    <div class="cols">
+      <div class="card">
+        <h3>מבוגר או ילד מעל גיל שנה</h3>
+        <ol>
+          <li><strong>משתעל?</strong> מעודדים אותו להמשיך להשתעל. לא מכים בגב ולא מתערבים.</li>
+          <li><strong>לא מצליח לדבר, לנשום או להשתעל?</strong> מבקשים ממישהו להתקשר ל־101.</li>
+          <li>מטים אותו קדימה ונותנים <strong>5 מכות חזקות בין השכמות</strong> עם בסיס כף היד.</li>
+          <li>אם זה לא עזר: <strong>5 לחיצות בטן (היימליך)</strong>. עומדים מאחוריו, שמים אגרוף מעל הטבור ומתחת לצלעות ומושכים חזק פנימה ולמעלה.</li>
+          <li>ממשיכים לסירוגין, 5 ו־5, עד שהגוף הזר יוצא.</li>
+          <li><strong>אם איבד הכרה:</strong> משכיבים אותו על הרצפה, מתקשרים ל־101 ומתחילים החייאה.</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3>תינוק (עד גיל שנה)</h3>
+        <ol>
+          <li>משכיבים אותו על הבטן לאורך האמה, כשהראש נמוך מהגוף ונתמך בלסת.</li>
+          <li>נותנים <strong>5 מכות בגב</strong> בין השכמות.</li>
+          <li>הופכים אותו על הגב ונותנים <strong>5 לחיצות חזה בשתי אצבעות</strong> במרכז החזה, מעט מתחת לקו הפטמות.</li>
+          <li>ממשיכים לסירוגין. אם איבד הכרה, מתקשרים ל־101 ומתחילים החייאה.</li>
+        </ol>
+        <p class="never"><strong>אצל תינוקות לא עושים</strong> לחיצות בטן, ולא מכניסים אצבע לפה כדי לחפש את החפץ.</p>
+      </div>
+    </div>
+    <p class="muted">גם אם הכל הסתדר, אחרי לחיצות בטן כדאי להיבדק אצל רופא. לנשים בהריון ולאנשים עם היקף גוף גדול עושים לחיצות חזה במקום לחיצות בטן.</p>
+  </section>
+
+  <section class="panel" id="p-stroke" role="tabpanel" aria-labelledby="tab-stroke" hidden>
+    <h2>שבץ: כל דקה חשובה</h2>
+    <p class="muted">הטיפול בשבץ עובד רק בשעות הראשונות. מה שהכי עוזר הוא לזהות מהר ולדעת מתי הסימנים התחילו.</p>
+    <div class="fast">
+      <div><span class="l">פנים</span><p>מבקשים לחייך. צד אחד של הפנים צונח?</p></div>
+      <div><span class="l">ידיים</span><p>מבקשים להרים את שתי הידיים. יד אחת נופלת או חלשה?</p></div>
+      <div><span class="l">דיבור</span><p>מבקשים לחזור על משפט פשוט. הדיבור משובש או לא ברור?</p></div>
+      <div><span class="l">זמן</span><p>יש אפילו סימן אחד? מתקשרים מיד ל־101 ורושמים את השעה.</p></div>
+    </div>
+    <p class="never"><strong>לא נותנים</strong> אוכל, שתייה או תרופות, גם לא אספירין, עד שצוות רפואי מחליט. לא מחכים לראות אם זה עובר.</p>
+    <div><button class="ghost" id="strokeTime" type="button">רישום שעת תחילת הסימנים</button> <span class="mono" id="strokeOut"></span></div>
+  </section>
+
+  <section class="panel" id="p-bleed" role="tabpanel" aria-labelledby="tab-bleed" hidden>
+    <h2>דימום חזק</h2>
+    <div class="cols">
+      <div class="card">
+        <h3>לחץ ישיר</h3>
+        <ol>
+          <li>מתקשרים ל־101. אם יש כפפות, לובשים.</li>
+          <li><strong>לוחצים חזק וישירות על הפצע</strong> עם בד, תחבושת או חולצה, ולא מרפים.</li>
+          <li>הבד נספג? <strong>לא מורידים אותו.</strong> מוסיפים עוד בד מעליו וממשיכים ללחוץ.</li>
+          <li>משכיבים את הפצוע ומכסים אותו כדי שישמור על חום הגוף.</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3>חוסם עורקים (רק ביד או ברגל)</h3>
+        <ol>
+          <li>משתמשים בו כשהדימום מסכן חיים ולחץ ישיר לא עוצר אותו.</li>
+          <li>מניחים אותו <strong>5–7 ס"מ מעל הפצע</strong>, לא על מפרק.</li>
+          <li>מהדקים עד שהדימום נעצר. זה כואב, וזה תקין.</li>
+          <li><strong>רושמים את השעה</strong> ולא משחררים עד שצוות רפואי מגיע.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-kids" role="tabpanel" aria-labelledby="tab-kids" hidden>
+    <h2>החייאה לילדים ולתינוקות</h2>
+    <p class="muted">הקצב זהה, 100–120 לחיצות בדקה, ומשתנים רק הכוח והעומק. אם יש טלפון, מתקשרים ל־101 על רמקול ומתחילים מיד. אם את לבד בלי טלפון, עושים 2 דקות החייאה ורק אז הולכים להתקשר.</p>
+    <div class="cols">
+      <div class="card">
+        <h3>ילד (מגיל שנה ועד גיל ההתבגרות)</h3>
+        <ul>
+          <li>לוחצים ביד אחת, או בשתיים אם צריך, במרכז בית החזה.</li>
+          <li>עומק של כשליש מעובי בית החזה, בערך 5 ס"מ.</li>
+          <li>אצל ילדים ההנשמות חשובות במיוחד. אם יודעים להנשים, עושים 30 לחיצות ו־2 הנשמות.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>תינוק (עד גיל שנה)</h3>
+        <ul>
+          <li>לוחצים בשתי אצבעות במרכז החזה, מעט מתחת לקו הפטמות.</li>
+          <li>עומק של כ־4 ס"מ, שליש מעובי בית החזה.</li>
+          <li>מנשימים בעדינות, מכסים בפה את הפה והאף יחד, רק עד שהחזה עולה.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>המדריך לא מחליף קורס עזרה ראשונה. ההנחיות מבוססות על ההמלצות המקובלות להחייאה (קצב 100–120, עומק 5–6 ס"מ), וכשיש מוקדן על הקו, עושים מה שהוא אומר.</p>
+    <p>קורסי עזרה ראשונה והחייאה של מד"א: <a href="https://www.mdais.org" target="_blank" rel="noopener">mdais.org</a>. ברוב המקרים קורס של כמה שעות מספיק.</p>
+  </footer>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+const $ = id => document.getElementById(id);
+const BPM = 110, BEAT = 60/BPM, CYCLE = 30, BREATH_GAP = 5, SWAP = 120;
+let ctx = null, running = false, mode = 'hands';
+let nextTime = 0, beatInCycle = 0, totalBeats = 0, queue = [], timerId = null;
+let elapsed = 0, startedAt = 0, swapBase = 0, lastSwapAlert = 0, wake = null;
+const log = [];
+
+function fmt(s){ s=Math.max(0,Math.floor(s)); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+function clock(){ return new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+function toast(m){ const t=$('toast'); t.textContent=m; t.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(()=>t.hidden=true,2000); }
+
+function addLog(label){
+  log.push({at:clock(), cpr: running||elapsed ? fmt(curElapsed()) : '', label});
+  $('log').innerHTML = log.slice().reverse().map(e=>`<li><time>${e.at}</time><span>${e.label}${e.cpr?` <span class="muted">(${e.cpr} מתחילת ההחייאה)</span>`:''}</span></li>`).join('');
+}
+function curElapsed(){ return elapsed + (running ? (performance.now()-startedAt)/1000 : 0); }
+
+function tone(time, freq, dur, vol){
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.frequency.value = freq; o.type = 'square';
+  g.gain.setValueAtTime(vol, time); g.gain.exponentialRampToValueAtTime(0.0001, time+dur);
+  o.connect(g).connect(ctx.destination); o.start(time); o.stop(time+dur+0.02);
+}
+function schedule(){
+  while(nextTime < ctx.currentTime + 0.12){
+    beatInCycle++;
+    const n = mode==='302' ? beatInCycle : ((beatInCycle-1)%CYCLE)+1;
+    tone(nextTime, n===1 ? 1320 : 880, 0.05, 0.25);
+    queue.push({time:nextTime, n});
+    if(mode==='302' && beatInCycle===CYCLE){
+      tone(nextTime+BEAT, 520, 0.35, 0.2); tone(nextTime+BEAT+0.45, 520, 0.35, 0.2);
+      queue.push({time:nextTime+BEAT, breath:true});
+      nextTime += BEAT + BREATH_GAP; beatInCycle = 0;
+    } else nextTime += BEAT;
+  }
+}
+function frame(){
+  if(!running) return;
+  const now = ctx.currentTime;
+  while(queue.length && queue[0].time <= now){
+    const q = queue.shift();
+    if(q.breath){ $('ring').className='ring breath'; $('count').textContent='2'; $('unit').textContent='הנשמות, ואז חוזרים'; }
+    else {
+      totalBeats++; $('ring').className='ring';
+      $('count').textContent = q.n; $('unit').textContent = mode==='302' ? 'מתוך 30' : 'לחצי, לחצי, לחצי';
+      const c=$('core'); c.classList.add('beat'); setTimeout(()=>c.classList.remove('beat'),110);
+      $('tCount').textContent = totalBeats;
+    }
+  }
+  const e = curElapsed(), sinceSwap = e - swapBase, left = SWAP - (sinceSwap % SWAP);
+  $('tTotal').textContent = fmt(e); $('tSwap').textContent = fmt(left);
+  const cycles = Math.floor(sinceSwap / SWAP);
+  if(cycles > lastSwapAlert){ lastSwapAlert = cycles; addLog('עברו 2 דקות, מחליפים מעסה');
+    tone(ctx.currentTime+0.02, 660, 0.25, 0.25); tone(ctx.currentTime+0.3, 990, 0.3, 0.25); }
+  const b = $('banner');
+  if(sinceSwap >= SWAP && (sinceSwap % SWAP) < 10){ b.hidden=false; b.textContent='עברו 2 דקות. אם יש עוד מישהו, מתחלפים עכשיו ומהר, ולא עוצרים ליותר מכמה שניות.'; }
+  else b.hidden = true;
+  requestAnimationFrame(frame);
+}
+async function start(){
+  ctx = ctx || new (window.AudioContext||window.webkitAudioContext)();
+  if(ctx.state==='suspended') await ctx.resume();
+  running = true; startedAt = performance.now();
+  nextTime = ctx.currentTime + 0.1; queue = [];
+  addLog(elapsed ? 'חוזרים לעיסויים' : 'מתחילים החייאה');
+  timerId = setInterval(schedule, 25); schedule();
+  $('go').textContent='הפסקה'; $('go').classList.add('stop');
+  try{ wake = await navigator.wakeLock?.request('screen'); }catch(e){}
+  requestAnimationFrame(frame);
+}
+function pause(){
+  elapsed = curElapsed(); running = false; clearInterval(timerId); queue = [];
+  $('go').textContent='להמשיך בעיסויים'; $('go').classList.remove('stop');
+  $('ring').className='ring idle'; $('count').textContent='⏸'; $('unit').textContent='בהפסקה';
+  addLog('עצרנו');
+  try{ wake?.release(); }catch(e){} wake=null;
+}
+$('go').addEventListener('click',()=> running ? pause() : start());
+$('reset').addEventListener('click',()=>{
+  if(running) pause();
+  elapsed=0; totalBeats=0; beatInCycle=0; swapBase=0; lastSwapAlert=0; log.length=0;
+  $('tTotal').textContent='00:00'; $('tSwap').textContent='02:00'; $('tCount').textContent='0'; $('banner').hidden=true;
+  $('count').textContent='110'; $('unit').textContent='לחיצות בדקה'; $('go').textContent='התחלת עיסויים';
+  $('log').innerHTML='<li class="muted">כשמתחילים, כאן ייכתבו אוטומטית השעה והאירועים.</li>';
+});
+function setMode(m){ mode=m; beatInCycle=0; $('mHands').setAttribute('aria-pressed',m==='hands'); $('m302').setAttribute('aria-pressed',m==='302'); }
+$('mHands').addEventListener('click',()=>setMode('hands'));
+$('m302').addEventListener('click',()=>setMode('302'));
+document.querySelectorAll('[data-ev]').forEach(b=>b.addEventListener('click',()=>{ addLog(b.dataset.ev); toast('נרשם ביומן'); }));
+$('copyLog').addEventListener('click',()=>{
+  const text = 'יומן החייאה\n' + log.map(e=>`${e.at}  ${e.label}${e.cpr?` (${e.cpr})`:''}`).join('\n');
+  navigator.clipboard.writeText(text).then(()=>toast('היומן הועתק'),()=>toast('ההעתקה נחסמה. אפשר לצלם את המסך'));
+});
+
+/* tabs */
+const tabs = [...document.querySelectorAll('[role=tab]')];
+function openTab(t){ tabs.forEach(x=>{ const on=x===t; x.setAttribute('aria-selected',on); $(x.getAttribute('aria-controls')).hidden=!on; }); }
+tabs.forEach(t=>t.addEventListener('click',()=>openTab(t)));
+const h = location.hash.slice(1); const ht = tabs.find(t=>t.id==='tab-'+h); if(ht) openTab(ht);
+
+/* stroke time */
+$('strokeTime').addEventListener('click',()=>{ $('strokeOut').textContent = 'הסימנים התחילו ב־' + clock(); });
+
+/* practice */
+let taps = [];
+function tap(){
+  const now = performance.now();
+  if(taps.length && now - taps[taps.length-1] > 2000) taps = [];
+  taps.push(now); if(taps.length>9) taps.shift();
+  if(ctx && ctx.state==='running' && !running) tone(ctx.currentTime, 700, 0.03, 0.12);
+  if(taps.length < 4){ $('verdict').className='verdict'; $('verdict').textContent='עוד כמה הקשות…'; return; }
+  const iv = (taps[taps.length-1]-taps[0])/(taps.length-1), r = Math.round(60000/iv);
+  $('rate').textContent = r + ' /min';
+  $('mark').style.left = Math.min(100,Math.max(0,(r-60)/100*100)) + '%';
+  const v=$('verdict');
+  if(r<100){ v.className='verdict bad'; v.textContent='לאט מדי. צריך להאיץ'; }
+  else if(r>120){ v.className='verdict bad'; v.textContent='מהר מדי. להאט קצת'; }
+  else { v.className='verdict ok'; v.textContent='מצוין, זה הקצב'; }
+}
+$('pad').addEventListener('pointerdown',e=>{ e.preventDefault(); ctx = ctx || new (window.AudioContext||window.webkitAudioContext)(); if(ctx.state==='suspended') ctx.resume(); tap(); });
+$('pad').addEventListener('keydown',e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); if(!e.repeat) tap(); } });
+document.addEventListener('keydown',e=>{
+  if(e.key===' ' && !$('p-practice').hidden && document.activeElement.tagName!=='BUTTON' && !e.repeat){ e.preventDefault(); tap(); }
+});
+})();
+</script>

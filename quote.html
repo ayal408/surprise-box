@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הצעת מחיר</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#EEEDEA;--surface:#FFFFFF;--surface2:#F7F6F3;--ink:#1D1C1A;--muted:#6E6A62;--line:#DDD9D0;--acc:#1E4E79;--acc-soft:#E3ECF5;--danger:#B3261E;
+  --display:"Frank Ruhl Libre","David",serif;--body:"Assistant","Segoe UI",Arial,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#141413;--surface:#1D1D1B;--surface2:#242422;--ink:#EDEBE6;--muted:#A29D93;--line:#353430;--acc:#8AB6E0;--acc-soft:#1C2A38;--danger:#FF8A7E}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#141413;--surface:#1D1D1B;--surface2:#242422;--ink:#EDEBE6;--muted:#A29D93;--line:#353430;--acc:#8AB6E0;--acc-soft:#1C2A38;--danger:#FF8A7E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.5}
+.wrap{max-width:1280px;margin:0 auto;padding-inline:18px;padding-block:22px 50px;display:grid;grid-template-columns:minmax(0,430px) minmax(0,1fr);gap:22px;align-items:start}
+.editor{display:flex;flex-direction:column;gap:14px}
+h1{margin:0;font-family:var(--display);font-size:2rem}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.box h2{margin:0;font-size:1rem;font-weight:700;color:var(--acc)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:.82rem;color:var(--muted);font-weight:600}
+label.f input,label.f select,label.f textarea,.items input{font:inherit;font-size:.95rem;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%;min-width:0}
+label.f textarea{resize:vertical;min-height:64px}
+.items{display:flex;flex-direction:column;gap:6px}
+.item{display:grid;grid-template-columns:1fr 58px 90px 26px;gap:6px;align-items:center}
+.item input.n{font-family:var(--mono);direction:ltr;text-align:right}
+.x{border:0;background:none;color:var(--danger);font-size:1.05rem;cursor:pointer}
+.btn{font:inherit;font-weight:700;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer}
+.btn:hover{border-color:var(--acc)}
+.btn.primary{background:var(--acc);border-color:var(--acc);color:var(--surface)}
+.bar{display:flex;gap:8px;flex-wrap:wrap}
+.seg{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{font:inherit;font-size:.88rem;border:0;background:var(--surface2);color:var(--muted);padding:8px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--acc);color:var(--surface);font-weight:700}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.hint{font-size:.8rem;color:var(--muted)}
+.logo-row{display:flex;gap:10px;align-items:center}
+.logo-row img{max-height:40px;max-width:120px;border-radius:6px;background:#fff}
+
+/* ---- the document (always light, like paper) ---- */
+.paperwrap{position:sticky;top:12px;overflow:auto;max-height:calc(100vh - 24px);border-radius:10px}
+.paper{background:#fff;color:#1d1c1a;width:100%;max-width:794px;min-height:1080px;margin:0 auto;padding:54px 56px;box-shadow:0 10px 40px rgba(0,0,0,.18);font-family:var(--body);display:flex;flex-direction:column;gap:22px}
+.p-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;border-bottom:3px solid #1E4E79;padding-bottom:18px}
+.p-biz{display:flex;flex-direction:column;gap:2px;font-size:.9rem;color:#4a4740}
+.p-biz strong{font-family:var(--display);font-size:1.6rem;color:#1d1c1a;font-weight:700}
+.p-logo{max-height:70px;max-width:180px}
+.p-title{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.p-title h2{margin:0;font-family:var(--display);font-size:2.2rem;color:#1E4E79}
+.p-meta{font-size:.88rem;color:#4a4740;text-align:left;display:grid;grid-template-columns:auto auto;gap:2px 12px}
+.p-meta b{font-family:var(--mono);font-weight:500;color:#1d1c1a;direction:ltr}
+.p-client{background:#F4F7FA;border-radius:8px;padding:12px 16px;font-size:.92rem}
+.p-client span{color:#6e6a62;font-size:.8rem;display:block}
+.p-table{width:100%;border-collapse:collapse;font-size:.92rem}
+.p-table th{background:#1E4E79;color:#fff;font-weight:600;padding:8px 10px;text-align:right}
+.p-table td{padding:8px 10px;border-bottom:1px solid #e6e3dc;vertical-align:top}
+.p-table td.n,.p-table th.n{text-align:left;font-family:var(--mono);direction:ltr;white-space:nowrap}
+.p-table tr:nth-child(even) td{background:#FAFAF8}
+.p-totals{align-self:flex-start;min-width:280px;display:flex;flex-direction:column;gap:4px;font-size:.95rem}
+.p-totals div{display:flex;justify-content:space-between;gap:20px}
+.p-totals b{font-family:var(--mono);font-weight:500;direction:ltr}
+.p-totals .grand{border-top:2px solid #1E4E79;padding-top:6px;margin-top:4px;font-size:1.15rem;font-weight:700;color:#1E4E79}
+.p-notes{font-size:.88rem;color:#4a4740;white-space:pre-wrap;border-top:1px solid #e6e3dc;padding-top:12px}
+.p-sign{margin-top:auto;display:flex;justify-content:space-between;gap:30px;font-size:.85rem;color:#6e6a62;padding-top:30px}
+.p-sign div{flex:1;border-top:1px solid #9c978c;padding-top:6px;text-align:center}
+@media (max-width:1000px){.wrap{grid-template-columns:1fr}.paperwrap{position:static;max-height:none}.paper{padding:28px 22px;min-height:0}}
+@media print{
+  @page{size:A4;margin:0}
+  body{background:#fff}
+  .editor{display:none!important}
+  .wrap{display:block;padding:0;max-width:none}
+  .paperwrap{position:static;max-height:none;overflow:visible}
+  .paper{box-shadow:none;max-width:none;min-height:297mm;padding:16mm 16mm}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="editor">
+    <div>
+      <h1>הצעת מחיר / חשבון עסקה</h1>
+      <p class="hint">ממלאים בצד אחד ורואים את המסמך המוכן בצד השני. פרטי העסק נשמרים בדפדפן, ובהדפסה אפשר לבחור "שמירה כ־PDF".</p>
+    </div>
+
+    <div class="box">
+      <h2>סוג המסמך</h2>
+      <div class="seg" role="group" aria-label="סוג מסמך">
+        <button type="button" data-doc="הצעת מחיר" aria-pressed="true">הצעת מחיר</button>
+        <button type="button" data-doc="חשבון עסקה" aria-pressed="false">חשבון עסקה</button>
+        <button type="button" data-doc="דרישת תשלום" aria-pressed="false">דרישת תשלום</button>
+      </div>
+      <div class="g2">
+        <label class="f" for="num">מספר מסמך<input id="num" type="text" inputmode="numeric"></label>
+        <label class="f" for="date">תאריך<input id="date" type="date"></label>
+      </div>
+      <label class="f" for="valid">בתוקף עד (ימים)<input id="valid" type="number" min="0" value="30"></label>
+    </div>
+
+    <div class="box">
+      <h2>פרטי העסק שלך</h2>
+      <label class="f" for="bName">שם העסק<input id="bName" type="text" placeholder="למשל: אילה ניהול חשבונות"></label>
+      <div class="g2">
+        <label class="f" for="bId">ע.מ / ח.פ<input id="bId" type="text" inputmode="numeric"></label>
+        <label class="f" for="bType">סוג עוסק
+          <select id="bType"><option value="murshe">עוסק מורשה / חברה</option><option value="patur">עוסק פטור</option></select>
+        </label>
+      </div>
+      <label class="f" for="bAddr">כתובת<input id="bAddr" type="text"></label>
+      <div class="g2">
+        <label class="f" for="bPhone">טלפון<input id="bPhone" type="tel"></label>
+        <label class="f" for="bMail">אימייל<input id="bMail" type="email"></label>
+      </div>
+      <div class="logo-row">
+        <label class="btn" for="logo" style="cursor:pointer">🖼️ העלאת לוגו</label>
+        <input type="file" id="logo" accept="image/*" hidden>
+        <img id="logoPrev" alt="" hidden>
+        <button type="button" class="x" id="logoRm" hidden title="הסרת לוגו">✕</button>
+      </div>
+    </div>
+
+    <div class="box">
+      <h2>הלקוח</h2>
+      <div class="g2">
+        <label class="f" for="cName">שם הלקוח<input id="cName" type="text"></label>
+        <label class="f" for="cId">ח.פ / ת.ז (לא חובה)<input id="cId" type="text"></label>
+      </div>
+      <label class="f" for="cContact">איש קשר / כתובת / טלפון<input id="cContact" type="text"></label>
+    </div>
+
+    <div class="box">
+      <h2>פריטים</h2>
+      <div class="item hint"><span>תיאור</span><span>כמות</span><span>מחיר ליחידה</span><span></span></div>
+      <div class="items" id="items"></div>
+      <button type="button" class="btn" id="addItem">➕ פריט נוסף</button>
+      <div class="g2">
+        <label class="f" for="disc">הנחה (%)<input id="disc" type="number" min="0" max="100" step="0.5" value="0"></label>
+        <label class="f" for="vat">מע"מ (%)<input id="vat" type="number" min="0" max="30" step="0.5" value="18"></label>
+      </div>
+      <label class="f" for="pricesInc"><span style="display:flex;gap:8px;align-items:center;color:var(--ink);font-weight:400"><input type="checkbox" id="pricesInc" style="width:auto"> המחירים שהקלדתי כוללים מע"מ</span></label>
+      <p class="hint" id="vatHint">שיעור המע"מ בישראל הוא 18%, בתוקף מינואר 2025. בודקים שהוא לא השתנה.</p>
+    </div>
+
+    <div class="box">
+      <h2>הערות ותנאים</h2>
+      <label class="f" for="notes"><textarea id="notes">תנאי תשלום: שוטף + 30.
+ההצעה אינה כוללת הוצאות שאינן מפורטות לעיל.</textarea></label>
+    </div>
+
+    <div class="bar">
+      <button type="button" class="btn primary" id="print">🖨️ הדפסה / שמירה כ־PDF</button>
+      <button type="button" class="btn" id="newDoc">📄 מסמך חדש</button>
+    </div>
+    <p class="hint">"מסמך חדש" שומר את פרטי העסק, מקדם את מספר המסמך ומנקה את הלקוח ואת הפריטים. <strong>שימו לב:</strong> זה לא תחליף לחשבונית מס רשמית מתוכנה מוכרת.</p>
+  </div>
+
+  <div class="paperwrap">
+    <article class="paper" id="paper">
+      <header class="p-head">
+        <div class="p-biz" id="pBiz"></div>
+        <img class="p-logo" id="pLogo" alt="" hidden>
+      </header>
+      <div class="p-title">
+        <h2 id="pDoc">הצעת מחיר</h2>
+        <div class="p-meta" id="pMeta"></div>
+      </div>
+      <div class="p-client" id="pClient"></div>
+      <table class="p-table">
+        <thead><tr><th style="width:36px">#</th><th>תיאור</th><th class="n">כמות</th><th class="n">מחיר</th><th class="n">סה"כ</th></tr></thead>
+        <tbody id="pRows"></tbody>
+      </table>
+      <div class="p-totals" id="pTot"></div>
+      <div class="p-notes" id="pNotes"></div>
+      <div class="p-sign"><div>חתימת העסק</div><div>אישור הלקוח</div></div>
+    </article>
+  </div>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const KEY="quote.v1";
+const money=n=>"₪"+(Math.round(n*100)/100).toLocaleString("he-IL",{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let doc="הצעת מחיר", logo="", items=[];
+const bizFields=["bName","bId","bType","bAddr","bPhone","bMail","vat","notes","valid"];
+function load(){
+  let d={}; try{ d=JSON.parse(localStorage.getItem(KEY)||"{}"); }catch(e){}
+  bizFields.forEach(k=>{ if(d[k]!=null) $(k).value=d[k]; });
+  logo=d.logo||""; $("num").value=d.num||"1001";
+  items=d.items&&d.items.length?d.items:[{d:"ייעוץ והנהלת חשבונות, חודש",q:1,p:1500},{d:"הכנת דוח שנתי",q:1,p:2400}];
+  $("cName").value=d.cName||"לקוח לדוגמה בע\"מ"; $("cId").value=d.cId||""; $("cContact").value=d.cContact||"";
+  $("disc").value=d.disc||0; $("pricesInc").checked=!!d.pricesInc;
+  if(d.doc) doc=d.doc;
+}
+function save(){
+  const d={logo,items,doc,num:$("num").value,cName:$("cName").value,cId:$("cId").value,cContact:$("cContact").value,disc:$("disc").value,pricesInc:$("pricesInc").checked};
+  bizFields.forEach(k=>d[k]=$(k).value);
+  try{ localStorage.setItem(KEY,JSON.stringify(d)); }catch(e){}
+}
+function renderItems(){
+  const box=$("items"); box.innerHTML="";
+  items.forEach((it,i)=>{
+    const row=document.createElement("div"); row.className="item";
+    row.innerHTML=`<input aria-label="תיאור" id="d${i}"><input class="n" aria-label="כמות" type="number" step="any" min="0" id="q${i}"><input class="n" aria-label="מחיר ליחידה" type="number" step="any" min="0" id="p${i}"><button type="button" class="x" title="הסרה">✕</button>`;
+    box.appendChild(row);
+    row.querySelector(`#d${i}`).value=it.d; row.querySelector(`#q${i}`).value=it.q; row.querySelector(`#p${i}`).value=it.p;
+    row.querySelector(`#d${i}`).addEventListener("input",e=>{ it.d=e.target.value; update(); });
+    row.querySelector(`#q${i}`).addEventListener("input",e=>{ it.q=parseFloat(e.target.value)||0; update(); });
+    row.querySelector(`#p${i}`).addEventListener("input",e=>{ it.p=parseFloat(e.target.value)||0; update(); });
+    row.querySelector(".x").addEventListener("click",()=>{ items.splice(i,1); if(!items.length) items.push({d:"",q:1,p:0}); renderItems(); update(); });
+  });
+}
+function update(){
+  const patur=$("bType").value==="patur"; $("vat").disabled=patur; $("pricesInc").disabled=patur;
+  const vatP=patur?0:(parseFloat($("vat").value)||0), disc=Math.min(100,Math.max(0,parseFloat($("disc").value)||0)), inc=$("pricesInc").checked&&!patur;
+  const lineTot=items.map(it=>(it.q||0)*(it.p||0));
+  let gross=lineTot.reduce((s,x)=>s+x,0);
+  let sub=inc?gross/(1+vatP/100):gross;           // before discount, excl. VAT
+  const discAmt=sub*disc/100, net=sub-discAmt, vatAmt=net*vatP/100, total=net+vatAmt;
+  // document
+  document.querySelectorAll("[data-doc]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.doc===doc));
+  $("pDoc").textContent=doc;
+  const bn=$("bName").value||"שם העסק";
+  $("pBiz").innerHTML=`<strong>${esc(bn)}</strong>${$("bId").value?`<span>${patur?"עוסק פטור":"ע.מ / ח.פ"} ${esc($("bId").value)}</span>`:""}${$("bAddr").value?`<span>${esc($("bAddr").value)}</span>`:""}<span>${[ $("bPhone").value, $("bMail").value ].filter(Boolean).map(esc).join(" · ")}</span>`;
+  const lg=$("pLogo"); lg.hidden=!logo; if(logo) lg.src=logo;
+  $("logoPrev").hidden=!logo; $("logoRm").hidden=!logo; if(logo) $("logoPrev").src=logo;
+  const dt=$("date").value?new Date($("date").value):new Date();
+  const vd=parseInt($("valid").value)||0, until=new Date(dt); until.setDate(until.getDate()+vd);
+  const f=d=>d.toLocaleDateString("he-IL");
+  $("pMeta").innerHTML=`<span>מספר</span><b>${esc($("num").value)}</b><span>תאריך</span><b>${f(dt)}</b>${doc==="הצעת מחיר"&&vd?`<span>בתוקף עד</span><b>${f(until)}</b>`:""}`;
+  $("pClient").innerHTML=`<span>לכבוד</span><strong>${esc($("cName").value||"—")}</strong>${$("cId").value?` · ${esc($("cId").value)}`:""}${$("cContact").value?`<br>${esc($("cContact").value)}`:""}`;
+  $("pRows").innerHTML=items.map((it,i)=>`<tr><td>${i+1}</td><td>${esc(it.d)||"&nbsp;"}</td><td class="n">${(it.q||0).toLocaleString("he-IL")}</td><td class="n">${money(it.p||0)}</td><td class="n">${money(lineTot[i])}</td></tr>`).join("");
+  $("pTot").innerHTML=`<div><span>סכום לפני מע"מ</span><b>${money(sub)}</b></div>${disc?`<div><span>הנחה ${disc}%</span><b>-${money(discAmt)}</b></div><div><span>אחרי הנחה</span><b>${money(net)}</b></div>`:""}${patur?`<div><span>עוסק פטור, ללא מע"מ</span><b>—</b></div>`:`<div><span>מע"מ ${vatP}%</span><b>${money(vatAmt)}</b></div>`}<div class="grand"><span>סה"כ לתשלום</span><b>${money(total)}</b></div>`;
+  $("pNotes").textContent=$("notes").value; $("pNotes").hidden=!$("notes").value.trim();
+  $("vatHint").hidden=patur;
+  document.title=`${doc} ${$("num").value} · ${$("cName").value||""}`.trim();
+  save();
+}
+document.querySelectorAll("[data-doc]").forEach(b=>b.addEventListener("click",()=>{ doc=b.dataset.doc; update(); }));
+document.querySelectorAll(".editor input:not([type=file]), .editor select, .editor textarea").forEach(el=>{ if(!el.closest(".items")) el.addEventListener("input",update); });
+$("addItem").addEventListener("click",()=>{ items.push({d:"",q:1,p:0}); renderItems(); update(); const last=$("d"+(items.length-1)); if(last) last.focus(); });
+$("logo").addEventListener("change",e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const img=new Image(), rd=new FileReader();
+  rd.onload=()=>{ img.onload=()=>{ const c=document.createElement("canvas"), s=Math.min(1,360/Math.max(img.width,img.height)); c.width=img.width*s; c.height=img.height*s; c.getContext("2d").drawImage(img,0,0,c.width,c.height); logo=c.toDataURL("image/png"); update(); }; img.src=rd.result; };
+  rd.readAsDataURL(f); e.target.value="";
+});
+$("logoRm").addEventListener("click",()=>{ logo=""; update(); });
+$("print").addEventListener("click",()=>{ try{ window.print(); }catch(e){} });
+$("newDoc").addEventListener("click",()=>{
+  const n=parseInt($("num").value,10); if(!isNaN(n)) $("num").value=String(n+1);
+  $("cName").value=""; $("cId").value=""; $("cContact").value=""; $("disc").value=0;
+  items=[{d:"",q:1,p:0}]; $("date").valueAsDate=new Date(); renderItems(); update();
+});
+load(); $("date").valueAsDate=new Date(); renderItems(); update();
+})();
+</script>
+</body>
+</html>

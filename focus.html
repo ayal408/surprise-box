@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>בועת ריכוז</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;500;800&family=JetBrains+Mono:wght@300;500&display=swap">
+<style>
+/* single deep-night theme on purpose: calm, low glare */
+:root{color-scheme:dark;--ink:#EAF2F4;--muted:#8FA6AD;--glass:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--work:#7FE0C9;--rest:#FFC98A}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:"Heebo","Segoe UI",Arial,sans-serif;background:#0A1418;overflow-x:hidden}
+.sky{position:fixed;inset:-20%;z-index:0;background:radial-gradient(40% 40% at 30% 30%,rgba(60,140,150,.35),transparent 70%),radial-gradient(35% 35% at 70% 60%,rgba(90,70,160,.3),transparent 70%),radial-gradient(30% 30% at 50% 90%,rgba(40,90,120,.35),transparent 70%);animation:drift 40s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate(4%,-3%) rotate(8deg) scale(1.08)}}
+.wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding-inline:18px;padding-block:24px 50px;display:grid;grid-template-columns:1.1fr 1fr;gap:26px;align-items:start}
+h1{margin:0;font-weight:800;font-size:clamp(1.9rem,5vw,2.7rem)}
+p{margin:0}.muted{color:var(--muted)}
+.left{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+.bubble{position:relative;width:min(340px,78vw);aspect-ratio:1;max-width:100%}
+.bubble svg{width:100%;height:100%;transform:rotate(-90deg)}
+.bubble .track{stroke:rgba(255,255,255,.08)}
+.bubble .prog{stroke:var(--mode);transition:stroke-dashoffset 1s linear,stroke .6s;filter:drop-shadow(0 0 10px var(--mode))}
+.bubble .core{position:absolute;inset:14%;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.14),rgba(255,255,255,.02) 60%);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;animation:breathe 8s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.035);box-shadow:0 0 60px -10px var(--mode)}}
+.time{font-family:"JetBrains Mono",monospace;font-weight:300;font-size:clamp(3rem,12vw,4.6rem);line-height:1;direction:ltr}
+.phase{font-weight:500;color:var(--mode);letter-spacing:.06em}
+.task{font:inherit;text-align:center;width:min(360px,100%);background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--ink);padding:8px;font-size:1.05rem}
+.task:focus{outline:none;border-color:var(--mode)}
+.btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.btns button,.presets button{font:inherit;cursor:pointer;border-radius:999px;border:1px solid var(--line);background:var(--glass);color:var(--ink);padding:10px 20px}
+#go{background:var(--mode);color:#0A1418;border:0;font-weight:800;min-width:140px}
+.presets{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.presets button{padding:6px 14px;font-size:.9rem;color:var(--muted)}
+.presets button[aria-pressed="true"]{color:var(--ink);border-color:var(--mode)}
+.dots{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;min-height:14px}
+.dots i{width:12px;height:12px;border-radius:50%;background:var(--work);box-shadow:0 0 8px var(--work);animation:pop .4s ease both}
+@keyframes pop{from{transform:scale(0)}}
+.panel{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;backdrop-filter:blur(8px)}
+.panel h2{margin:0;font-size:1.15rem;font-weight:500}
+.snd{display:grid;grid-template-columns:34px 1fr 44px;align-items:center;gap:10px}
+.snd .ic{font-size:1.4rem;text-align:center}
+.snd label{display:flex;flex-direction:column;gap:2px;font-size:.92rem}
+.snd input[type=range]{width:100%;accent-color:var(--work)}
+.snd output{font-family:"JetBrains Mono",monospace;font-size:.8rem;color:var(--muted);text-align:left}
+.mixes{display:flex;gap:6px;flex-wrap:wrap}
+.mixes button{font:inherit;font-size:.85rem;cursor:pointer;border-radius:999px;border:1px dashed var(--line);background:transparent;color:var(--muted);padding:5px 12px}
+.mixes button:hover{color:var(--ink);border-color:var(--work)}
+.tips{font-size:.9rem;color:var(--muted);line-height:1.6}
+:focus-visible{outline:2px solid var(--mode);outline-offset:3px}
+@media (max-width:820px){.wrap{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body style="--mode:var(--work)">
+<div class="sky" aria-hidden="true"></div>
+<div class="wrap">
+  <section class="left">
+    <div><h1>בועת ריכוז</h1><p class="muted">טיימר פומודורו עם צלילי רקע שנוצרים בזמן אמת. בוחרים משימה אחת ונכנסים לבועה.</p></div>
+    <div class="presets" role="group" aria-label="אורך סשן">
+      <button type="button" data-w="25" data-r="5" aria-pressed="true">25 / 5</button>
+      <button type="button" data-w="50" data-r="10" aria-pressed="false">50 / 10</button>
+      <button type="button" data-w="15" data-r="3" aria-pressed="false">15 / 3</button>
+      <button type="button" data-w="90" data-r="20" aria-pressed="false">90 / 20</button>
+    </div>
+    <div class="bubble">
+      <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="track" cx="60" cy="60" r="56" fill="none" stroke-width="3"/><circle class="prog" id="prog" cx="60" cy="60" r="56" fill="none" stroke-width="3" stroke-linecap="round" stroke-dasharray="351.9" stroke-dashoffset="0"/></svg>
+      <div class="core"><span class="phase" id="phase">ריכוז</span><span class="time" id="time">25:00</span></div>
+    </div>
+    <input class="task" id="task" maxlength="80" placeholder="על מה אני עובדת עכשיו?" aria-label="המשימה הנוכחית">
+    <div class="btns">
+      <button id="go" type="button">להתחיל</button>
+      <button id="skip" type="button">דילוג</button>
+      <button id="reset" type="button">איפוס</button>
+    </div>
+    <div class="dots" id="dots" aria-label="סשנים שהושלמו היום"></div>
+    <p class="muted" id="today"></p>
+  </section>
+
+  <section class="panel">
+    <h2>צלילי רקע</h2>
+    <div class="mixes" id="mixes"></div>
+    <div id="sounds" style="display:flex;flex-direction:column;gap:12px"></div>
+    <p class="tips">הצלילים מסונתזים בדפדפן ולא נטענים מהאינטרנט, כך שהם עובדים גם בלי חיבור. רעש חום ורעש של גשם מסתירים רעשי רקע ומקלים על הריכוז.</p>
+    <p class="tips"><strong style="color:var(--ink)">בזמן ההפסקה:</strong> קמים מהכיסא, שותים מים ומסתכלים לרחוק 20 שניות. זה נותן מנוחה לעיניים.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+/* ---------- timer ---------- */
+let workMin=25, restMin=5, mode="work", total=workMin*60, left=total, running=false, tick=null, endAt=0;
+const C=351.9;
+function fmt(s){ s=Math.max(0,Math.ceil(s)); return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); }
+function paint(){
+  $("time").textContent=fmt(left); $("prog").style.strokeDashoffset=(C*(1-left/total)).toFixed(1);
+  $("phase").textContent=mode==="work"?"ריכוז":"הפסקה";
+  document.body.style.setProperty("--mode",mode==="work"?"var(--work)":"var(--rest)");
+  document.title=(running?fmt(left)+" · ":"")+"בועת ריכוז";
+}
+function setMode(m){ mode=m; total=(m==="work"?workMin:restMin)*60; left=total; paint(); }
+function start(){ audio(); running=true; endAt=Date.now()+left*1000; $("go").textContent="השהיה"; tick=setInterval(step,250); paint(); }
+function pause(){ running=false; clearInterval(tick); $("go").textContent="להמשיך"; paint(); }
+function step(){ left=(endAt-Date.now())/1000; if(left<=0){ done(); return; } paint(); }
+function done(){
+  clearInterval(tick); running=false; chime(mode==="work");
+  if(mode==="work"){ addSession(); setMode("rest"); } else setMode("work");
+  $("go").textContent="להתחיל"; start();
+}
+$("go").addEventListener("click",()=>running?pause():start());
+$("skip").addEventListener("click",()=>{ clearInterval(tick); running=false; setMode(mode==="work"?"rest":"work"); $("go").textContent="להתחיל"; });
+$("reset").addEventListener("click",()=>{ clearInterval(tick); running=false; setMode("work"); $("go").textContent="להתחיל"; });
+document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".presets button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  workMin=+b.dataset.w; restMin=+b.dataset.r; clearInterval(tick); running=false; setMode("work"); $("go").textContent="להתחיל";
+}));
+/* sessions */
+const dk=()=>{ const d=new Date(); return "focus."+d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); };
+function getS(){ try{ return JSON.parse(localStorage.getItem(dk())||"{\"n\":0,\"min\":0}"); }catch(e){ return {n:0,min:0}; } }
+function renderS(){ const s=getS(); $("dots").innerHTML="<i></i>".repeat(Math.min(s.n,24)); $("today").textContent=s.n?`היום: ${s.n} סשנים · ${s.min} דקות של ריכוז`:"עוד לא היו סשנים היום"; }
+function addSession(){ const s=getS(); s.n++; s.min+=workMin; try{ localStorage.setItem(dk(),JSON.stringify(s)); }catch(e){} renderS(); }
+try{ $("task").value=localStorage.getItem("focus.task")||""; }catch(e){}
+$("task").addEventListener("input",e=>{ try{ localStorage.setItem("focus.task",e.target.value); }catch(err){} });
+
+/* ---------- ambient synth ---------- */
+let ac=null, master;
+const S=[
+  {id:"rain",ic:"🌧️",he:"גשם"},{id:"waves",ic:"🌊",he:"גלים"},{id:"brown",ic:"🟤",he:"רעש חום"},
+  {id:"wind",ic:"🍃",he:"רוח"},{id:"fire",ic:"🔥",he:"אח בוערת"},{id:"birds",ic:"🐦",he:"ציפורים"}
+];
+const vols={}; try{ Object.assign(vols,JSON.parse(localStorage.getItem("focus.vols")||"{}")); }catch(e){}
+function noiseBuffer(kind){
+  const len=ac.sampleRate*4, b=ac.createBuffer(1,len,ac.sampleRate), d=b.getChannelData(0); let last=0;
+  for(let i=0;i<len;i++){ const w=Math.random()*2-1; if(kind==="brown"){ last=(last+.02*w)/1.02; d[i]=last*3.5; } else d[i]=w; }
+  return b;
+}
+function loopSrc(buf){ const s=ac.createBufferSource(); s.buffer=buf; s.loop=true; s.start(); return s; }
+function lfo(freq,depth,param,base){ const o=ac.createOscillator(), g=ac.createGain(); o.frequency.value=freq; g.gain.value=depth; o.connect(g).connect(param); param.value=base; o.start(); }
+const gains={};
+function audio(){
+  if(ac){ if(ac.state==="suspended") ac.resume(); return; }
+  ac=new (window.AudioContext||window.webkitAudioContext)(); master=ac.createGain(); master.gain.value=.9; master.connect(ac.destination);
+  const white=noiseBuffer("white"), brown=noiseBuffer("brown");
+  S.forEach(s=>{ gains[s.id]=ac.createGain(); gains[s.id].gain.value=0; gains[s.id].connect(master); });
+  // rain: filtered white + droplets
+  { const f=ac.createBiquadFilter(); f.type="bandpass"; f.frequency.value=2500; f.Q.value=.4; loopSrc(white).connect(f).connect(gains.rain);
+    const drops=()=>{ if(gains.rain.gain.value>0.01){ const o=ac.createBufferSource(); o.buffer=white; const hf=ac.createBiquadFilter(); hf.type="highpass"; hf.frequency.value=3000+Math.random()*3000; const g=ac.createGain(), t=ac.currentTime; g.gain.setValueAtTime(.25,t); g.gain.exponentialRampToValueAtTime(1e-4,t+.03); o.connect(hf).connect(g).connect(gains.rain); o.start(t,Math.random()*3,.05); } setTimeout(drops,20+Math.random()*80); }; drops(); }
+  // waves: brown noise with slow swelling volume
+  { const f=ac.createBiquadFilter(); f.type="lowpass"; f.frequency.value=900; const sw=ac.createGain(); loopSrc(brown).connect(f).connect(sw).connect(gains.waves); lfo(.09,.45,sw.gain,.55); lfo(.09,400,f.frequency,900); }
+  // brown noise
+  { const f=ac.createBiquadFilter(); f.type="lowpass"; f.frequency.value=500; loopSrc(brown).connect(f).connect(gains.brown); }
+  // wind: band-passed noise with wandering frequency
+  { const f=ac.createBiquadFilter(); f.type="bandpass"; f.Q.value=1.2; loopSrc(white).connect(f).connect(gains.wind); lfo(.05,250,f.frequency,500); const f2=ac.createGain(); }
+  // fire: low rumble + crackles
+  { const f=ac.createBiquadFilter(); f.type="lowpass"; f.frequency.value=200; const g=ac.createGain(); g.gain.value=.6; loopSrc(brown).connect(f).connect(g).connect(gains.fire);
+    const crack=()=>{ if(gains.fire.gain.value>0.01){ const o=ac.createBufferSource(); o.buffer=white; const bp=ac.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=1500+Math.random()*2500; const cg=ac.createGain(), t=ac.currentTime; cg.gain.setValueAtTime(.5*Math.random()+.2,t); cg.gain.exponentialRampToValueAtTime(1e-4,t+.02+Math.random()*.05); o.connect(bp).connect(cg).connect(gains.fire); o.start(t,Math.random()*3,.08); } setTimeout(crack,40+Math.random()*350); }; crack(); }
+  // birds: occasional chirps
+  { const chirp=()=>{ if(gains.birds.gain.value>0.01){ const t=ac.currentTime, n=2+Math.floor(Math.random()*4), base=2200+Math.random()*1800;
+      for(let i=0;i<n;i++){ const o=ac.createOscillator(), g=ac.createGain(), s=t+i*.11; o.type="sine"; o.frequency.setValueAtTime(base,s); o.frequency.exponentialRampToValueAtTime(base*(1.3+Math.random()*.4),s+.06);
+        g.gain.setValueAtTime(0,s); g.gain.linearRampToValueAtTime(.12,s+.01); g.gain.exponentialRampToValueAtTime(1e-4,s+.08); o.connect(g).connect(gains.birds); o.start(s); o.stop(s+.1); } }
+      setTimeout(chirp,800+Math.random()*3500); }; chirp(); }
+  S.forEach(s=>setVol(s.id,vols[s.id]||0));
+}
+function setVol(id,v){ vols[id]=v; if(ac) gains[id].gain.setTargetAtTime(Math.pow(v/100,2)*(id==="brown"?1.2:1),ac.currentTime,.3); try{ localStorage.setItem("focus.vols",JSON.stringify(vols)); }catch(e){} }
+S.forEach(s=>{
+  const row=document.createElement("div"); row.className="snd";
+  row.innerHTML=`<span class="ic">${s.ic}</span><label for="v_${s.id}">${s.he}<input type="range" id="v_${s.id}" min="0" max="100" value="${vols[s.id]||0}"></label><output id="o_${s.id}">${vols[s.id]||0}</output>`;
+  $("sounds").appendChild(row);
+  row.querySelector("input").addEventListener("input",e=>{ audio(); $("o_"+s.id).textContent=e.target.value; setVol(s.id,+e.target.value); });
+});
+const MIX={"☔ יום גשום":{rain:70,wind:25,brown:15},"🏖️ חוף":{waves:75,birds:25,wind:15},"🏕️ מדורה":{fire:70,wind:20,birds:10},"🧠 עבודה עמוקה":{brown:60},"🔇 שקט":{}};
+Object.entries(MIX).forEach(([name,m])=>{ const b=document.createElement("button"); b.type="button"; b.textContent=name;
+  b.addEventListener("click",()=>{ audio(); S.forEach(s=>{ const v=m[s.id]||0; $("v_"+s.id).value=v; $("o_"+s.id).textContent=v; setVol(s.id,v); }); }); $("mixes").appendChild(b); });
+
+function chime(work){
+  if(!ac) return; const t=ac.currentTime, notes=work?[659.25,783.99,1046.5]:[523.25,659.25,783.99];
+  notes.forEach((f,i)=>{ const o=ac.createOscillator(), g=ac.createGain(), s=t+i*.22; o.type="sine"; o.frequency.value=f; g.gain.setValueAtTime(0,s); g.gain.linearRampToValueAtTime(.3,s+.02); g.gain.exponentialRampToValueAtTime(1e-4,s+1.4); o.connect(g).connect(ac.destination); o.start(s); o.stop(s+1.5); });
+}
+renderS(); paint();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>גלגל ההחלטות</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--y:#ffe14d;--pink:#ff6ec7;--blue:#4d9bff;--green:#3ee07a;--ink:#000}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--y);color:var(--ink);font-family:Rubik,"Arial Hebrew",Arial,sans-serif;padding:20px 14px}
+.wrap{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1.1fr 1fr;gap:22px}
+.b{background:#fff;border:4px solid var(--ink);box-shadow:8px 8px 0 var(--ink);border-radius:14px;padding:16px}
+header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;background:var(--pink)}
+h1{margin:0;font-weight:900;font-size:clamp(1.8rem,5vw,3rem);letter-spacing:-1px}
+a{color:var(--ink);font-weight:800}
+.wheelbox{display:flex;flex-direction:column;align-items:center;gap:16px;background:var(--blue)}
+.wh{position:relative;width:min(100%,440px);aspect-ratio:1}
+canvas{width:100%;height:100%;display:block}
+.ptr{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:20px solid transparent;border-right:20px solid transparent;border-top:40px solid var(--ink);filter:drop-shadow(0 3px 0 #fff)}
+button{font:inherit;font-weight:900;font-size:1.1rem;background:var(--green);color:var(--ink);border:4px solid var(--ink);box-shadow:5px 5px 0 var(--ink);border-radius:12px;padding:12px 26px;cursor:pointer;transition:transform .08s,box-shadow .08s}
+button:active{transform:translate(5px,5px);box-shadow:0 0 0 var(--ink)}
+button.sm{font-size:.9rem;padding:6px 12px;background:#fff;box-shadow:3px 3px 0 var(--ink)}
+#spin{font-size:1.6rem;padding:14px 40px}
+.result{font-weight:900;font-size:1.8rem;min-height:1.3em;text-align:center;background:#fff;border:4px solid var(--ink);border-radius:12px;padding:8px 16px;box-shadow:5px 5px 0 var(--ink)}
+.side{display:flex;flex-direction:column;gap:14px}
+textarea{width:100%;min-height:200px;font:inherit;font-weight:500;font-size:1.05rem;border:4px solid var(--ink);border-radius:10px;padding:10px;resize:vertical;background:#fffbe0}
+.presets{display:flex;flex-wrap:wrap;gap:8px}
+label{font-weight:800;display:flex;gap:8px;align-items:center}
+input[type=checkbox]{width:22px;height:22px;accent-color:#000}
+ol{margin:0;padding-inline-start:20px;font-weight:500;max-height:160px;overflow:auto}
+@media(max-width:780px){.wrap{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){button{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="b"><h1>🎡 גלגל ההחלטות</h1><a href="התחל כאן.html">← חזרה לקופסה</a></header>
+  <div class="b wheelbox">
+    <div class="wh"><div class="ptr"></div><canvas id="cv" width="880" height="880"></canvas></div>
+    <button id="spin">סובבו!</button>
+    <div class="result" id="res">מה יוצא?</div>
+  </div>
+  <div class="side">
+    <div class="b">
+      <h2 style="margin:0 0 8px">האפשרויות (שורה לכל אחת)</h2>
+      <textarea id="opts"></textarea>
+      <div class="presets" style="margin-top:10px">
+        <button class="sm" data-p="food">🍕 מה אוכלים</button>
+        <button class="sm" data-p="chores">🧹 מי עושה כלים</button>
+        <button class="sm" data-p="yesno">👍 כן / לא</button>
+        <button class="sm" data-p="fun">🎲 מה עושים היום</button>
+      </div>
+      <label style="margin-top:12px"><input type="checkbox" id="remove"> להוציא את הזוכה מהגלגל אחרי כל סיבוב</label>
+    </div>
+    <div class="b" style="background:var(--green)">
+      <h2 style="margin:0 0 8px">היסטוריה</h2>
+      <ol id="hist"></ol>
+    </div>
+  </div>
+</div>
+<script>
+const P={food:'פיצה\nסושי\nשווארמה\nהמבורגר\nסלט גדול\nפסטה\nחומוס\nמה שיש במקרר',chores:'אבא\nאמא\nהגדול\nהקטנה\nכולם ביחד\nמדיח הכלים 😎',yesno:'כן\nלא\nכן\nלא\nאולי מחר',fun:'טיול בטבע\nסרט בבית\nמשחק קופסה\nאפייה\nים\nביקור אצל סבתא\nפיקניק\nלישון 😴'};
+const COL=['#ff6ec7','#4d9bff','#3ee07a','#ffe14d','#ff8a3d','#b18cff','#2de0e0','#ff4d4d'];
+const cv=document.getElementById('cv'),x=cv.getContext('2d'),T=document.getElementById('opts');
+let rot=0,spinning=false,AC;
+const items=()=>T.value.split('\n').map(s=>s.trim()).filter(Boolean);
+function draw(){const it=items(),n=it.length,R=430,C=440;x.clearRect(0,0,880,880);
+  if(!n){x.fillStyle='#fff';x.beginPath();x.arc(C,C,R,0,7);x.fill();return}
+  const a=2*Math.PI/n;it.forEach((t,i)=>{const s=rot+i*a-Math.PI/2;x.beginPath();x.moveTo(C,C);x.arc(C,C,R,s,s+a);x.closePath();x.fillStyle=COL[i%COL.length];if(n%COL.length===1&&i===n-1)x.fillStyle=COL[3];x.fill();x.lineWidth=8;x.strokeStyle='#000';x.stroke();
+    x.save();x.translate(C,C);x.rotate(s+a/2);x.textAlign='right';x.fillStyle='#000';x.font=`900 ${Math.max(22,Math.min(46,300/n+14))}px Rubik, Arial`;x.fillText(t.length>16?t.slice(0,15)+'…':t,R-30,14);x.restore()});
+  x.beginPath();x.arc(C,C,R,0,7);x.lineWidth=12;x.stroke();x.beginPath();x.arc(C,C,46,0,7);x.fillStyle='#fff';x.fill();x.stroke()}
+function tick(){try{AC=AC||new AudioContext();const o=AC.createOscillator(),g=AC.createGain();o.type='square';o.frequency.value=900;g.gain.setValueAtTime(.05,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+.04);o.connect(g).connect(AC.destination);o.start();o.stop(AC.currentTime+.05)}catch{}}
+function spin(){const it=items();if(spinning||it.length<2){if(it.length<2)document.getElementById('res').textContent='צריך לפחות 2 אפשרויות';return}
+  spinning=true;document.getElementById('res').textContent='...';const n=it.length,a=2*Math.PI/n,start=rot,total=Math.PI*2*(5+Math.random()*3)+Math.random()*2*Math.PI,dur=4200+Math.random()*1200,t0=performance.now();let last=Math.floor(start/a);
+  const f=now=>{const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,4);rot=start+total*e;const seg=Math.floor(rot/a);if(seg!==last){last=seg;tick()}draw();
+    if(p<1)requestAnimationFrame(f);else{spinning=false;rot%=2*Math.PI;const idx=((n-Math.floor(rot/a)-1)%n+n)%n;const w=it[idx];
+      document.getElementById('res').textContent='🎉 '+w;const li=document.createElement('li');li.textContent=w+' · '+new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});document.getElementById('hist').prepend(li);
+      if(document.getElementById('remove').checked){const arr=T.value.split('\n');const k=arr.findIndex(s=>s.trim()===w);arr.splice(k,1);T.value=arr.join('\n');save();draw()}}};
+  requestAnimationFrame(f)}
+function save(){try{localStorage.setItem('wheel',T.value)}catch{}}
+T.value=(()=>{try{return localStorage.getItem('wheel')}catch{}})()||P.food;
+T.oninput=()=>{save();draw()};
+document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{T.value=P[b.dataset.p];save();draw()});
+document.getElementById('spin').onclick=spin;
+cv.onclick=spin;
+draw();
+</script>
+</body>
+</html>

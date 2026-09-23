@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>סיימון אומר</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% 30%,#2b2466 0%,transparent 60%),var(--bg);color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:440px;display:flex;flex-direction:column;gap:14px;align-items:stretch}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+h1{margin:0;font-size:2.2rem}
+.simon{position:relative;direction:ltr;display:grid;grid-template-columns:1fr 1fr;gap:12px;aspect-ratio:1;border-radius:50%;padding:14px;background:#1b1838;user-select:none;touch-action:manipulation}
+.pad{border:0;cursor:pointer;opacity:.45;transition:opacity .12s,filter .12s}
+.pad.lit{opacity:1;filter:brightness(1.3) drop-shadow(0 0 18px currentColor)}
+.g{background:#2bd67b;color:#2bd67b;border-radius:100% 0 0 0}.r{background:#ff4d6d;color:#ff4d6d;border-radius:0 100% 0 0}
+.y{background:#ffd60a;color:#ffd60a;border-radius:0 0 0 100%}.b{background:#4f7bff;color:#4f7bff;border-radius:0 0 100% 0}
+.hub{position:absolute;inset:32%;border-radius:50%;background:#0f0c24;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:6px solid #1b1838}
+.hub b{font-size:2.4rem;font-variant-numeric:tabular-nums}.hub small{color:var(--muted)}
+button.start{font:inherit;cursor:pointer;border-radius:12px;padding:10px;border:0;background:#c77dff;color:#1c0630;font-weight:800;font-size:1.1rem}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between;color:var(--muted)}
+.msg{text-align:center;font-weight:700;min-height:1.5em}
+label{display:flex;gap:6px;align-items:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🎵 סיימון אומר</h1>
+  <div class="simon">
+    <button class="pad g" data-i="0"></button><button class="pad r" data-i="1"></button>
+    <button class="pad y" data-i="2"></button><button class="pad b" data-i="3"></button>
+    <div class="hub"><small>סבב</small><b id="lvl">0</b></div>
+  </div>
+  <div class="msg" id="msg">זוכרים את הרצף וחוזרים עליו. בכל סבב נוסף צבע.</div>
+  <div class="row"><label><input type="checkbox" id="strict"> מצב קשוח (טעות = מתחילים מחדש)</label><span>שיא <b id="best">0</b></span></div>
+  <button class="start" id="go">התחל</button>
+</div>
+<script>
+const pads=[...document.querySelectorAll('.pad')],freq=[329.63,261.63,220,164.81];
+const LS=k=>{try{return localStorage.getItem(k)}catch(e){return null}},SV=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let ac,seq=[],idx=0,listening=false,best=+LS('simonbest')||0;document.getElementById('best').textContent=best;
+function tone(f,ms,type='triangle'){try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.25,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+ms/1000);o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+ms/1000)}catch(e){}}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function flash(i,ms){pads[i].classList.add('lit');tone(freq[i],ms);await sleep(ms);pads[i].classList.remove('lit')}
+async function playSeq(){listening=false;msg('תסתכלו...');await sleep(600);const sp=Math.max(220,560-seq.length*20);
+  for(const i of seq){await flash(i,sp);await sleep(sp*.35)}idx=0;listening=true;msg('תורכם!')}
+function msg(t){document.getElementById('msg').textContent=t}
+function next(){seq.push(Math.random()*4|0);document.getElementById('lvl').textContent=seq.length;playSeq()}
+function start(){seq=[];next()}
+pads.forEach(p=>p.addEventListener('pointerdown',async()=>{if(!listening)return;const i=+p.dataset.i;flash(i,220);
+  if(i!==seq[idx]){listening=false;tone(90,700,'sawtooth');const got=seq.length-1;if(got>best){best=got;SV('simonbest',best);document.getElementById('best').textContent=best}
+    if(document.getElementById('strict').checked){msg(`אופס! הגעתם לסבב ${seq.length}. לחצו התחל`);}else{msg('אופס! עוד הזדמנות...');await sleep(900);playSeq()}return}
+  if(++idx===seq.length){listening=false;msg('מצוין! ✨');await sleep(700);next()}}));
+addEventListener('keydown',e=>{const k={q:0,w:1,a:2,s:3,'1':0,'2':1,'3':2,'4':3}[e.key.toLowerCase()];if(k!=null)pads[k].dispatchEvent(new PointerEvent('pointerdown'))});
+document.getElementById('go').onclick=start;
+</script>
+</body>
+</html>

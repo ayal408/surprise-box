@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעבדת האלגוריתמים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* deliberate single dark "terminal" look */
+:root{color-scheme:dark;--bg:#0B0E14;--panel:#121722;--ink:#E6EDF3;--muted:#8B97A8;--line:#233044;--acc:#58D68D;--cmp:#F7C948;--swp:#FF6B6B;--done:#5DADE2;--mono:"JetBrains Mono",ui-monospace,Consolas,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Heebo","Segoe UI",Arial,sans-serif;line-height:1.5}
+.wrap{max-width:1150px;margin:0 auto;padding-inline:18px;padding-block:22px 50px;display:flex;flex-direction:column;gap:16px}
+h1{margin:0;font-weight:900;font-size:clamp(1.8rem,5vw,2.6rem)}
+h1 span{font-family:var(--mono);color:var(--acc)}
+.sub{color:var(--muted);max-width:70ch;margin:0}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
+.bar label{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:.9rem}
+select,button,input[type=range]{font:inherit;font-size:.92rem}
+select,button{background:#1A2130;color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:7px 12px;cursor:pointer}
+button:hover,select:hover{border-color:var(--acc)}
+button.primary{background:var(--acc);color:#07140c;border-color:var(--acc);font-weight:700}
+input[type=range]{accent-color:var(--acc);width:120px}
+.arenas{display:grid;grid-template-columns:1fr;gap:14px}
+.arenas.race{grid-template-columns:1fr 1fr}
+.arena{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.ahead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.ahead b{font-size:1.1rem}
+.ahead .big{font-family:var(--mono);color:var(--muted);font-size:.85rem}
+canvas{width:100%;height:300px;display:block;border-radius:8px;background:#080B10}
+.stats{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:.85rem;color:var(--muted)}
+.stats b{color:var(--ink);font-weight:600}
+.win{color:var(--acc);font-weight:900}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-inline-end:5px;vertical-align:-1px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.card h3{margin:0;font-size:1.05rem}
+.card p{margin:0;color:var(--muted);font-size:.92rem}
+.card code{font-family:var(--mono);color:var(--cmp);direction:ltr;unicode-bidi:isolate}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:right}
+th{background:#161C28;color:var(--muted);font-weight:700}
+td.m{font-family:var(--mono);direction:ltr;text-align:left}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media (max-width:760px){.arenas.race{grid-template-columns:1fr}canvas{height:220px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:6px">
+    <h1>מעבדת האלגוריתמים <span>sort()</span></h1>
+    <p class="sub">איך מחשב מסדר רשימה? בוחרים אלגוריתם מיון ורואים אותו עובד, עמודה אחרי עמודה, עם צליל לכל השוואה. במצב מרוץ שני אלגוריתמים ממיינים את אותו המערך בדיוק, ורואים למה O(n log n) מנצח את O(n²).</p>
+  </header>
+
+  <div class="bar">
+    <label for="mode">מצב <select id="mode"><option value="single">אלגוריתם אחד</option><option value="race" selected>מרוץ</option></select></label>
+    <label for="algA">אלגוריתם א׳ <select id="algA"></select></label>
+    <label for="algB" id="algBWrap">אלגוריתם ב׳ <select id="algB"></select></label>
+    <label for="size">גודל <input type="range" id="size" min="10" max="220" value="80"></label>
+    <label for="speed">מהירות <input type="range" id="speed" min="1" max="100" value="55"></label>
+    <label for="data">נתונים <select id="data"><option value="rand">אקראי</option><option value="near">כמעט ממוין</option><option value="rev">הפוך</option><option value="few">מעט ערכים שונים</option></select></label>
+    <label for="snd"><input type="checkbox" id="snd" checked> צליל</label>
+    <button id="shuffle" type="button">🔀 ערבוב</button>
+    <button id="go" class="primary" type="button">▶ הפעלה</button>
+  </div>
+
+  <div class="legend"><span><i style="background:var(--cmp)"></i>השוואה</span><span><i style="background:var(--swp)"></i>החלפה או כתיבה</span><span><i style="background:var(--done)"></i>במקום הסופי</span></div>
+
+  <div class="arenas race" id="arenas"></div>
+
+  <h2 style="margin:8px 0 0;font-size:1.4rem">מה ההבדל בין האלגוריתמים?</h2>
+  <div class="cards" id="cards"></div>
+  <div class="tablebox"><table>
+    <thead><tr><th>אלגוריתם</th><th>מקרה ממוצע</th><th>מקרה גרוע</th><th>זיכרון נוסף</th><th>יציב?</th></tr></thead>
+    <tbody id="tbody"></tbody>
+  </table></div>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+
+/* each algorithm is a generator that yields operations on the shared array */
+const ALGS={
+ bubble:{he:"מיון בועות",avg:"O(n²)",worst:"O(n²)",mem:"O(1)",stable:"כן",
+  desc:"עוברים שוב ושוב על הרשימה ומחליפים כל שני שכנים שלא בסדר. הערכים הגדולים \"מבעבעים\" לסוף.",code:"if a[j] > a[j+1]: swap",
+  *run(a){ const n=a.length; for(let i=0;i<n;i++){ let sw=false; for(let j=0;j<n-i-1;j++){ yield ["c",j,j+1]; if(a[j]>a[j+1]){ yield ["s",j,j+1]; sw=true; } } yield ["d",n-i-1]; if(!sw){ for(let k=0;k<n-i-1;k++) yield ["d",k]; return; } } }},
+ insertion:{he:"מיון הכנסה",avg:"O(n²)",worst:"O(n²)",mem:"O(1)",stable:"כן",
+  desc:"כמו סידור קלפים ביד: לוקחים כל איבר ומכניסים אותו למקום הנכון בחלק שכבר ממוין. מהיר מאוד על רשימה כמעט ממוינת.",code:"while a[j-1] > key: shift",
+  *run(a){ for(let i=1;i<a.length;i++){ let j=i; while(j>0){ yield ["c",j-1,j]; if(a[j-1]>a[j]){ yield ["s",j-1,j]; j--; } else break; } } for(let k=0;k<a.length;k++) yield ["d",k]; }},
+ selection:{he:"מיון בחירה",avg:"O(n²)",worst:"O(n²)",mem:"O(1)",stable:"לא",
+  desc:"מוצאים את הערך הקטן ביותר ומעבירים אותו להתחלה, ואז את הבא אחריו, וכך הלאה. מעט החלפות, אבל הרבה השוואות.",code:"min = argmin(a[i:]); swap(i, min)",
+  *run(a){ const n=a.length; for(let i=0;i<n;i++){ let m=i; for(let j=i+1;j<n;j++){ yield ["c",m,j]; if(a[j]<a[m]) m=j; } if(m!==i) yield ["s",i,m]; yield ["d",i]; } }},
+ merge:{he:"מיון מיזוג",avg:"O(n log n)",worst:"O(n log n)",mem:"O(n)",stable:"כן",
+  desc:"\"הפרד ומשול\": מחלקים את הרשימה לחצאים עד שנשארים איברים בודדים, ואז ממזגים בחזרה חלקים ממוינים.",code:"merge(sort(left), sort(right))",
+  *run(a){ function* ms(l,r){ if(r-l<1) return; const m=(l+r)>>1; yield* ms(l,m); yield* ms(m+1,r);
+      const L=a.slice(l,m+1), R=a.slice(m+1,r+1); let i=0,j=0,k=l;
+      while(i<L.length&&j<R.length){ yield ["c",l+i,m+1+j]; if(L[i]<=R[j]) yield ["w",k++,L[i++]]; else yield ["w",k++,R[j++]]; }
+      while(i<L.length) yield ["w",k++,L[i++]]; while(j<R.length) yield ["w",k++,R[j++]]; }
+    yield* ms(0,a.length-1); for(let k=0;k<a.length;k++) yield ["d",k]; }},
+ quick:{he:"מיון מהיר",avg:"O(n log n)",worst:"O(n²)",mem:"O(log n)",stable:"לא",
+  desc:"בוחרים איבר ציר (pivot), שמים את הקטנים ממנו משמאל ואת הגדולים מימין, וחוזרים על זה בכל צד. בפועל זה אחד המיונים המהירים ביותר.",code:"partition(pivot); quick(left); quick(right)",
+  *run(a){ function* qs(l,r){ if(l>=r){ if(l===r) yield ["d",l]; return; } const mid=(l+r)>>1; yield ["s",mid,r]; const p=a[r]; let i=l;
+      for(let j=l;j<r;j++){ yield ["c",j,r]; if(a[j]<p){ if(i!==j) yield ["s",i,j]; i++; } }
+      yield ["s",i,r]; yield ["d",i]; yield* qs(l,i-1); yield* qs(i+1,r); }
+    yield* qs(0,a.length-1); }},
+ heap:{he:"מיון ערימה",avg:"O(n log n)",worst:"O(n log n)",mem:"O(1)",stable:"לא",
+  desc:"בונים מהרשימה \"ערימה\", עץ שבו כל הורה גדול מילדיו, ושולפים ממנה שוב ושוב את הגדול ביותר לסוף הרשימה.",code:"heapify(); swap(0, end); siftDown()",
+  *run(a){ const n=a.length; function* sift(s,end){ let root=s; while(true){ let c=2*root+1; if(c>end) return; if(c+1<=end){ yield ["c",c,c+1]; if(a[c]<a[c+1]) c++; } yield ["c",root,c]; if(a[root]<a[c]){ yield ["s",root,c]; root=c; } else return; } }
+    for(let s=(n>>1)-1;s>=0;s--) yield* sift(s,n-1);
+    for(let end=n-1;end>0;end--){ yield ["s",0,end]; yield ["d",end]; yield* sift(0,end-1); } yield ["d",0]; }},
+ shell:{he:"מיון של (Shell)",avg:"O(n^1.3)",worst:"O(n²)",mem:"O(1)",stable:"לא",
+  desc:"שדרוג של מיון הכנסה: קודם משווים איברים רחוקים זה מזה, ומקטינים בהדרגה את המרווח. כך איברים זזים מהר למקום הנכון.",code:"for gap in [..,4,1]: insertion(gap)",
+  *run(a){ const n=a.length; let gap=1; while(gap<n/3) gap=gap*3+1;
+    for(;gap>=1;gap=(gap-1)/3|0){ for(let i=gap;i<n;i++){ let j=i; while(j>=gap){ yield ["c",j-gap,j]; if(a[j-gap]>a[j]){ yield ["s",j-gap,j]; j-=gap; } else break; } } if(gap===1) break; }
+    for(let k=0;k<n;k++) yield ["d",k]; }}
+};
+const KEYS=Object.keys(ALGS);
+["algA","algB"].forEach((id,k)=>{ const s=$(id); KEYS.forEach(key=>{ const o=document.createElement("option"); o.value=key; o.textContent=ALGS[key].he; s.appendChild(o); }); s.value=k?"quick":"bubble"; });
+
+/* info cards + table */
+KEYS.forEach(k=>{ const a=ALGS[k];
+  const c=document.createElement("div"); c.className="card"; c.innerHTML=`<h3></h3><p></p><p><code></code></p>`;
+  c.querySelector("h3").textContent=`${a.he} · ${a.avg}`; c.querySelectorAll("p")[0].textContent=a.desc; c.querySelector("code").textContent=a.code; $("cards").appendChild(c);
+  const tr=document.createElement("tr"); [a.he,a.avg,a.worst,a.mem,a.stable].forEach((v,i)=>{ const td=document.createElement("td"); td.textContent=v; if(i&&i<4) td.className="m"; tr.appendChild(td); }); $("tbody").appendChild(tr); });
+
+/* sound */
+let ac=null; function beep(v,max){ if(!$("snd").checked) return; try{ ac=ac||new (window.AudioContext||window.webkitAudioContext)(); const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime;
+  o.type="triangle"; o.frequency.value=180+v/max*900; g.gain.setValueAtTime(.035,t); g.gain.exponentialRampToValueAtTime(1e-4,t+.06); o.connect(g).connect(ac.destination); o.start(t); o.stop(t+.07);}catch(e){} }
+
+/* data */
+let base=[];
+function makeData(){
+  const n=+$("size").value, kind=$("data").value; let a=Array.from({length:n},(_,i)=>i+1);
+  if(kind==="few") a=a.map(()=>1+Math.floor(Math.random()*5)*(n/5|0));
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  if(kind==="near"){ a.sort((x,y)=>x-y); for(let k=0;k<Math.max(2,n/12);k++){ const i=Math.floor(Math.random()*n), j=Math.min(n-1,i+1+Math.floor(Math.random()*3)); [a[i],a[j]]=[a[j],a[i]]; } }
+  if(kind==="rev") a.sort((x,y)=>y-x);
+  base=a;
+}
+
+/* arenas */
+let arenas=[], running=false, raf=0, finishOrder=[];
+function buildArenas(){
+  const race=$("mode").value==="race"; $("algBWrap").style.display=race?"":"none";
+  const box=$("arenas"); box.className="arenas"+(race?" race":""); box.innerHTML="";
+  arenas=(race?["algA","algB"]:["algA"]).map(id=>{
+    const key=$(id).value, el=document.createElement("div"); el.className="arena";
+    el.innerHTML=`<div class="ahead"><b></b><span class="big"></span></div><canvas></canvas><div class="stats"><span>השוואות: <b class="c">0</b></span><span>החלפות/כתיבות: <b class="s">0</b></span><span>זמן: <b class="t">0.0</b> שנ׳</span><span class="res"></span></div>`;
+    el.querySelector("b").textContent=ALGS[key].he; el.querySelector(".big").textContent=ALGS[key].avg; box.appendChild(el);
+    const cv=el.querySelector("canvas");
+    return {key,el,cv,cx:cv.getContext("2d"),a:base.slice(),gen:null,cmp:0,sw:0,hl:{},done:new Set(),fin:false,t0:0,t:0};
+  });
+  arenas.forEach(draw);
+}
+function draw(A){
+  const d=devicePixelRatio||1, r=A.cv.getBoundingClientRect(); if(A.cv.width!==Math.round(r.width*d)){ A.cv.width=r.width*d; A.cv.height=r.height*d; }
+  const cx=A.cx, W=A.cv.width, H=A.cv.height, n=A.a.length, max=Math.max(...A.a), bw=W/n, css=getComputedStyle(document.documentElement);
+  cx.clearRect(0,0,W,H);
+  const col={c:css.getPropertyValue("--cmp"),s:css.getPropertyValue("--swp"),d:css.getPropertyValue("--done")};
+  for(let i=0;i<n;i++){ const h=A.a[i]/max*(H-6);
+    cx.fillStyle=A.hl[i]?col[A.hl[i]]:(A.done.has(i)?col.d:`hsl(${150+A.a[i]/max*60},45%,${38+A.a[i]/max*22}%)`);
+    cx.fillRect(i*bw+(bw>3?1:0),H-h,Math.max(1,bw-(bw>3?2:0)),h); }
+  A.el.querySelector(".c").textContent=A.cmp.toLocaleString("he-IL"); A.el.querySelector(".s").textContent=A.sw.toLocaleString("he-IL");
+  A.el.querySelector(".t").textContent=A.t.toFixed(1);
+}
+function stepsPerFrame(){ const s=+$("speed").value; return s<30?(Math.random()<s/30?1:0):Math.round(Math.pow(1.075,s-30)); }
+function tick(now){
+  const k=stepsPerFrame();
+  arenas.forEach(A=>{
+    if(A.fin) return; A.hl={};
+    for(let i=0;i<k;i++){
+      const r=A.gen.next(); if(r.done){ A.fin=true; A.hl={}; for(let j=0;j<A.a.length;j++) A.done.add(j); finishOrder.push(A); markWinner(A); break; }
+      const [op,x,y]=r.value;
+      if(op==="c"){ A.cmp++; A.hl[x]="c"; A.hl[y]="c"; }
+      else if(op==="s"){ A.sw++; [A.a[x],A.a[y]]=[A.a[y],A.a[x]]; A.hl[x]="s"; A.hl[y]="s"; }
+      else if(op==="w"){ A.sw++; A.a[x]=y; A.hl[x]="s"; }
+      else if(op==="d"){ A.done.add(x); }
+    }
+    A.t=(now-A.t0)/1000;
+    const hk=Object.keys(A.hl); if(hk.length && arenas.indexOf(A)===0) beep(A.a[hk[0]],A.a.length);
+    draw(A);
+  });
+  if(arenas.every(A=>A.fin)){ running=false; $("go").textContent="▶ הפעלה"; return; }
+  raf=requestAnimationFrame(tick);
+}
+function markWinner(A){
+  const res=A.el.querySelector(".res");
+  if(arenas.length>1){ res.className="res"+(finishOrder.length===1?" win":""); res.textContent=finishOrder.length===1?"🏆 ניצח!":"סיים שני"; }
+  else res.textContent="✓ ממוין";
+}
+function start(){
+  if(running){ cancelAnimationFrame(raf); running=false; $("go").textContent="▶ הפעלה"; return; }
+  if(arenas.length && arenas[0].gen && !arenas.every(A=>A.fin)){ // resume
+    const now=performance.now(); arenas.forEach(A=>{ A.t0=now-A.t*1000; });
+    running=true; $("go").textContent="⏸ עצירה"; raf=requestAnimationFrame(tick); return; }
+  if(arenas.some(A=>A.gen)){ makeData(); buildArenas(); }
+  finishOrder=[]; const now=performance.now();
+  arenas.forEach(A=>{ A.gen=ALGS[A.key].run(A.a); A.t0=now; });
+  running=true; $("go").textContent="⏸ עצירה"; raf=requestAnimationFrame(tick);
+}
+function reset(){ cancelAnimationFrame(raf); running=false; $("go").textContent="▶ הפעלה"; makeData(); buildArenas(); }
+$("go").addEventListener("click",start);
+$("shuffle").addEventListener("click",reset);
+["mode","algA","algB","size","data"].forEach(id=>$(id).addEventListener("change",reset));
+$("size").addEventListener("input",reset);
+addEventListener("resize",()=>arenas.forEach(draw));
+reset();
+})();
+</script>
+</body>
+</html>

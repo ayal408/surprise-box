@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>אצבעות קסם</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Rubik:wght@500;800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{--bg:#EEF2F7;--surface:#FFFFFF;--surface2:#F4F6FA;--ink:#18202E;--muted:#667089;--line:#D6DCE8;--acc:#5B5BD6;--ok:#16874F;--bad:#D23A3A;--next:#FFD34D;
+  --f1:#F28B82;--f2:#FBBC04;--f3:#34A853;--f4:#4285F4;--f5:#A142F4;
+  --body:"Varela Round","Segoe UI",Arial,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#10131A;--surface:#181C26;--surface2:#1F2430;--ink:#E8ECF5;--muted:#9AA3BA;--line:#2D3342;--acc:#9B9BFF;--ok:#5BD69A;--bad:#FF7A7A;--next:#E8B923}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#10131A;--surface:#181C26;--surface2:#1F2430;--ink:#E8ECF5;--muted:#9AA3BA;--line:#2D3342;--acc:#9B9BFF;--ok:#5BD69A;--bad:#FF7A7A;--next:#E8B923}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+.wrap{max-width:980px;margin:0 auto;padding-inline:16px;padding-block:22px 50px;display:flex;flex-direction:column;gap:16px}
+h1{margin:0;font-family:"Rubik",var(--body);font-weight:800;font-size:clamp(1.9rem,6vw,2.7rem);color:var(--acc)}
+p{margin:0}.muted{color:var(--muted)}
+.lessons{display:flex;gap:6px;flex-wrap:wrap}
+.lessons button{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+.lessons button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.stats div{background:var(--surface);padding:10px 14px;display:flex;flex-direction:column}
+.stats b{font-family:var(--mono);font-size:1.5rem;font-weight:500}
+.stats span{font-size:.8rem;color:var(--muted)}
+.text{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;font-size:clamp(1.4rem,3.6vw,2rem);line-height:1.9;letter-spacing:.02em;min-height:140px;cursor:text;position:relative;outline:none}
+.text:focus{border-color:var(--acc);box-shadow:0 0 0 4px color-mix(in srgb,var(--acc) 18%,transparent)}
+.text .c{border-radius:4px;transition:color .1s}
+.text .done{color:var(--ok)}
+.text .err{color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}
+.text .cur{background:var(--next);color:#1a1a1a;animation:blink 1s steps(2) infinite}
+.text .sp.cur{box-shadow:inset 0 -3px 0 #1a1a1a}
+@keyframes blink{50%{background:transparent;color:inherit}}
+.text .todo{color:var(--muted)}
+.focusmsg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--surface) 80%,transparent);border-radius:16px;font-size:1.1rem;color:var(--muted)}
+.kb{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:6px;direction:ltr;overflow-x:auto}
+.kr{display:flex;gap:6px;justify-content:center}
+.k{flex:0 0 auto;width:52px;height:52px;border-radius:10px;background:var(--surface2);border:1px solid var(--line);border-bottom-width:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.25rem;position:relative;transition:transform .08s,background .15s;border-top:4px solid var(--fc,transparent)}
+.k small{position:absolute;top:2px;left:5px;font-size:.62rem;color:var(--muted);font-family:var(--mono)}
+.k.home::after{content:"";position:absolute;bottom:6px;width:12px;height:2px;border-radius:2px;background:var(--muted)}
+.k.next{background:var(--next);color:#1a1a1a;transform:translateY(-2px);box-shadow:0 6px 16px color-mix(in srgb,var(--next) 50%,transparent)}
+.k.hitok{background:color-mix(in srgb,var(--ok) 35%,var(--surface2));transform:translateY(2px)}
+.k.hitbad{background:color-mix(in srgb,var(--bad) 35%,var(--surface2));animation:wob .25s}
+@keyframes wob{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.k.space{width:340px}
+.k.heat{outline:3px solid color-mix(in srgb,var(--bad) calc(var(--h)*100%),transparent)}
+.fingers{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:.82rem;color:var(--muted)}
+.fingers i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:4px}
+.done-card{background:var(--surface);border:2px solid var(--acc);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:8px;animation:pop .4s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{from{transform:scale(.9);opacity:.3}}
+.done-card h2{margin:0;font-family:"Rubik";font-size:1.5rem}
+.btn{font:inherit;border:0;border-radius:999px;padding:10px 20px;background:var(--acc);color:#fff;cursor:pointer;align-self:flex-start}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media (max-width:640px){.k{width:30px;height:40px;font-size:.95rem}.k.space{width:180px}.stats{grid-template-columns:repeat(2,1fr)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:4px">
+    <h1>אצבעות קסם ⌨️</h1>
+    <p class="muted">לומדים הקלדה עיוורת בעברית. מניחים את האצבעות על השורה האמצעית (כ ו־ח מסומנים בבליטה) ומקלידים בלי להסתכל על הידיים. זה עובד גם כשהמחשב מוגדר לאנגלית.</p>
+  </header>
+  <div class="lessons" id="lessons" role="group" aria-label="שיעורים"></div>
+  <div class="stats">
+    <div><b id="wpm">0</b><span>מילים לדקה</span></div>
+    <div><b id="acc">100%</b><span>דיוק</span></div>
+    <div><b id="time">0:00</b><span>זמן</span></div>
+    <div><b id="best">—</b><span>שיא (מילים לדקה)</span></div>
+  </div>
+  <div class="text" id="text" tabindex="0" aria-label="הטקסט להקלדה. לוחצים כאן ומתחילים להקליד"></div>
+  <div id="result"></div>
+  <div class="kb" id="kb" aria-hidden="true"></div>
+  <div class="fingers"><span><i style="background:var(--f1)"></i>זרת</span><span><i style="background:var(--f2)"></i>קמיצה</span><span><i style="background:var(--f3)"></i>אמה</span><span><i style="background:var(--f4)"></i>אצבע</span><span><i style="background:var(--f5)"></i>אגודל</span></div>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+/* physical key -> Hebrew (SI-1452) */
+const CODE={KeyQ:"/",KeyW:"'",KeyE:"ק",KeyR:"ר",KeyT:"א",KeyY:"ט",KeyU:"ו",KeyI:"ן",KeyO:"ם",KeyP:"פ",
+  KeyA:"ש",KeyS:"ד",KeyD:"ג",KeyF:"כ",KeyG:"ע",KeyH:"י",KeyJ:"ח",KeyK:"ל",KeyL:"ך",Semicolon:"ף",Quote:",",
+  KeyZ:"ז",KeyX:"ס",KeyC:"ב",KeyV:"ה",KeyB:"נ",KeyN:"מ",KeyM:"צ",Comma:"ת",Period:"ץ",Slash:".",Space:" "};
+const ROWS=[
+  [["KeyQ","Q",1],["KeyW","W",2],["KeyE","E",3],["KeyR","R",4],["KeyT","T",4],["KeyY","Y",4],["KeyU","U",4],["KeyI","I",3],["KeyO","O",2],["KeyP","P",1]],
+  [["KeyA","A",1],["KeyS","S",2],["KeyD","D",3],["KeyF","F",4,1],["KeyG","G",4],["KeyH","H",4],["KeyJ","J",4,1],["KeyK","K",3],["KeyL","L",2],["Semicolon",";",1],["Quote","'",1]],
+  [["KeyZ","Z",1],["KeyX","X",2],["KeyC","C",3],["KeyV","V",4],["KeyB","B",4],["KeyN","N",4],["KeyM","M",4],["Comma",",",3],["Period",".",2],["Slash","/",1]],
+  [["Space","",5]]
+];
+const HEB2CODE=Object.fromEntries(Object.entries(CODE).map(([c,h])=>[h,c]));
+const FINGER=["","var(--f1)","var(--f2)","var(--f3)","var(--f4)","var(--f5)"];
+const kb=$("kb"), keyEl={};
+ROWS.forEach(r=>{ const row=document.createElement("div"); row.className="kr";
+  r.forEach(([code,lat,f,home])=>{ const k=document.createElement("div"); k.className="k"+(code==="Space"?" space":"")+(home?" home":""); k.style.setProperty("--fc",FINGER[f]);
+    k.innerHTML=(lat?`<small>${lat}</small>`:"")+`<span>${code==="Space"?"רווח":CODE[code]}</span>`; row.appendChild(k); keyEl[code]=k; });
+  kb.appendChild(row); });
+
+/* lessons */
+const WORDS=["של","את","על","לא","זה","הוא","היא","עם","כל","גם","אני","מה","יש","אם","או","כי","רק","עוד","אבל","היה","בית","יום","שלום","תודה","אהבה","משפחה","עבודה","חשבון","כסף","זמן","שנה","ילד","ספר","מים","לחם","שמש","ירח","עולם","ארץ","עיר","דרך","חבר","שיר","מחשב","מקלדת","מהר","לאט","טוב","יפה","גדול","קטן","חדש","ישן","בוקר","ערב","לילה","אוכל","ים","הר","פרח","עץ","כלב","חתול","ציפור","שולחן","כיסא","חלון","דלת","מורה","תלמיד","חלום","צחוק","שמחה","אור"];
+const SENT=["אין דבר העומד בפני הרצון.","טוב מעט בנחת מהרבה בצער.","מי שמתחיל במצווה אומרים לו גמור.","לאט לאט הולכים רחוק.","כל התחלה קשה, אבל כל המשך קל יותר.","הדרך הטובה ביותר לחזות את העתיד היא ליצור אותו.","תרגול קטן כל יום עדיף על תרגול גדול פעם בחודש.","השמש זורחת גם אחרי הלילה הארוך ביותר."];
+const L=[
+  {n:"1. שורת הבית",set:"שדגכעיחלךף"},
+  {n:"2. + שורה עליונה",set:"שדגכעיחלךףקראטוןםפ"},
+  {n:"3. + שורה תחתונה",set:"שדגכעיחלךףקראטוןםפזסבהנמצתץ"},
+  {n:"4. מילים נפוצות",words:true},
+  {n:"5. משפטים",sent:true}
+];
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function gen(l){
+  if(l.sent){ let s=[]; while(s.join(" ").length<120) s.push(pick(SENT)); return s.join(" "); }
+  if(l.words){ let w=[]; while(w.join(" ").length<110) w.push(pick(WORDS)); return w.join(" "); }
+  const fitting=WORDS.filter(w=>[...w].every(ch=>l.set.includes(ch)));
+  const out=[]; while(out.join(" ").length<95){
+    if(fitting.length && Math.random()<.45) out.push(pick(fitting));
+    else { let w=""; const len=2+Math.floor(Math.random()*4); for(let i=0;i<len;i++) w+=pick([...l.set]); out.push(w); }
+  }
+  return out.join(" ");
+}
+let lesson=0; try{ lesson=+localStorage.getItem("typing.lesson")||0; }catch(e){}
+function renderLessons(){ const box=$("lessons"); box.innerHTML="";
+  L.forEach((l,i)=>{ const b=document.createElement("button"); b.type="button"; b.textContent=l.n; b.setAttribute("aria-pressed",i===lesson);
+    b.addEventListener("click",()=>{ lesson=i; try{ localStorage.setItem("typing.lesson",i); }catch(e){} renderLessons(); start(); $("text").focus(); }); box.appendChild(b); }); }
+
+/* run state */
+let text="", pos=0, errs=0, typed=0, t0=0, timer=null, marks=[], keyErr={};
+const tEl=$("text");
+function start(){
+  text=gen(L[lesson]); pos=0; errs=0; typed=0; t0=0; marks=[]; keyErr={}; clearInterval(timer); timer=null;
+  tEl.innerHTML=[...text].map((ch,i)=>`<span class="c todo${ch===" "?" sp":""}" data-i="${i}">${ch===" "?"&nbsp;":ch}</span>`).join("")+`<div class="focusmsg" id="fm">👆 לוחצים כאן ומתחילים להקליד</div>`;
+  $("result").innerHTML=""; Object.values(keyEl).forEach(k=>{ k.classList.remove("heat"); k.style.removeProperty("--h"); });
+  if(document.activeElement===tEl) $("fm").hidden=true;
+  paint(); stats(); best();
+}
+function span(i){ return tEl.querySelector(`[data-i="${i}"]`); }
+function paint(){
+  tEl.querySelectorAll(".cur").forEach(s=>s.classList.remove("cur"));
+  const s=span(pos); if(s){ s.classList.remove("todo"); s.classList.add("cur"); }
+  Object.values(keyEl).forEach(k=>k.classList.remove("next"));
+  const code=HEB2CODE[text[pos]]; if(code&&keyEl[code]) keyEl[code].classList.add("next");
+}
+function stats(){
+  const sec=t0?(Date.now()-t0)/1000:0, correct=typed-errs;
+  $("wpm").textContent=sec>2?Math.round((correct/5)/(sec/60)):0;
+  $("acc").textContent=typed?Math.round(correct/typed*100)+"%":"100%";
+  $("time").textContent=`${Math.floor(sec/60)}:${String(Math.floor(sec%60)).padStart(2,"0")}`;
+}
+function best(){ let b=0; try{ b=+localStorage.getItem("typing.best."+lesson)||0; }catch(e){} $("best").textContent=b||"—"; return b; }
+function flash(code,ok){ const k=keyEl[code]; if(!k) return; const c=ok?"hitok":"hitbad"; k.classList.add(c); setTimeout(()=>k.classList.remove(c),160); }
+let ac=null; function click(ok){ try{ ac=ac||new (window.AudioContext||window.webkitAudioContext)(); const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime;
+  o.type=ok?"triangle":"square"; o.frequency.value=ok?1200:180; g.gain.setValueAtTime(ok?.03:.06,t); g.gain.exponentialRampToValueAtTime(1e-4,t+(ok?.03:.12)); o.connect(g).connect(ac.destination); o.start(t); o.stop(t+.15);}catch(e){} }
+tEl.addEventListener("focus",()=>{ const f=$("fm"); if(f) f.hidden=true; });
+tEl.addEventListener("blur",()=>{ const f=$("fm"); if(f&&pos<text.length) f.hidden=false; });
+tEl.addEventListener("keydown",e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey) return;
+  if(e.key==="Backspace"){ e.preventDefault(); return; }
+  if(e.key==="Escape"){ e.preventDefault(); start(); return; }
+  let ch = CODE[e.code];
+  if(ch===undefined){ if(e.key.length===1) ch=e.key; else return; }
+  e.preventDefault(); if(pos>=text.length) return;
+  if(!t0){ t0=Date.now(); timer=setInterval(stats,500); }
+  typed++;
+  const want=text[pos], s=span(pos);
+  if(ch===want){
+    if(!s.classList.contains("err")) s.classList.add("done");
+    s.classList.remove("cur","todo"); flash(e.code,true); click(true); pos++;
+    if(pos>=text.length) finish(); else paint();
+  } else {
+    errs++; s.classList.add("err"); flash(e.code,false); click(false);
+    const wc=HEB2CODE[want]; if(wc) keyErr[wc]=(keyErr[wc]||0)+1;
+  }
+  stats();
+});
+function finish(){
+  clearInterval(timer); timer=null; stats();
+  Object.values(keyEl).forEach(k=>k.classList.remove("next"));
+  const sec=(Date.now()-t0)/1000, correct=typed-errs, wpm=Math.round((correct/5)/(sec/60)), acc=Math.round(correct/typed*100);
+  const b=best(), isBest=wpm>b; if(isBest) try{ localStorage.setItem("typing.best."+lesson,wpm); }catch(e){}
+  best();
+  const maxE=Math.max(0,...Object.values(keyErr));
+  Object.entries(keyErr).forEach(([c,n])=>{ const k=keyEl[c]; if(k){ k.classList.add("heat"); k.style.setProperty("--h",(n/maxE).toFixed(2)); } });
+  const worst=Object.entries(keyErr).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([c])=>CODE[c]==" "?"רווח":CODE[c]);
+  const tip = acc<90 ? "כדאי להאט קצת. קודם דיוק ואחר כך מהירות." : wpm<20 ? "מעולה! עם תרגול יומי קצר המהירות תעלה מעצמה." : wpm<40 ? "יפה מאוד! זה כבר קצב של הקלדה נוחה." : "וואו, זה קצב מקצועי! 🚀";
+  $("result").innerHTML=`<div class="done-card"><h2>${isBest?"🏆 שיא חדש! ":"✨ "}${wpm} מילים לדקה · ${acc}% דיוק</h2><p>${tip}</p>${worst.length?`<p class="muted">האותיות שהכי כדאי לתרגל: <strong>${worst.join(" · ")}</strong> (מסומנות באדום על המקלדת)</p>`:"<p class=\"muted\">בלי אף טעות. מושלם!</p>"}<button class="btn" id="again" type="button">תרגיל חדש (Esc)</button></div>`;
+  $("again").addEventListener("click",()=>{ start(); tEl.focus(); });
+  if(isBest && !matchMedia("(prefers-reduced-motion: reduce)").matches){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>{ try{ const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime; o.frequency.value=f; o.type="triangle"; g.gain.setValueAtTime(.08,t); g.gain.exponentialRampToValueAtTime(1e-4,t+.25); o.connect(g).connect(ac.destination); o.start(t); o.stop(t+.3);}catch(e){} },i*100)); }
+}
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && document.activeElement!==tEl){ start(); } });
+renderLessons(); start();
+})();
+</script>
+</body>
+</html>

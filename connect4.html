@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ארבע בשורה</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--p1:#ff4d6d;--p2:#ffd60a}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% 0%,#1d3b7a 0%,transparent 55%),var(--bg);color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:520px;display:flex;flex-direction:column;gap:12px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+h1{margin:0;font-size:2.2rem;background:linear-gradient(90deg,var(--p1),var(--p2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+select,button{font:inherit;cursor:pointer;border-radius:10px;padding:7px 12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+button.pri{background:#4f7bff;color:#fff;border:0;font-weight:700}
+.status{font-weight:700;font-size:1.15rem;text-align:center;min-height:1.5em}
+.board{direction:ltr;display:grid;grid-template-columns:repeat(7,1fr);gap:6px;background:#2546b8;padding:10px;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+.col{display:grid;grid-template-rows:repeat(6,1fr);gap:6px;cursor:pointer;border-radius:10px}
+.col:hover{background:rgba(255,255,255,.08)}
+.h{aspect-ratio:1;border-radius:50%;background:#0f0c24;box-shadow:inset 0 3px 6px rgba(0,0,0,.6)}
+.h.a{background:var(--p1)}.h.b{background:var(--p2)}
+.h.a,.h.b{box-shadow:inset 0 -4px 0 rgba(0,0,0,.25);animation:drop .35s cubic-bezier(.5,0,1,1)}
+.h.win{outline:4px solid #fff;outline-offset:-4px}
+@keyframes drop{from{transform:translateY(calc(-1 * var(--d,300%)))}}
+.score{display:flex;justify-content:center;gap:20px;color:var(--muted)}
+.score b{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>ארבע בשורה</h1>
+  <div class="bar">
+    <select id="mode"><option value="ai2">נגד המחשב (רגיל)</option><option value="ai4" selected>נגד המחשב (קשה)</option><option value="ai6">נגד המחשב (אלוף)</option><option value="pvp">שני שחקנים</option></select>
+    <button class="pri" id="new">משחק חדש</button>
+  </div>
+  <div class="score"><span>🔴 <b id="s0">0</b></span><span>תיקו <b id="s2">0</b></span><span>🟡 <b id="s1">0</b></span></div>
+  <div class="status" id="status"></div>
+  <div class="board" id="board"></div>
+</div>
+<script>
+const R=6,C=7,B=document.getElementById('board');let g,turn,over,wins=[0,0,0],busy=false,starter=0;
+for(let c=0;c<C;c++){const col=document.createElement('div');col.className='col';for(let r=0;r<R;r++){const h=document.createElement('div');h.className='h';col.appendChild(h)}col.onclick=()=>human(c);B.appendChild(col)}
+const hole=(r,c)=>B.children[c].children[r];
+function reset(){g=[...Array(R)].map(()=>Array(C).fill(0));turn=starter;starter=1-starter;over=false;busy=false;
+  for(let r=0;r<R;r++)for(let c=0;c<C;c++)hole(r,c).className='h';status();if(ai()&&turn===1)aiMove()}
+const ai=()=>document.getElementById('mode').value!=='pvp';
+function status(t){document.getElementById('status').textContent=t||(turn===0?'🔴 תור האדום':ai()?'🟡 המחשב חושב...':'🟡 תור הצהוב')}
+function drop(b,c,p){for(let r=R-1;r>=0;r--)if(!b[r][c]){b[r][c]=p;return r}return-1}
+function line(b,r,c){const p=b[r][c];for(const[dr,dc]of[[0,1],[1,0],[1,1],[1,-1]]){const cells=[[r,c]];
+  for(const s of[1,-1]){let rr=r+dr*s,cc=c+dc*s;while(rr>=0&&rr<R&&cc>=0&&cc<C&&b[rr][cc]===p){cells.push([rr,cc]);rr+=dr*s;cc+=dc*s}}
+  if(cells.length>=4)return cells}return null}
+function play(c){if(over)return false;const r=drop(g,c,turn+1);if(r<0)return false;
+  const h=hole(r,c);h.style.setProperty('--d',(r+1)*115+'%');h.classList.add(turn?'b':'a');
+  const w=line(g,r,c);if(w){over=true;w.forEach(([a,b])=>hole(a,b).classList.add('win'));wins[turn]++;status(turn===0?(ai()?'🎉 ניצחת!':'🔴 האדום ניצח!'):(ai()?'🤖 המחשב ניצח':'🟡 הצהוב ניצח!'))}
+  else if(g[0].every(Boolean)){over=true;wins[2]++;status('🤝 תיקו')}
+  else{turn=1-turn;status()}
+  [0,1,2].forEach(i=>document.getElementById('s'+i).textContent=wins[i]);return true}
+function human(c){if(busy||over||(ai()&&turn===1))return;if(play(c)&&ai()&&!over)aiMove()}
+function aiMove(){busy=true;setTimeout(()=>{play(best());busy=false},350)}
+// minimax with alpha-beta
+const order=[3,2,4,1,5,0,6];
+function score(b){let s=0;for(let r=0;r<R;r++)s+=(b[r][3]===2?3:b[r][3]===1?-3:0);
+  const w=(a)=>{const ai=a.filter(v=>v===2).length,hu=a.filter(v=>v===1).length;if(ai&&hu)return 0;return ai===3?5:ai===2?2:hu===3?-5:hu===2?-2:0};
+  for(let r=0;r<R;r++)for(let c=0;c<C;c++)for(const[dr,dc]of[[0,1],[1,0],[1,1],[1,-1]]){const er=r+3*dr,ec=c+3*dc;if(er<0||er>=R||ec<0||ec>=C)continue;s+=w([0,1,2,3].map(k=>b[r+k*dr][c+k*dc]))}return s}
+function mm(b,d,a,be,max){
+  let bestV=max?-1e9:1e9;let moved=false;
+  for(const c of order){const r=drop(b,c,max?2:1);if(r<0)continue;moved=true;let v;
+    if(line(b,r,c))v=max?1e6+d:-1e6-d;else if(d===0)v=score(b);else v=mm(b,d-1,a,be,!max);
+    b[r][c]=0;if(max){bestV=Math.max(bestV,v);a=Math.max(a,v)}else{bestV=Math.min(bestV,v);be=Math.min(be,v)}if(a>=be)break}
+  return moved?bestV:0}
+function best(){const depth=+document.getElementById('mode').value.slice(2);let bc=-1,bv=-1e9;
+  for(const c of order){const r=drop(g,c,2);if(r<0)continue;let v=line(g,r,c)?1e7:mm(g,depth-1,-1e9,1e9,false);if(depth===2)v+=Math.random()*4;g[r][c]=0;if(v>bv){bv=v;bc=c}}return bc}
+document.getElementById('new').onclick=reset;document.getElementById('mode').onchange=()=>{wins=[0,0,0];starter=0;reset()};
+reset();
+</script>
+</body>
+</html>

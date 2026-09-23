@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחולל QR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;800&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--bg:#F1F3F2;--surface:#fff;--surface2:#F6F8F7;--ink:#141A18;--muted:#5F6B67;--line:#D8DFDC;--acc:#0B7A5A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0F1312;--surface:#171C1A;--surface2:#1E2422;--ink:#E9EFEC;--muted:#98A5A0;--line:#2B3431;--acc:#4FD1A5}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0F1312;--surface:#171C1A;--surface2:#1E2422;--ink:#E9EFEC;--muted:#98A5A0;--line:#2B3431;--acc:#4FD1A5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Assistant","Segoe UI",Arial,sans-serif;font-size:16px}
+.wrap{max-width:960px;margin:0 auto;padding-inline:18px;padding-block:24px 50px;display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:22px;align-items:start}
+header{grid-column:1/-1}
+h1{margin:0;font-weight:800;font-size:clamp(1.9rem,5vw,2.6rem)}
+p{margin:0}.muted{color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tabs button{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--surface);font-weight:700}
+.form{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:.88rem;color:var(--muted);font-weight:600}
+label.f input,label.f select,label.f textarea{font:inherit;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+label.f textarea{min-height:90px;resize:vertical}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.style{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:.88rem;color:var(--muted)}
+.style input[type=color]{width:38px;height:30px;border:0;background:none;padding:0;cursor:pointer}
+.out{position:sticky;top:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.qrbox{background:#fff;padding:14px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.08);animation:in .35s cubic-bezier(.3,1.5,.5,1)}
+.qrbox img,.qrbox canvas{display:block;width:260px;height:260px;image-rendering:pixelated}
+@keyframes in{from{transform:scale(.92);opacity:.4}}
+.cap{font-weight:800;text-align:center;max-width:280px;word-break:break-word}
+.btn{font:inherit;font-weight:700;border:0;border-radius:12px;padding:10px 16px;background:var(--acc);color:var(--surface);cursor:pointer;width:100%}
+.btn.sec{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
+.data{font-size:.78rem;color:var(--muted);direction:ltr;word-break:break-all;max-width:300px;max-height:70px;overflow:auto}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media (max-width:760px){.wrap{grid-template-columns:1fr}.out{position:static}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1>מחולל QR ▦</h1><p class="muted">קוד לסריקה עם מצלמת הטלפון: לחיבור לוויפי בלי להקליד סיסמה, לכרטיס ביקור, לוואטסאפ ולקישורים. הכל נוצר בדפדפן ושום מידע לא נשלח לשום מקום.</p></header>
+  <div>
+    <div class="tabs" id="tabs"></div>
+    <form class="form" id="form" novalidate></form>
+    <div class="form" style="margin-top:12px">
+      <div class="style">
+        <label for="fg">צבע <input type="color" id="fg" value="#111111"></label>
+        <label for="bgc">רקע <input type="color" id="bgc" value="#ffffff"></label>
+        <label for="caption" style="flex:1;display:flex;gap:6px;align-items:center">כיתוב מתחת <input id="caption" type="text" placeholder="למשל: סרקו לוויפי" style="font:inherit;flex:1;min-width:0;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface2);color:var(--ink)"></label>
+      </div>
+    </div>
+  </div>
+  <div class="out">
+    <div class="qrbox" id="qrbox"><div id="qr"></div></div>
+    <div class="cap" id="capOut"></div>
+    <button class="btn" id="dl" type="button">⬇️ הורדה כתמונה</button>
+    <button class="btn sec" id="cp" type="button">📋 העתקת התוכן</button>
+    <div class="data" id="data"></div>
+  </div>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+if(typeof QRCode==="undefined"){ $("qr").textContent="כדי ליצור קוד צריך חיבור לאינטרנט (לטעינת הספרייה)."; return; }
+const esc=s=>String(s).replace(/([\\;,:"])/g,"\\$1");
+const TYPES={
+  wifi:{n:"📶 וויפי",f:[["ssid","שם הרשת","","text"],["pass","סיסמה","","text"],["sec","אבטחה","WPA",["WPA","WEP","nopass"]],["hid","רשת מוסתרת","no",["no","yes"]]],
+    make:v=>`WIFI:T:${v.sec};S:${esc(v.ssid)};${v.sec!=="nopass"?`P:${esc(v.pass)};`:""}${v.hid==="yes"?"H:true;":""};`,cap:v=>v.ssid?`📶 ${v.ssid}`:""},
+  url:{n:"🔗 קישור",f:[["url","כתובת","https://","url"]],make:v=>v.url.trim()},
+  wa:{n:"💬 וואטסאפ",f:[["phone","מספר טלפון","050-0000000","tel"],["msg","הודעה מוכנה (לא חובה)","","area"]],
+    make:v=>{ let p=v.phone.replace(/\D/g,""); if(p.startsWith("0")) p="972"+p.slice(1); return `https://wa.me/${p}${v.msg?`?text=${encodeURIComponent(v.msg)}`:""}`; }},
+  vcard:{n:"👤 כרטיס ביקור",f:[["name","שם מלא","","text"],["org","עסק / תפקיד","","text"],["tel","טלפון","","tel"],["email","אימייל","","email"],["site","אתר","","url"]],
+    make:v=>["BEGIN:VCARD","VERSION:3.0",`FN:${v.name}`,`N:${v.name};;;;`,v.org&&`ORG:${v.org}`,v.tel&&`TEL;TYPE=CELL:${v.tel}`,v.email&&`EMAIL:${v.email}`,v.site&&`URL:${v.site}`,"END:VCARD"].filter(Boolean).join("\n"),cap:v=>v.name},
+  mail:{n:"✉️ אימייל",f:[["to","לכתובת","","email"],["sub","נושא","","text"],["body","תוכן","","area"]],make:v=>`mailto:${v.to}?subject=${encodeURIComponent(v.sub)}&body=${encodeURIComponent(v.body)}`},
+  text:{n:"📝 טקסט חופשי",f:[["t","טקסט","שלום! 👋","area"]],make:v=>v.t}
+};
+let type="wifi"; try{ const s=localStorage.getItem("qr.type"); if(TYPES[s]) type=s; }catch(e){}
+const vals={};
+function tabs(){ $("tabs").innerHTML=""; Object.entries(TYPES).forEach(([k,t])=>{ const b=document.createElement("button"); b.type="button"; b.textContent=t.n; b.setAttribute("aria-pressed",k===type);
+  b.addEventListener("click",()=>{ type=k; try{ localStorage.setItem("qr.type",k); }catch(e){} tabs(); form(); }); $("tabs").appendChild(b); }); }
+function form(){
+  const F=$("form"); F.innerHTML=""; const t=TYPES[type]; vals[type] ||= {};
+  t.f.forEach(([id,label,def,kind])=>{
+    const v=vals[type][id]??(Array.isArray(kind)?def:(kind==="url"&&def)?def:"");
+    vals[type][id]=v; const lab=document.createElement("label"); lab.className="f"; lab.htmlFor="i_"+id; lab.textContent=label;
+    let el;
+    if(Array.isArray(kind)){ el=document.createElement("select"); const names={WPA:"WPA/WPA2 (הכי נפוץ)",WEP:"WEP",nopass:"בלי סיסמה",no:"לא",yes:"כן"}; kind.forEach(o=>{ const op=document.createElement("option"); op.value=o; op.textContent=names[o]||o; el.appendChild(op); }); }
+    else if(kind==="area"){ el=document.createElement("textarea"); }
+    else { el=document.createElement("input"); el.type=kind; if(def&&kind!=="url") el.placeholder=def; }
+    el.id="i_"+id; el.value=v; el.addEventListener("input",()=>{ vals[type][id]=el.value; draw(); });
+    lab.appendChild(el); F.appendChild(lab);
+  });
+  draw();
+}
+let lastData="", timer=null;
+function draw(){ clearTimeout(timer); timer=setTimeout(()=>{
+  const t=TYPES[type], v=vals[type]; let data=t.make(v)||" ";
+  lastData=data; $("data").textContent=data;
+  const box=$("qr"); box.innerHTML="";
+  try{ new QRCode(box,{text:data,width:520,height:520,colorDark:$("fg").value,colorLight:$("bgc").value,correctLevel:QRCode.CorrectLevel.M}); }
+  catch(e){ box.textContent="הטקסט ארוך מדי לקוד אחד. נסו לקצר."; }
+  const qb=$("qrbox"); qb.style.background=$("bgc").value; qb.style.animation="none"; void qb.offsetWidth; qb.style.animation="";
+  const cap=$("caption").value || (t.cap?t.cap(v):""); $("capOut").textContent=cap;
+},120); }
+["fg","bgc","caption"].forEach(id=>$(id).addEventListener("input",draw));
+$("dl").addEventListener("click",()=>{
+  const c=$("qr").querySelector("canvas"); if(!c) return;
+  const cap=$("capOut").textContent, pad=40, W=c.width+pad*2, H=c.height+pad*2+(cap?70:0);
+  const out=document.createElement("canvas"); out.width=W; out.height=H; const g=out.getContext("2d");
+  g.fillStyle=$("bgc").value; g.fillRect(0,0,W,H); g.drawImage(c,pad,pad);
+  if(cap){ g.fillStyle=$("fg").value; g.font="bold 36px Assistant, Arial, sans-serif"; g.textAlign="center"; g.direction="rtl"; g.fillText(cap,W/2,c.height+pad+50); }
+  const a=document.createElement("a"); a.download="qr-code.png"; a.href=out.toDataURL("image/png"); document.body.appendChild(a); a.click(); a.remove();
+});
+$("cp").addEventListener("click",()=>{ navigator.clipboard.writeText(lastData).then(()=>{ $("cp").textContent="✅ הועתק"; setTimeout(()=>$("cp").textContent="📋 העתקת התוכן",1500); },()=>{}); });
+tabs(); form();
+})();
+</script>
+</body>
+</html>

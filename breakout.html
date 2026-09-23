@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>שובר הלבנים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--line:rgba(255,255,255,.12);--acc:#ff9f43}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% 0%,#7a3b1d 0%,transparent 55%),var(--bg);color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:640px;display:flex;flex-direction:column;gap:12px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+h1{margin:0;font-size:2.2rem;color:var(--acc)}
+canvas{width:100%;aspect-ratio:4/3;background:#120f2c;border-radius:14px;border:1px solid var(--line);touch-action:none;display:block;cursor:none}
+p.hint{color:var(--muted);margin:0;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🧱 שובר הלבנים</h1>
+  <canvas id="cv" width="640" height="480"></canvas>
+  <p class="hint">מזיזים את המחבט עם העכבר, האצבע או החצים. לחיצה או רווח משגרים את הכדור. לבנים זוהרות מפילות בונוס: ⬌ מחבט רחב, ✚ שלושה כדורים, ♥ חיים.</p>
+</div>
+<script>
+const cv=document.getElementById('cv'),x=cv.getContext('2d'),Wd=cv.width,Ht=cv.height;
+const LS=k=>{try{return localStorage.getItem(k)}catch(e){return null}},SV=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let pad,balls=[],bricks=[],drops=[],parts=[],score=0,lives=3,level=1,stuck,best=+LS('brkbest')||0,keys={},state='title',wideT=0;
+const COLS=10,BW=Wd/COLS,BH=22,hue=r=>`hsl(${(r*40+level*25)%360},85%,60%)`;
+function build(){bricks=[];const rows=Math.min(4+level,9);
+  for(let r=0;r<rows;r++)for(let c=0;c<COLS;c++){if(level%2===0&&(r+c)%5===0)continue;bricks.push({x:c*BW+2,y:60+r*BH,w:BW-4,h:BH-4,hp:r<level-2?2:1,r,bonus:Math.random()<.1})}}
+function newBall(){return{x:pad.x,y:pad.y-10,vx:0,vy:0,r:7}}
+function reset(){pad={x:Wd/2,y:Ht-28,w:100};balls=[newBall()];drops=[];stuck=true}
+function start(){score=0;lives=3;level=1;parts=[];build();reset();state='play'}
+function launch(){if(state!=='play'){start();return}if(stuck){stuck=false;const sp=5+level*.4;balls.forEach(b=>{const a=-Math.PI/2+(Math.random()-.5)*.8;b.vx=Math.cos(a)*sp;b.vy=Math.sin(a)*sp})}}
+function burst(px,py,col){for(let i=0;i<10;i++)parts.push({x:px,y:py,vx:(Math.random()-.5)*5,vy:(Math.random()-.5)*5,l:30,col})}
+function update(){if(state!=='play')return;
+  if(keys.ArrowLeft)pad.x-=9;if(keys.ArrowRight)pad.x+=9;
+  if(wideT>0&&--wideT===0)pad.w=100;
+  pad.x=Math.max(pad.w/2,Math.min(Wd-pad.w/2,pad.x));
+  for(const b of balls){if(stuck){b.x=pad.x;b.y=pad.y-10;continue}
+    b.x+=b.vx;b.y+=b.vy;
+    if(b.x<b.r||b.x>Wd-b.r){b.vx*=-1;b.x=Math.max(b.r,Math.min(Wd-b.r,b.x))}
+    if(b.y<b.r){b.vy=Math.abs(b.vy)}
+    if(b.vy>0&&b.y+b.r>pad.y-6&&b.y<pad.y+6&&Math.abs(b.x-pad.x)<pad.w/2+b.r){const sp=Math.hypot(b.vx,b.vy),o=(b.x-pad.x)/(pad.w/2),a=-Math.PI/2+o*1.05;b.vx=Math.cos(a)*sp;b.vy=Math.sin(a)*sp}
+    for(const k of bricks){if(b.x+b.r>k.x&&b.x-b.r<k.x+k.w&&b.y+b.r>k.y&&b.y-b.r<k.y+k.h){
+      const ox=Math.min(b.x+b.r-k.x,k.x+k.w-(b.x-b.r)),oy=Math.min(b.y+b.r-k.y,k.y+k.h-(b.y-b.r));if(ox<oy)b.vx*=-1;else b.vy*=-1;
+      if(--k.hp<=0){k.dead=true;score+=10*level;burst(k.x+k.w/2,k.y+k.h/2,hue(k.r));if(k.bonus)drops.push({x:k.x+k.w/2,y:k.y,t:['wide','multi','life'][Math.random()*3|0]})}
+      break}}}
+  bricks=bricks.filter(k=>!k.dead);balls=balls.filter(b=>b.y<Ht+20);
+  if(!balls.length){lives--;if(lives<=0){state='over';if(score>best){best=score;SV('brkbest',best)}}else reset()}
+  for(const d of drops){d.y+=3;if(d.y>pad.y-8&&d.y<pad.y+8&&Math.abs(d.x-pad.x)<pad.w/2){d.got=true;
+    if(d.t==='wide'){pad.w=170;wideT=900}else if(d.t==='life')lives++;else if(!stuck){const b=balls[0];for(const s of[-1,1])balls.push({...b,vx:b.vx*Math.cos(.4*s)-b.vy*Math.sin(.4*s),vy:b.vx*Math.sin(.4*s)+b.vy*Math.cos(.4*s)})}}}
+  drops=drops.filter(d=>!d.got&&d.y<Ht);
+  if(!bricks.length){level++;build();reset();score+=100}}
+function draw(){x.clearRect(0,0,Wd,Ht);
+  for(const k of bricks){x.fillStyle=hue(k.r);x.globalAlpha=k.hp>1?1:.85;x.beginPath();x.roundRect(k.x,k.y,k.w,k.h,5);x.fill();if(k.hp>1){x.strokeStyle='#fff';x.lineWidth=2;x.stroke()}
+    if(k.bonus){x.shadowColor='#fff';x.shadowBlur=12;x.fillStyle='rgba(255,255,255,.5)';x.fillRect(k.x+k.w/2-3,k.y+k.h/2-3,6,6);x.shadowBlur=0}}
+  x.globalAlpha=1;
+  parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.l--;x.globalAlpha=p.l/30;x.fillStyle=p.col;x.fillRect(p.x,p.y,3,3)});parts=parts.filter(p=>p.l>0);x.globalAlpha=1;
+  x.font='bold 18px Segoe UI, Arial';x.textAlign='center';
+  for(const d of drops){x.fillStyle={wide:'#4cc9f0',multi:'#c77dff',life:'#ff4d6d'}[d.t];x.beginPath();x.arc(d.x,d.y,11,0,7);x.fill();x.fillStyle='#fff';x.fillText({wide:'⬌',multi:'✚',life:'♥'}[d.t],d.x,d.y+6)}
+  if(pad){x.fillStyle='#f3efff';x.beginPath();x.roundRect(pad.x-pad.w/2,pad.y-6,pad.w,12,6);x.fill();
+    balls.forEach(b=>{x.fillStyle='#ffd60a';x.shadowColor='#ffd60a';x.shadowBlur=14;x.beginPath();x.arc(b.x,b.y,b.r,0,7);x.fill();x.shadowBlur=0})}
+  x.fillStyle='#f3efff';x.textAlign='right';x.font='16px Segoe UI, Arial';
+  if(state==='play'){x.fillText(`ניקוד ${score}   שלב ${level}   ${'♥'.repeat(lives)}`,Wd-12,26);x.textAlign='left';x.fillText(`שיא ${best}`,12,26)}
+  if(state!=='play'){x.fillStyle='rgba(15,12,36,.7)';x.fillRect(0,0,Wd,Ht);x.fillStyle='#fff';x.textAlign='center';x.font='bold 40px Segoe UI, Arial';
+    x.fillText(state==='over'?`המשחק נגמר · ${score}`:'שובר הלבנים',Wd/2,Ht/2);x.font='20px Segoe UI, Arial';x.fillText('לחצו כדי להתחיל'+(best?` · שיא ${best}`:''),Wd/2,Ht/2+40)}}
+function loop(){update();draw();requestAnimationFrame(loop)}
+const toX=e=>{const r=cv.getBoundingClientRect();return(e.clientX-r.left)*Wd/r.width};
+cv.addEventListener('pointermove',e=>{if(pad)pad.x=toX(e)});
+cv.addEventListener('pointerdown',e=>{if(pad)pad.x=toX(e);launch()});
+addEventListener('keydown',e=>{keys[e.key]=true;if(e.key===' '){e.preventDefault();launch()}});addEventListener('keyup',e=>keys[e.key]=false);
+loop();
+</script>
+</body>
+</html>

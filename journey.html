@@ -1,0 +1,287 @@
+<title>המסע שלך סביב השמש</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bellefair&family=Varela+Round&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* A deliberately single-theme night-sky design: every color is painted explicitly. */
+:root{
+  color-scheme:dark;
+  --space:#070816; --ink:#EEF0FF; --muted:#9CA0C8; --line:rgba(160,170,255,.16); --glass:rgba(20,22,52,.55);
+  --sun:#FFC24B; --sun2:#FF7A3D; --earth:#4FB3FF; --moon:#E9E6D8; --aurora:#7CF2C4; --rose:#FF6FA8;
+  --display:"Bellefair","Frank Ruhl Libre","Times New Roman",serif;
+  --body:"Varela Round","Segoe UI",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{background:var(--space);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.6;margin:0;overflow-x:hidden}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.wrap{position:relative;z-index:1;max-width:1060px;margin:0 auto;padding-inline:18px;padding-block:34px 70px;display:flex;flex-direction:column;gap:46px}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;line-height:1.08;text-wrap:balance}
+h1{font-size:clamp(2.6rem,8vw,5.2rem);background:linear-gradient(100deg,var(--sun) 0%,var(--rose) 45%,var(--earth) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% 100%;animation:shimmer 9s ease-in-out infinite alternate}
+h2{font-size:clamp(1.7rem,4.5vw,2.5rem)}
+p{margin:0}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
+:focus-visible{outline:2px solid var(--aurora);outline-offset:3px}
+@keyframes shimmer{to{background-position:100% 0}}
+@keyframes rise{from{transform:translateY(18px);opacity:.3}to{transform:none;opacity:1}}
+.rise{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center}
+.intro{display:flex;flex-direction:column;gap:16px}
+.intro .lead{font-size:1.15rem;color:var(--muted);max-width:44ch}
+.born{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.born input{font:inherit;font-family:var(--mono);background:var(--glass);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:1.05rem;backdrop-filter:blur(6px)}
+.born button{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:11px 22px;font-weight:700;color:#1B1030;background:linear-gradient(90deg,var(--sun),var(--rose));box-shadow:0 0 0 0 rgba(255,111,168,.5);animation:ping 2.8s ease-out infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(255,111,168,.45)}80%,100%{box-shadow:0 0 0 16px rgba(255,111,168,0)}}
+.tag{font-size:.8rem;border:1px solid var(--line);border-radius:999px;padding:2px 10px;color:var(--muted)}
+.hebdate{font-family:var(--display);font-size:1.35rem;color:var(--moon)}
+.orbitbox{position:relative;aspect-ratio:1;width:100%;max-width:470px;justify-self:center}
+#orbit{width:100%;height:100%;display:block}
+.laps{position:absolute;inset-inline:0;bottom:4%;text-align:center;display:flex;flex-direction:column;align-items:center}
+.laps b{font-family:var(--mono);font-size:2.2rem;color:var(--sun);line-height:1;text-shadow:0 0 24px rgba(255,194,75,.5)}
+.laps span{font-size:.9rem;color:var(--muted)}
+
+.counters{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ctr{position:relative;background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:6px;overflow:hidden;backdrop-filter:blur(8px);transition:transform .35s cubic-bezier(.2,.7,.2,1),border-color .35s}
+.ctr:hover{transform:translateY(-4px);border-color:rgba(160,170,255,.4)}
+.ctr::after{content:"";position:absolute;inset:auto -30% -60% auto;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,var(--c,var(--earth)) 0%,transparent 65%);opacity:.18;animation:drift 7s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate(-40px,-20px) scale(1.2)}}
+.ctr .ic{font-size:1.5rem;line-height:1}
+.ctr .ic.beat{display:inline-block;animation:hb 0.8s ease-in-out infinite}
+@keyframes hb{0%,40%,100%{transform:scale(1)}20%{transform:scale(1.28)}}
+.ctr .v{font-family:var(--mono);font-size:clamp(1.25rem,2.6vw,1.65rem);font-weight:600;direction:ltr;text-align:right;unicode-bidi:isolate;color:var(--c,var(--ink));word-break:break-all}
+.ctr .l{color:var(--muted);font-size:.92rem}
+
+.twin{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:12px;backdrop-filter:blur(8px)}
+.moonrow{display:flex;gap:20px;align-items:center}
+#moon{width:130px;height:130px;flex:none;filter:drop-shadow(0 0 22px rgba(233,230,216,.35));animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px)}}
+.ring{display:flex;gap:20px;align-items:center}
+.ring svg{width:130px;height:130px;flex:none;transform:rotate(-90deg)}
+.ring .track{stroke:rgba(160,170,255,.15)}
+.ring .prog{stroke:url(#g);transition:stroke-dashoffset 1.6s cubic-bezier(.2,.7,.2,1)}
+.big{font-family:var(--mono);font-size:1.6rem;color:var(--sun)}
+
+.now{display:flex;flex-direction:column;gap:14px}
+.world{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.world div{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column}
+.world b{font-family:var(--mono);font-size:1.5rem;direction:ltr;text-align:right;unicode-bidi:isolate}
+.world span{color:var(--muted);font-size:.9rem}
+.w1 b{color:var(--aurora)} .w2 b{color:var(--muted)} .w3 b{color:var(--earth)} .w4 b{color:var(--rose)}
+.quote{font-family:var(--display);font-size:clamp(1.4rem,3.4vw,2.1rem);line-height:1.35;max-width:36ch;text-wrap:balance}
+footer{font-size:.84rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+
+@media (max-width:860px){ .hero,.twin{grid-template-columns:1fr} .counters{grid-template-columns:repeat(2,1fr)} .world{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:460px){ .counters{grid-template-columns:1fr} .moonrow,.ring{flex-direction:column;align-items:flex-start} }
+@media (prefers-reduced-motion:reduce){ *,*::after{animation:none!important;transition:none!important} }
+</style>
+
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="wrap" dir="rtl" lang="he">
+  <section class="hero">
+    <div class="intro">
+      <h1 class="rise">המסע שלך סביב השמש</h1>
+      <p class="lead rise" style="animation-delay:.12s">מהיום שנולדת את לא עוצרת לרגע: כדור הארץ מסתובב סביב עצמו, מקיף את השמש ושועט דרך הגלקסיה, והלב שלך פועם כל הזמן. הזיני תאריך לידה ותראי כמה רחוק הגעת.</p>
+      <form class="born rise" id="form" style="animation-delay:.24s">
+        <input type="date" id="bd" aria-label="תאריך לידה" required>
+        <button type="submit">יוצאים לדרך ✦</button>
+        <span class="tag" id="sample">תאריך לדוגמה</span>
+      </form>
+      <p class="hebdate rise" id="heb" style="animation-delay:.36s"></p>
+    </div>
+    <div class="orbitbox rise" style="animation-delay:.2s">
+      <canvas id="orbit" aria-label="כדור הארץ מקיף את השמש"></canvas>
+      <div class="laps"><b id="laps">0</b><span>סיבובים סביב השמש</span></div>
+    </div>
+  </section>
+
+  <section class="counters" id="ctrs"></section>
+
+  <section class="twin">
+    <div class="card rise" style="animation-delay:.1s">
+      <h2>הירח הלילה</h2>
+      <div class="moonrow">
+        <canvas id="moon" width="260" height="260" aria-hidden="true"></canvas>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <p class="big" id="mname" style="font-family:var(--display);font-size:1.8rem"></p>
+          <p class="muted" id="mdesc"></p>
+          <p class="muted" id="mcount"></p>
+        </div>
+      </div>
+    </div>
+    <div class="card rise" style="animation-delay:.2s">
+      <h2>עד יום ההולדת הבא</h2>
+      <div class="ring">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#FFC24B"/><stop offset="1" stop-color="#FF6FA8"/></linearGradient></defs>
+          <circle class="track" cx="60" cy="60" r="52" fill="none" stroke-width="10"/>
+          <circle class="prog" id="prog" cx="60" cy="60" r="52" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+        </svg>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <p class="big mono" id="cd"></p>
+          <p class="muted" id="cdtxt"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="now">
+    <h2>מאז שפתחת את הדף</h2>
+    <div class="world">
+      <div class="w1"><b id="wb">0</b><span>תינוקות נולדו בעולם</span></div>
+      <div class="w2"><b id="wd">0</b><span>אנשים נפטרו</span></div>
+      <div class="w3"><b id="wk">0</b><span>ק"מ שעברת סביב השמש</span></div>
+      <div class="w4"><b id="wh">0</b><span>פעימות לב שלך (בערך)</span></div>
+    </div>
+    <p class="quote" id="quote"></p>
+  </section>
+
+  <footer>החישובים הם הערכות: דופק ממוצע של כ־75 בדקה ו־16 נשימות בדקה לאורך החיים, מהירות מסלול של 29.78 ק"מ בשנייה, ומהירות סביב מרכז שביל החלב של כ־230 ק"מ בשנייה. אוכלוסיית העולם ונתוני הלידה והתמותה הם הערכות לפי האו"ם. תאריך הלידה נשמר רק בדפדפן שלך.</footer>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const DAY=864e5, YEAR=365.2422*DAY, SYN=29.530588853;
+
+/* ---------- starfield ---------- */
+const sky=$('sky'), sx=sky.getContext('2d'); let W,H,stars=[],meteors=[];
+function size(){ const d=devicePixelRatio||1; W=innerWidth; H=innerHeight; sky.width=W*d; sky.height=H*d; sx.setTransform(d,0,0,d,0,0);
+  stars=Array.from({length:Math.round(W*H/2600)},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.3+.2,p:Math.random()*6.28,s:.4+Math.random()*1.6,z:Math.random()})); }
+addEventListener('resize',size); size();
+let scrollY0=0; addEventListener('scroll',()=>scrollY0=scrollY,{passive:true});
+function drawSky(t){
+  sx.clearRect(0,0,W,H);
+  const g=sx.createRadialGradient(W*.8,H*.1,0,W*.8,H*.1,Math.max(W,H)*.9);
+  g.addColorStop(0,'rgba(90,60,170,.28)'); g.addColorStop(.5,'rgba(30,40,110,.12)'); g.addColorStop(1,'rgba(7,8,22,0)');
+  sx.fillStyle=g; sx.fillRect(0,0,W,H);
+  for(const s of stars){
+    const a=.35+.65*Math.abs(Math.sin(s.p+t*.001*s.s));
+    const y=((s.y - scrollY0*s.z*.25)%H+H)%H;
+    sx.fillStyle=`rgba(230,232,255,${a})`; sx.beginPath(); sx.arc(s.x,y,s.r,0,6.283); sx.fill();
+  }
+  if(!reduce && Math.random()<.006) meteors.push({x:Math.random()*W*.8+W*.2,y:Math.random()*H*.4,v:7+Math.random()*5,l:1});
+  meteors=meteors.filter(m=>m.l>0);
+  for(const m of meteors){
+    const tx=m.x+60, ty=m.y-30; const gr=sx.createLinearGradient(m.x,m.y,tx,ty);
+    gr.addColorStop(0,`rgba(255,240,220,${m.l})`); gr.addColorStop(1,'rgba(255,240,220,0)');
+    sx.strokeStyle=gr; sx.lineWidth=1.6; sx.beginPath(); sx.moveTo(m.x,m.y); sx.lineTo(tx,ty); sx.stroke();
+    m.x-=m.v; m.y+=m.v*.5; m.l-=.012;
+  }
+}
+
+/* ---------- orbit ---------- */
+const oc=$('orbit'), ox=oc.getContext('2d'); let OS=400;
+function osize(){ const d=devicePixelRatio||1, r=oc.getBoundingClientRect(); OS=r.width; oc.width=OS*d; oc.height=OS*d; ox.setTransform(d,0,0,d,0,0); }
+addEventListener('resize',osize);
+const angleOf = d => { const start=new Date(d.getFullYear(),0,3); return ((d-start)/YEAR)*Math.PI*2; }; // perihelion ≈ Jan 3
+let anim={from:0,to:0,t0:0,dur:1,laps:0}, trail=[];
+function drawOrbit(t){
+  const c=OS/2, R=OS*.36; ox.clearRect(0,0,OS,OS);
+  // orbit path
+  ox.strokeStyle='rgba(160,170,255,.22)'; ox.setLineDash([2,6]); ox.lineWidth=1; ox.beginPath(); ox.ellipse(c,c*.92,R,R*.92,0,0,6.283); ox.stroke(); ox.setLineDash([]);
+  // sun
+  const pulse=1+ (reduce?0:Math.sin(t*.002)*.04);
+  const sg=ox.createRadialGradient(c,c*.92,0,c,c*.92,R*.42*pulse);
+  sg.addColorStop(0,'#FFF3C4'); sg.addColorStop(.25,'#FFC24B'); sg.addColorStop(.6,'rgba(255,122,61,.35)'); sg.addColorStop(1,'rgba(255,122,61,0)');
+  ox.fillStyle=sg; ox.beginPath(); ox.arc(c,c*.92,R*.42*pulse,0,6.283); ox.fill();
+  // rays
+  if(!reduce){ ox.save(); ox.translate(c,c*.92); ox.rotate(t*.0002); ox.strokeStyle='rgba(255,194,75,.18)'; ox.lineWidth=2;
+    for(let i=0;i<16;i++){ ox.rotate(Math.PI/8); ox.beginPath(); ox.moveTo(R*.2,0); ox.lineTo(R*.3+Math.sin(t*.003+i)*4,0); ox.stroke(); } ox.restore(); }
+  // earth position
+  const k=Math.min(1,(t-anim.t0)/anim.dur), e=1-Math.pow(1-k,4);
+  const a=anim.from+(anim.to-anim.from)*e;
+  $('laps').textContent=Math.floor(Math.max(0,(a-anim.from)/(Math.PI*2)) * (anim.laps? 1:0) + (k>=1?0:0)).toLocaleString('he-IL');
+  if(k>=1) $('laps').textContent=anim.laps.toLocaleString('he-IL');
+  const x=c+Math.cos(-a)*R, y=c*.92+Math.sin(-a)*R*.92;
+  trail.push({x,y}); if(trail.length>(k<1?46:24)) trail.shift();
+  trail.forEach((p,i)=>{ const f=i/trail.length; ox.fillStyle=`rgba(79,179,255,${f*.5})`; ox.beginPath(); ox.arc(p.x,p.y,OS*.012*f,0,6.283); ox.fill(); });
+  const eg=ox.createRadialGradient(x-3,y-3,1,x,y,OS*.03); eg.addColorStop(0,'#BFE6FF'); eg.addColorStop(.6,'#4FB3FF'); eg.addColorStop(1,'#1F5FA8');
+  ox.fillStyle=eg; ox.beginPath(); ox.arc(x,y,OS*.028,0,6.283); ox.fill();
+  ox.strokeStyle='rgba(79,179,255,.35)'; ox.lineWidth=1; ox.beginPath(); ox.arc(x,y,OS*.045+(reduce?0:Math.sin(t*.004)*2),0,6.283); ox.stroke();
+  // tiny moon
+  const ma=t*.003; ox.fillStyle='#E9E6D8'; ox.beginPath(); ox.arc(x+Math.cos(ma)*OS*.06,y+Math.sin(ma)*OS*.06,OS*.008,0,6.283); ox.fill();
+  // label "you are here"
+  if(k>=1){ ox.fillStyle='rgba(238,240,255,.85)'; ox.font=`${Math.max(11,OS*.03)}px "Varela Round", sans-serif`; ox.textAlign='center'; ox.fillText('את כאן',x,y-OS*.06); }
+}
+
+/* ---------- moon ---------- */
+function moonPhase(now){ const ref=Date.UTC(2000,0,6,18,14); const age=(((now-ref)/DAY)%SYN+SYN)%SYN; return {age,phase:age/SYN}; }
+function drawMoon(phase){
+  const m=$('moon'), x=m.getContext('2d'), r=112, c=130; x.clearRect(0,0,260,260);
+  x.save(); x.translate(c,c);
+  x.fillStyle='#23264A'; x.beginPath(); x.arc(0,0,r,0,6.283); x.fill();
+  const lit=x.createRadialGradient(-30,-30,10,0,0,r); lit.addColorStop(0,'#FFFDF2'); lit.addColorStop(1,'#CFCAB5');
+  x.fillStyle=lit; x.beginPath();
+  const rx=r*Math.abs(Math.cos(phase*Math.PI*2));
+  if(phase<.5){ x.arc(0,0,r,-Math.PI/2,Math.PI/2,false); x.ellipse(0,0,rx,r,0,Math.PI/2,-Math.PI/2,phase<.25); }
+  else { x.arc(0,0,r,-Math.PI/2,Math.PI/2,true); x.ellipse(0,0,rx,r,0,Math.PI/2,-Math.PI/2,!(phase>.75)); }
+  x.fill();
+  x.globalCompositeOperation='multiply'; x.fillStyle='rgba(120,115,100,.25)';
+  [[-30,-20,20],[25,30,14],[-10,45,10],[40,-35,9],[-50,25,8]].forEach(([a,b,s])=>{ x.beginPath(); x.arc(a,b,s,0,6.283); x.fill(); });
+  x.restore();
+}
+function moonName(p){ const n=[['מולד',.03],['סהר מתמלא',.22],['רבע ראשון',.28],['ירח מתמלא',.47],['ירח מלא',.53],['ירח מתמעט',.72],['רבע אחרון',.78],['סהר מתמעט',.97],['מולד',1.01]]; return n.find(([,e])=>p<e)[0]; }
+
+/* ---------- counters ---------- */
+const C=[
+  {k:'sec', ic:'⏱', l:'שניות שחיית', rate:1, c:'#EEF0FF'},
+  {k:'hb',  ic:'♥', l:'פעימות לב (בערך)', rate:75/60, c:'#FF6FA8', beat:true},
+  {k:'br',  ic:'〰', l:'נשימות (בערך)', rate:16/60, c:'#7CF2C4'},
+  {k:'sun', ic:'☀', l:'ק"מ שעברת סביב השמש', rate:29.78, c:'#FFC24B'},
+  {k:'gal', ic:'✦', l:'ק"מ שעברת דרך שביל החלב', rate:230, c:'#B79CFF'},
+  {k:'rot', ic:'↻', l:'ק"מ שהסתובבת עם כדור הארץ (בקו הרוחב של ישראל)', rate:1420/3600, c:'#4FB3FF'},
+];
+$('ctrs').innerHTML=C.map((c,i)=>`<div class="ctr rise" style="--c:${c.c};animation-delay:${.08*i}s"><span class="ic${c.beat?' beat':''}" style="color:${c.c}">${c.ic}</span><span class="v" id="c_${c.k}">0</span><span class="l">${c.l}</span></div>`).join('');
+
+/* ---------- state ---------- */
+let birth=null; const opened=Date.now();
+const fmt=n=>Math.floor(n).toLocaleString('he-IL');
+function setBirth(d, fromUser){
+  birth=d; const now=new Date();
+  const years=(now-d)/YEAR, laps=Math.floor(years);
+  const t=performance.now();
+  anim={from:angleOf(d), to:angleOf(d)+years*Math.PI*2, t0:t, dur:reduce?1:Math.min(5200,1600+laps*55), laps}; trail=[];
+  $('sample').hidden=!!fromUser;
+  try{ $('heb').textContent='נולדת ב־'+new Intl.DateTimeFormat('he-IL-u-ca-hebrew',{day:'numeric',month:'long',year:'numeric'}).format(d); }catch(e){ $('heb').textContent=''; }
+  // moons seen
+  $('mcount').textContent=`מאז שנולדת ראית בערך ${fmt((now-d)/DAY/SYN)} ירחים מלאים.`;
+  // birthday ring
+  let next=new Date(now.getFullYear(),d.getMonth(),d.getDate()); if(next<new Date(now.getFullYear(),now.getMonth(),now.getDate())) next.setFullYear(next.getFullYear()+1);
+  let prev=new Date(next); prev.setFullYear(next.getFullYear()-1);
+  const frac=(now-prev)/(next-prev);
+  requestAnimationFrame(()=>$('prog').style.strokeDashoffset=(326.7*(1-frac)).toFixed(1));
+  setBirth.next=next;
+  const age=next.getFullYear()-d.getFullYear();
+  $('cdtxt').textContent = `ואז תהיי בת ${age}. עברת כבר ${Math.round(frac*100)}% מהסיבוב הנוכחי.`;
+  $('quote').textContent = `האור שנוגע בך עכשיו יצא מהשמש לפני 8 דקות ו־20 שניות. בזמן הזה עברת עוד ${fmt(500*29.78)} ק"מ במסלול.`;
+  if(fromUser) try{ localStorage.setItem('journey.bd',$('bd').value); }catch(e){}
+}
+function tickText(){
+  const now=Date.now();
+  if(birth){ const s=(now-birth)/1000; C.forEach(c=>$('c_'+c.k).textContent=fmt(s*c.rate)); }
+  const o=(now-opened)/1000;
+  $('wb').textContent=fmt(o*4.25); $('wd').textContent=fmt(o*1.95); $('wk').textContent=fmt(o*29.78); $('wh').textContent=fmt(o*75/60);
+  if(setBirth.next){ let r=Math.max(0,setBirth.next-now); const d=Math.floor(r/DAY); r-=d*DAY; const h=Math.floor(r/36e5); r-=h*36e5; const m=Math.floor(r/6e4); const s=Math.floor((r-m*6e4)/1000);
+    $('cd').textContent=`${d}d ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
+}
+function loop(t){ drawSky(t); drawOrbit(t); tickText(); requestAnimationFrame(loop); }
+
+$('form').addEventListener('submit',e=>{ e.preventDefault(); const v=$('bd').value; if(!v) return; const [y,m,d]=v.split('-').map(Number); const dt=new Date(y,m-1,d); if(dt>new Date()) return; setBirth(dt,true); });
+$('bd').addEventListener('change',()=>$('form').requestSubmit());
+
+let saved=null; try{ saved=localStorage.getItem('journey.bd'); }catch(e){}
+$('bd').max=new Date().toISOString().slice(0,10);
+$('bd').value=saved||'1995-04-08';
+const [y,m,d]=$('bd').value.split('-').map(Number);
+osize();
+const mp=moonPhase(Date.now()); drawMoon(mp.phase);
+$('mname').textContent=moonName(mp.phase);
+$('mdesc').textContent=`גיל הירח ${mp.age.toFixed(1)} ימים. מוארים כ־${Math.round((1-Math.cos(mp.phase*Math.PI*2))/2*100)}% ממנו.`;
+setBirth(new Date(y,m-1,d), !!saved);
+requestAnimationFrame(loop);
+})();
+</script>

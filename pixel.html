@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>סטודיו פיקסלים</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1a1c2c;--p1:#5d275d;--p2:#b13e53;--y:#ffcd75;--ink:#f4f4f4;--edge:#000}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);background-image:linear-gradient(45deg,#20233a 25%,transparent 25%,transparent 75%,#20233a 75%),linear-gradient(45deg,#20233a 25%,transparent 25%,transparent 75%,#20233a 75%);background-size:32px 32px;background-position:0 0,16px 16px;color:var(--ink);font-family:"Press Start 2P",monospace;font-size:11px;padding:16px;image-rendering:pixelated}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.px{background:#333c57;border:4px solid var(--edge);box-shadow:4px 4px 0 var(--edge),inset -4px -4px 0 #29366f,inset 4px 4px 0 #566c86;padding:12px}
+h1{margin:0;font-size:18px;color:var(--y);text-shadow:3px 3px 0 var(--p2);line-height:1.6}
+a{color:var(--y)}
+.main{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start}
+.tools{display:flex;flex-direction:column;gap:8px}
+button{font:inherit;font-size:10px;background:#566c86;color:var(--ink);border:3px solid var(--edge);box-shadow:3px 3px 0 var(--edge);padding:8px;cursor:pointer;white-space:nowrap}
+button:active,button.on{transform:translate(3px,3px);box-shadow:none;background:var(--y);color:#1a1c2c}
+.pal{display:grid;grid-template-columns:repeat(4,26px);gap:4px}
+.pal div{width:26px;height:26px;border:3px solid var(--edge);cursor:pointer}
+.pal div.on{outline:3px solid var(--y);outline-offset:1px}
+.canvasbox{display:flex;justify-content:center;align-items:center;flex-direction:column;gap:10px}
+#cv{width:min(100%,560px);aspect-ratio:1;border:4px solid var(--edge);box-shadow:6px 6px 0 var(--edge);cursor:crosshair;touch-action:none;image-rendering:pixelated;background:conic-gradient(#ccc 25%,#fff 0 50%,#ccc 0 75%,#fff 0) 0 0/16px 16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#prev{width:64px;height:64px;image-rendering:pixelated;border:3px solid var(--edge);background:#fff}
+input[type=color]{width:40px;height:32px;border:3px solid var(--edge);padding:0;background:none}
+select{font:inherit;font-size:10px;background:#566c86;color:var(--ink);border:3px solid var(--edge);padding:6px}
+@media(max-width:700px){.main{grid-template-columns:1fr}.tools{flex-direction:row;flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="px row" style="justify-content:space-between"><h1>★ סטודיו פיקסלים</h1><a href="התחל כאן.html">◀ חזרה</a></div>
+  <div class="main">
+    <div class="px tools">
+      <button class="tool on" data-t="pen">✏ עט</button>
+      <button class="tool" data-t="erase">▢ מחק</button>
+      <button class="tool" data-t="fill">▼ דלי</button>
+      <button class="tool" data-t="pick">◉ דוגם</button>
+      <button id="mirror">⇋ מראה</button>
+      <div class="pal" id="pal"></div>
+      <input type="color" id="custom" value="#ff0044" title="צבע משלך">
+    </div>
+    <div class="px canvasbox">
+      <canvas id="cv"></canvas>
+      <div class="row">
+        <select id="size"><option>16</option><option selected>24</option><option>32</option><option>48</option></select>
+        <button id="undo">↶</button><button id="grid" class="on">#</button><button id="clear">✖ נקה</button>
+        <select id="scale"><option value="8">×8</option><option value="16" selected>×16</option><option value="32">×32</option></select>
+        <button id="save">💾 PNG</button>
+        <canvas id="prev"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const PAL=['#1a1c2c','#5d275d','#b13e53','#ef7d57','#ffcd75','#a7f070','#38b764','#257179','#29366f','#3b5dc9','#41a6f6','#73eff7','#f4f4f4','#94b0c2','#566c86','#333c57'];
+const cv=document.getElementById('cv'),x=cv.getContext('2d'),pv=document.getElementById('prev'),px=pv.getContext('2d');
+const $=id=>document.getElementById(id);
+let N=24,px_=[],col=PAL[2],tool='pen',mirror=false,grid=true,hist=[],down=false;
+function reset(n){N=n;px_=Array(N*N).fill(null);hist=[];draw()}
+function draw(){const Z=Math.floor(560/N)*2;cv.width=cv.height=N*Z;x.clearRect(0,0,cv.width,cv.height);
+  px_.forEach((c,i)=>{if(c){x.fillStyle=c;x.fillRect((i%N)*Z,(i/N|0)*Z,Z,Z)}});
+  if(grid){x.strokeStyle='rgba(0,0,0,.15)';x.lineWidth=1;for(let k=0;k<=N;k++){x.beginPath();x.moveTo(k*Z,0);x.lineTo(k*Z,cv.height);x.moveTo(0,k*Z);x.lineTo(cv.width,k*Z);x.stroke()}}
+  if(mirror){x.strokeStyle='#b13e53';x.lineWidth=3;x.beginPath();x.moveTo(cv.width/2,0);x.lineTo(cv.width/2,cv.height);x.stroke()}
+  pv.width=pv.height=N;px.clearRect(0,0,N,N);px_.forEach((c,i)=>{if(c){px.fillStyle=c;px.fillRect(i%N,i/N|0,1,1)}});
+  try{localStorage.setItem('pixel',JSON.stringify({N,px_}))}catch{}}
+function at(e){const r=cv.getBoundingClientRect();const cx=Math.floor((e.clientX-r.left)/r.width*N),cy=Math.floor((e.clientY-r.top)/r.height*N);return cx<0||cy<0||cx>=N||cy>=N?-1:cy*N+cx}
+function fill(i,c){const o=px_[i];if(o===c)return;const s=[i];while(s.length){const j=s.pop();if(px_[j]!==o)continue;px_[j]=c;const a=j%N,b=j/N|0;if(a>0)s.push(j-1);if(a<N-1)s.push(j+1);if(b>0)s.push(j-N);if(b<N-1)s.push(j+N)}}
+function act(i){if(i<0)return;const c=tool==='erase'?null:col;
+  if(tool==='pick'){if(px_[i]){setCol(px_[i])}return}
+  if(tool==='fill'){fill(i,c);if(mirror){const m=(i/N|0)*N+(N-1-i%N);fill(m,c)}}
+  else{px_[i]=c;if(mirror)px_[(i/N|0)*N+(N-1-i%N)]=c}
+  draw()}
+function setCol(c){col=c;$('custom').value=c;[...$('pal').children].forEach(d=>d.classList.toggle('on',d.dataset.c===c));if(tool==='erase'||tool==='pick')setTool('pen')}
+function setTool(t){tool=t;document.querySelectorAll('.tool').forEach(b=>b.classList.toggle('on',b.dataset.t===t))}
+PAL.forEach(c=>{const d=document.createElement('div');d.style.background=c;d.dataset.c=c;d.onclick=()=>setCol(c);$('pal').appendChild(d)});
+cv.addEventListener('pointerdown',e=>{down=true;hist.push(px_.slice());if(hist.length>60)hist.shift();cv.setPointerCapture(e.pointerId);act(at(e))});
+cv.addEventListener('pointermove',e=>{if(down&&(tool==='pen'||tool==='erase'))act(at(e))});
+addEventListener('pointerup',()=>down=false);
+document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>setTool(b.dataset.t));
+$('custom').oninput=e=>setCol(e.target.value);
+$('mirror').onclick=e=>{mirror=!mirror;e.currentTarget.classList.toggle('on',mirror);draw()};
+$('grid').onclick=e=>{grid=!grid;e.currentTarget.classList.toggle('on',grid);draw()};
+$('undo').onclick=()=>{if(hist.length){px_=hist.pop();draw()}};
+$('clear').onclick=()=>{hist.push(px_.slice());px_.fill(null);draw()};
+$('size').onchange=e=>{if(px_.some(Boolean)&&!confirm('להתחיל ציור חדש בגודל אחר?')){e.target.value=N;return}reset(+e.target.value)};
+$('save').onclick=()=>{const s=+$('scale').value,c=document.createElement('canvas');c.width=c.height=N*s;const y=c.getContext('2d');px_.forEach((cl,i)=>{if(cl){y.fillStyle=cl;y.fillRect((i%N)*s,(i/N|0)*s,s,s)}});const a=document.createElement('a');a.download='pixel-art.png';a.href=c.toDataURL();a.click()};
+addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'){$('undo').click();e.preventDefault()}});
+try{const s=JSON.parse(localStorage.getItem('pixel'));if(s&&s.px_.length===s.N*s.N){N=s.N;px_=s.px_;$('size').value=N;draw()}else throw 0}catch{
+  reset(24);// starter heart
+  const h=['..XX...XX..','.XXXX.XXXX.','XXXXXXXXXXX','XXXXXXXXXXX','.XXXXXXXXX.','..XXXXXXX..','...XXXXX...','....XXX....','.....X.....'];h.forEach((r,y)=>[...r].forEach((ch,xx)=>{if(ch==='X')px_[(y+7)*N+xx+6]='#b13e53'}));draw()}
+setCol(PAL[2]);
+</script>
+</body>
+</html>

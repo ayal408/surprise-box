@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ספירה לאחור</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Assistant:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--pk:#ff2bd6;--cy:#22f3ff;--or:#ffb347;--bg:#12002b}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:linear-gradient(#12002b 0%,#3a0057 55%,#ff3d7f 78%,#ffb347 100%) fixed;color:#fff;font-family:Assistant,"Arial Hebrew",Arial,sans-serif;overflow-x:hidden}
+.sky{position:fixed;inset:0;pointer-events:none;z-index:0}
+.sun{position:absolute;left:50%;bottom:22vh;width:min(60vw,380px);aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:linear-gradient(#ffe066,#ff3d7f 70%);-webkit-mask:linear-gradient(#000 0 50%,transparent 50%),repeating-linear-gradient(#000 0 12px,transparent 12px 18px);mask:linear-gradient(#000 0 50%,transparent 50%),repeating-linear-gradient(#000 0 12px,transparent 12px 18px);box-shadow:0 0 80px #ff3d7f}
+.floor{position:absolute;left:-50%;right:-50%;bottom:0;height:34vh;background:#12002b;background-image:linear-gradient(var(--pk) 2px,transparent 2px),linear-gradient(90deg,var(--pk) 2px,transparent 2px);background-size:60px 40px;transform:perspective(300px) rotateX(60deg);transform-origin:bottom;animation:run 1s linear infinite;box-shadow:0 -10px 40px var(--pk)}
+@keyframes run{to{background-position:0 40px}}
+.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:26px 16px 60px;display:flex;flex-direction:column;gap:20px}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+h1{margin:0;font-family:Orbitron,sans-serif;font-weight:900;font-size:clamp(1.6rem,5vw,2.8rem);color:#fff;text-shadow:0 0 8px var(--pk),0 0 22px var(--pk),0 0 40px var(--pk);font-style:italic}
+a{color:var(--cy);text-shadow:0 0 6px var(--cy)}
+.hero{text-align:center;background:rgba(18,0,43,.6);border:2px solid var(--cy);box-shadow:0 0 18px var(--cy),inset 0 0 18px rgba(34,243,255,.3);border-radius:10px;padding:18px;backdrop-filter:blur(4px)}
+.hero h2{margin:0 0 10px;font-size:1.5rem;color:var(--cy);text-shadow:0 0 8px var(--cy)}
+.big{display:flex;justify-content:center;gap:clamp(8px,3vw,26px);direction:ltr;font-family:Orbitron,sans-serif}
+.big div{display:flex;flex-direction:column;align-items:center}
+.big b{font-size:clamp(2rem,9vw,4.6rem);font-weight:900;color:#fff;text-shadow:0 0 10px var(--pk),0 0 30px var(--pk);min-width:2ch}
+.big small{font-family:Assistant;color:var(--or);font-size:.95rem}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.ev{background:rgba(18,0,43,.72);border:1px solid var(--pk);box-shadow:0 0 10px rgba(255,43,214,.5);border-radius:8px;padding:12px 14px;cursor:pointer;position:relative}
+.ev.on{border-color:var(--cy);box-shadow:0 0 16px var(--cy)}
+.ev h3{margin:0;font-size:1.15rem}
+.ev .d{font-family:Orbitron;font-size:1.4rem;color:var(--or);text-shadow:0 0 6px var(--or)}
+.ev small{color:#d8c7ff}
+.ev .x{position:absolute;left:8px;top:6px;background:none;border:0;color:#d8c7ff;cursor:pointer;font-size:1rem}
+form{display:flex;gap:8px;flex-wrap:wrap;background:rgba(18,0,43,.72);border:1px dashed var(--or);padding:12px;border-radius:8px}
+input{font:inherit;background:transparent;border:1px solid var(--or);color:#fff;padding:8px;border-radius:6px;color-scheme:dark}
+input[type=text]{flex:1;min-width:150px}
+button.add{font:inherit;font-weight:700;background:var(--pk);color:#fff;border:0;border-radius:6px;padding:8px 18px;cursor:pointer;box-shadow:0 0 14px var(--pk)}
+@media (prefers-reduced-motion:reduce){.floor{animation:none}}
+</style>
+</head>
+<body>
+<div class="sky"><div class="sun"></div><div class="floor"></div></div>
+<div class="wrap">
+  <header><h1>COUNTDOWN ✦ ספירה לאחור</h1><a href="התחל כאן.html">← חזרה לקופסה</a></header>
+  <div class="hero"><h2 id="hname"></h2><div class="big" id="big"></div><p id="hdate" style="margin:10px 0 0;color:#d8c7ff"></p></div>
+  <form id="f"><input type="text" id="n" placeholder="שם האירוע (יום הולדת, חופשה, מבחן...)" required><input type="date" id="d" required><input type="time" id="t" value="00:00"><button class="add">+ הוספה</button></form>
+  <div class="list" id="list"></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+function nextDate(m,d){const n=new Date(),y=n.getFullYear();let t=new Date(y,m,d);if(t<n)t=new Date(y+1,m,d);return t.toISOString()}
+let evs,sel=0;
+try{evs=JSON.parse(localStorage.getItem('cd-evs'))}catch{}
+if(!evs||!evs.length)evs=[{n:'🎆 השנה האזרחית החדשה',at:nextDate(0,1)},{n:'☀️ החופש הגדול',at:nextDate(6,1)},{n:'🎂 יום ההולדת שלי',at:nextDate(new Date().getMonth()+2,1)}];
+const save=()=>{try{localStorage.setItem('cd-evs',JSON.stringify(evs))}catch{}};
+function parts(ms){const s=Math.max(0,ms/1000|0);return{d:s/86400|0,h:s%86400/3600|0,m:s%3600/60|0,s:s%60}}
+const p2=n=>String(n).padStart(2,'0');
+function render(){evs.sort((a,b)=>new Date(a.at)-new Date(b.at));if(sel>=evs.length)sel=0;
+  $('list').innerHTML=evs.map((e,i)=>{const ms=new Date(e.at)-Date.now(),p=parts(ms);return`<div class="ev ${i===sel?'on':''}" data-i="${i}"><button class="x" data-x="${i}" title="מחיקה">✕</button><h3>${e.n.replace(/</g,'&lt;')}</h3><div class="d">${ms<=0?'הגיע! 🎉':p.d+' ימים'}</div><small>${new Date(e.at).toLocaleString('he-IL',{dateStyle:'medium',timeStyle:'short'})}</small></div>`}).join('');tick()}
+function tick(){const e=evs[sel];if(!e){$('hname').textContent='הוסיפו אירוע';$('big').innerHTML='';return}
+  const ms=new Date(e.at)-Date.now(),p=parts(ms);$('hname').textContent=e.n;
+  $('big').innerHTML=ms<=0?'<div><b>🎉</b><small>הגיע הזמן!</small></div>':[[p.d,'ימים'],[p2(p.h),'שעות'],[p2(p.m),'דקות'],[p2(p.s),'שניות']].map(([v,l])=>`<div><b>${v}</b><small>${l}</small></div>`).join('');
+  const wk=(ms/604800000).toFixed(1),sl=Math.max(0,Math.ceil(ms/86400000));$('hdate').textContent=ms>0?`עוד ${wk} שבועות · עוד ${sl} לילות שינה`:''}
+$('list').onclick=e=>{const x=e.target.dataset.x;if(x!==undefined){evs.splice(+x,1);save();render();return}const c=e.target.closest('.ev');if(c){sel=+c.dataset.i;render()}};
+$('f').onsubmit=e=>{e.preventDefault();const at=new Date($('d').value+'T'+($('t').value||'00:00'));evs.push({n:$('n').value,at:at.toISOString()});save();evs.sort((a,b)=>new Date(a.at)-new Date(b.at));sel=evs.findIndex(v=>v.n===$('n').value);$('n').value='';render()};
+render();setInterval(tick,1000);setInterval(render,60000);
+</script>
+</body>
+</html>

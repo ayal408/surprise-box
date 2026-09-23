@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>פאזל ההזזה</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#5fc1cf}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% 0%,#1d5a6a 0%,transparent 55%),var(--bg);color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:440px;display:flex;flex-direction:column;gap:12px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+h1{margin:0;font-size:2.2rem;color:var(--acc)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+select,button{font:inherit;cursor:pointer;border-radius:10px;padding:7px 12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+button.pri{background:var(--acc);color:#04202b;border:0;font-weight:700}
+.info{margin-inline-start:auto;font-variant-numeric:tabular-nums}
+.board{position:relative;direction:ltr;aspect-ratio:1;background:#1b1838;border-radius:14px;user-select:none}
+.t{position:absolute;display:flex;align-items:center;justify-content:center;font-weight:800;border-radius:10px;cursor:pointer;transition:left .12s,top .12s;background-size:var(--bs);color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.7)}
+.t.home{box-shadow:inset 0 0 0 3px rgba(124,242,196,.8)}
+.msg{text-align:center;font-weight:800;font-size:1.3rem;min-height:1.6em;color:#7cf2c4}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>פאזל ההזזה</h1>
+  <div class="bar">
+    <select id="size"><option value="3">3×3</option><option value="4" selected>4×4</option><option value="5">5×5</option></select>
+    <select id="look"><option value="num">מספרים</option><option value="pic">תמונה (שקיעה)</option></select>
+    <button class="pri" id="new">ערבב</button>
+    <span class="info">מהלכים <b id="moves">0</b> · <span id="time">0</span> שנ׳</span>
+  </div>
+  <div class="board" id="board"></div>
+  <div class="msg" id="msg"></div>
+</div>
+<script>
+let n,tiles,blank,moves,t0,timer,solved;const B=document.getElementById('board');
+function pic(){const c=document.createElement('canvas');c.width=c.height=400;const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,0,400);g.addColorStop(0,'#2b1a6b');g.addColorStop(.55,'#f72585');g.addColorStop(.75,'#ffb703');x.fillStyle=g;x.fillRect(0,0,400,400);
+  x.fillStyle='#ffe066';x.beginPath();x.arc(200,250,70,0,7);x.fill();
+  x.fillStyle='#1b103a';x.beginPath();x.moveTo(0,300);x.lineTo(90,220);x.lineTo(170,290);x.lineTo(260,200);x.lineTo(400,310);x.lineTo(400,400);x.lineTo(0,400);x.fill();
+  x.fillStyle='rgba(255,255,255,.8)';for(let i=0;i<40;i++)x.fillRect(Math.random()*400,Math.random()*150,2,2);return c.toDataURL()}
+const PIC=pic();
+function solvable(a){let inv=0;const f=a.filter(v=>v);for(let i=0;i<f.length;i++)for(let j=i+1;j<f.length;j++)if(f[i]>f[j])inv++;
+  if(n%2)return inv%2===0;const rowFromBottom=n-(a.indexOf(0)/n|0);return(inv+rowFromBottom)%2===1}
+function newGame(){n=+document.getElementById('size').value;let a;
+  do{a=[...Array(n*n).keys()].map(v=>(v+1)%(n*n)).sort(()=>Math.random()-.5)}while(!solvable(a)||a.every((v,i)=>v===(i+1)%(n*n)));
+  tiles=a;moves=0;solved=false;clearInterval(timer);t0=null;document.getElementById('time').textContent=0;document.getElementById('msg').textContent='';render()}
+function render(){B.innerHTML='';const pad=8,gap=6,s=`((100% - ${2*pad}px - ${(n-1)*gap}px)/${n})`,usePic=document.getElementById('look').value==='pic';
+  tiles.forEach((v,i)=>{if(!v)return;const d=document.createElement('div');d.className='t'+(v===i+1?' home':'');const r=i/n|0,c=i%n,hr=(v-1)/n|0,hc=(v-1)%n;
+    d.style.width=d.style.height=`calc${s}`;d.style.left=`calc(${pad}px + ${c}*(${s} + ${gap}px))`;d.style.top=`calc(${pad}px + ${r}*(${s} + ${gap}px))`;
+    d.style.fontSize=(n>4?1.3:n>3?1.7:2.3)+'rem';
+    if(usePic){d.style.backgroundImage=`url(${PIC})`;d.style.backgroundSize=`${n*100}% ${n*100}%`;d.style.backgroundPosition=`${hc/(n-1)*100}% ${hr/(n-1)*100}%`;d.textContent=v;d.style.fontSize='.9rem';d.style.alignItems='flex-start';d.style.justifyContent='flex-end';d.style.padding='4px 6px'}
+    else{d.style.background=`hsl(${190+v*110/(n*n)},60%,${40+(v%2)*6}%)`;d.textContent=v}
+    d.onclick=()=>slide(i);B.appendChild(d)});
+  document.getElementById('moves').textContent=moves}
+function slide(i){if(solved)return;const b=tiles.indexOf(0),br=b/n|0,bc=b%n,r=i/n|0,c=i%n;if(r!==br&&c!==bc)return;
+  if(!t0){t0=Date.now();timer=setInterval(()=>document.getElementById('time').textContent=(Date.now()-t0)/1000|0,500)}
+  const step=r===br?(c<bc?-1:1):(r<br?-n:n);let k=b;while(k!==i){tiles[k]=tiles[k+step];k+=step}tiles[i]=0;moves++;render();
+  if(tiles.every((v,j)=>v===(j+1)%(n*n))){solved=true;clearInterval(timer);document.getElementById('msg').textContent=`🎉 סודר! ${moves} מהלכים ב־${(Date.now()-t0)/1000|0} שניות`}}
+addEventListener('keydown',e=>{const b=tiles.indexOf(0),d={ArrowLeft:1,ArrowRight:-1,ArrowUp:n,ArrowDown:-n}[e.key];if(d==null)return;e.preventDefault();const t=b+d;
+  if(t<0||t>=n*n||(Math.abs(d)===1&&(t/n|0)!==(b/n|0)))return;slide(t)});
+document.getElementById('new').onclick=newGame;document.getElementById('size').onchange=newGame;document.getElementById('look').onchange=render;
+newGame();
+</script>
+</body>
+</html>

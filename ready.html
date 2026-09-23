@@ -1,0 +1,176 @@
+<title>הבית מוכן</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=Rubik:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#EEEFE9; --paper:#FBFBF7; --ink:#1E2320; --muted:#626A64; --line:#D5D8CF;
+  --olive:#56652B; --olive-soft:#E3E8D2; --orange:#D2601A; --orange-soft:#F8E3D3;
+  --body:"Rubik","Segoe UI",Arial,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ color-scheme:dark;
+  --bg:#141612; --paper:#1C1F1A; --ink:#E8EBE3; --muted:#9CA396; --line:#30352D;
+  --olive:#A9C06A; --olive-soft:#262E18; --orange:#FF9A55; --orange-soft:#3A2414; } }
+:root[data-theme="dark"]{ color-scheme:dark;
+  --bg:#141612; --paper:#1C1F1A; --ink:#E8EBE3; --muted:#9CA396; --line:#30352D;
+  --olive:#A9C06A; --olive-soft:#262E18; --orange:#FF9A55; --orange-soft:#3A2414; }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.55;margin:0}
+.wrap{max-width:1000px;margin:0 auto;padding-inline:18px;padding-block:24px 56px;display:flex;flex-direction:column;gap:22px}
+h1{font-family:"Rubik Mono One",var(--body);font-weight:400;font-size:clamp(1.9rem,6vw,2.7rem);margin:0;line-height:1.1;letter-spacing:-.01em}
+h2{font-size:1.2rem;font-weight:700;margin:0}
+p{margin:0} .muted{color:var(--muted)}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.top{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;align-items:end}
+.house{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.house label{display:flex;flex-direction:column;gap:4px;font-size:.82rem;color:var(--muted);font-weight:500}
+.house input{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 8px;font-family:var(--mono);font-size:1.05rem;width:100%;min-width:0;text-align:center}
+.progress{display:flex;flex-direction:column;gap:8px}
+.bar{height:14px;background:var(--paper);border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.bar div{height:100%;background:var(--olive);transition:width .3s}
+.prow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.prow b{font-family:var(--mono);font-size:1.4rem}
+.cols{columns:2 420px;column-gap:20px}
+.group{break-inside:avoid;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:20px;display:flex;flex-direction:column;gap:8px}
+.ghead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ghead span{font-family:var(--mono);font-size:.85rem;color:var(--muted)}
+.item{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:start;padding:6px 0;border-top:1px solid var(--line);cursor:pointer}
+.item:first-of-type{border-top:0}
+.item input{width:18px;height:18px;margin-top:3px;accent-color:var(--olive)}
+.item .q{font-family:var(--mono);font-size:.9rem;background:var(--olive-soft);color:var(--olive);border-radius:6px;padding:1px 8px;white-space:nowrap}
+.item small{display:block;color:var(--muted);font-size:.84rem}
+.item:has(input:checked) .t{text-decoration:line-through;color:var(--muted)}
+.alert{background:var(--orange-soft);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+.alert h2{color:var(--orange)}
+.alert ol{margin:0;padding-inline-start:22px;display:flex;flex-direction:column;gap:4px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:8px 16px;font-weight:500;cursor:pointer}
+.btn:hover{border-color:var(--olive)}
+footer{font-size:.86rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+footer a{color:var(--ink)}
+.toast{position:fixed;inset-inline:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));margin:auto;width:max-content;max-width:90vw;background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-weight:500}
+@media (max-width:820px){ .top{grid-template-columns:1fr} }
+@media (max-width:480px){ .house{grid-template-columns:repeat(3,1fr)} }
+</style>
+
+<div class="wrap" dir="rtl" lang="he">
+  <div class="top">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <h1>הבית מוכן</h1>
+      <p class="muted" style="max-width:56ch">רשימת ציוד חירום לבית ולממ"ד, עם כמויות שמחושבות לפי מספר האנשים בבית. מה שמסמנים נשמר בדפדפן, אז אפשר לחזור ולהשלים בהדרגה.</p>
+    </div>
+    <div class="house" aria-label="מי גר בבית">
+      <label for="ad">מבוגרים<input id="ad" type="number" min="0" max="20" value="2" inputmode="numeric"></label>
+      <label for="ki">ילדים<input id="ki" type="number" min="0" max="20" value="2" inputmode="numeric"></label>
+      <label for="ba">תינוקות<input id="ba" type="number" min="0" max="10" value="0" inputmode="numeric"></label>
+      <label for="pe">חיות<input id="pe" type="number" min="0" max="10" value="1" inputmode="numeric"></label>
+      <label for="da">ימים<input id="da" type="number" min="1" max="14" value="3" inputmode="numeric"></label>
+    </div>
+  </div>
+
+  <div class="progress">
+    <div class="prow"><h2 id="ptitle">מה כבר מוכן</h2><b id="pnum">0/0</b></div>
+    <div class="bar"><div id="pbar" style="width:0%"></div></div>
+  </div>
+
+  <div class="alert">
+    <h2>כשיש אזעקה</h2>
+    <ol>
+      <li>נכנסים למרחב המוגן בזמן שמוגדר לאזור שלך. בודקים מראש כמה זמן יש באפליקציית פיקוד העורף.</li>
+      <li>סוגרים דלת וחלון, כולל חלון הפלדה.</li>
+      <li>נשארים בפנים עד שמגיעה הודעה שאפשר לצאת, לפי ההנחיות העדכניות של פיקוד העורף.</li>
+      <li>אין ממ"ד? הולכים למקלט או לחדר מדרגות פנימי, רחוק מחלונות.</li>
+    </ol>
+  </div>
+
+  <div class="cols" id="list"></div>
+
+  <div class="actions">
+    <button class="btn" id="copy" type="button">העתקת רשימת מה שחסר (לקניות)</button>
+    <button class="btn" id="reset" type="button">ניקוי כל הסימונים</button>
+  </div>
+
+  <footer>ההמלצות מבוססות על ההנחיות המקובלות של פיקוד העורף להיערכות בבית. ההנחיות המחייבות והעדכניות נמצאות ב־<a href="https://www.oref.org.il" target="_blank" rel="noopener">oref.org.il</a> ובאפליקציית פיקוד העורף.</footer>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+let done={}; try{ done=JSON.parse(localStorage.getItem('ready.done')||'{}'); }catch(e){}
+const saveDone=()=>{ try{ localStorage.setItem('ready.done',JSON.stringify(done)); }catch(e){} };
+function H(){ const n=k=>Math.max(0,parseInt($(k).value)||0); return {ad:n('ad'),ki:n('ki'),ba:n('ba'),pe:n('pe'),da:Math.max(1,n('da'))}; }
+const G = h => {
+  const ppl=h.ad+h.ki+h.ba;
+  return [
+  {t:'מים ומזון', items:[
+    ['water','מים לשתייה',`${ppl*3*h.da} ליטר`,'3 ליטר לאדם ליום, ובקבוקים סגורים'],
+    ['cans','שימורים ומזון יבש',`${ppl*h.da*2} מנות`,'טונה, תירס, חומוס, קרקרים, חטיפי אנרגיה'],
+    ['opener','פותחן קופסאות','1','אם השימורים לא נפתחים ביד'],
+    ['plates','כלים חד־פעמיים ושקיות אשפה','חבילה'],
+  ]},
+  {t:'תאורה, חשמל ותקשורת', items:[
+    ['torch','פנס לכל אדם',`${Math.max(1,ppl)}`,'עדיף פנס ראש, כדי שהידיים יישארו חופשיות'],
+    ['batt','סוללות רזרביות','לכל פנס ורדיו'],
+    ['radio','רדיו על סוללות','1','כשאין חשמל ואין אינטרנט, זה ערוץ ההנחיות'],
+    ['power','סוללה ניידת טעונה לטלפון',`${Math.max(1,h.ad)}`,'טוענים אותה פעם בחודש'],
+    ['cables','כבלי טעינה בממ"ד','לכל טלפון'],
+  ]},
+  {t:'בריאות', items:[
+    ['kit','ערכת עזרה ראשונה','1','תחבושות, פלסטרים, חיטוי, מספריים, כפפות'],
+    ['meds','תרופות קבועות',`ל־${Math.max(h.da,7)} ימים`,'כולל רשימה מודפסת של התרופות והמינונים'],
+    ['glasses','משקפיים רזרביים, מכשירי שמיעה וסוללות להם','לפי הצורך'],
+    ['hyg','מגבונים, נייר טואלט, תחבושות היגייניות','חבילה'],
+  ]},
+  {t:'מסמכים וכסף', items:[
+    ['docs','צילום תעודות זהות ודרכונים','שקית אטומה','וגם עותק בענן או במייל'],
+    ['cash','מזומן בשטרות קטנים','כמה מאות ₪','כשאין חשמל, אשראי לא עובד'],
+    ['contacts','רשימת טלפונים חשובים על דף','1','בני משפחה, רופא, שכנים'],
+    ['keys','מפתחות רזרביים לבית ולרכב','סט'],
+  ]},
+  {t:'הממ"ד עצמו', items:[
+    ['clear','הממ"ד פנוי ונכנסים אליו בלי מכשולים','','בודקים שחלון הפלדה נסגר עד הסוף'],
+    ['seat','מקום לשבת או מזרון לכל אחד',`${ppl}`],
+    ['ext','מטף כיבוי אש','1','בודקים מתי הוא פג תוקף'],
+    ['bag','תיק מוכן ליד הדלת','1','אם צריך לצאת מהבית מהר'],
+    ['drill','תרגלנו עם כל המשפחה כניסה לממ"ד','','במיוחד עם הילדים'],
+  ]},
+  h.ki+h.ba ? {t:'ילדים ותינוקות', items:[
+    ...(h.ba?[['formula','תחליף חלב ומזון לתינוק',`ל־${h.da} ימים`],['diapers','חיתולים',`${h.ba*8*h.da}`,'בערך 8 ביום'],['bottles','בקבוקים ומים סגורים להכנת תחליף חלב','']]:[]),
+    ...(h.ki?[['games','משחקים, קלפים, ספרים וצבעים','','מעסיקים ומרגיעים בזמן שנמצאים בממ"ד'],['snack','חטיפים שהם אוהבים','']]:[]),
+    ['comfort','בובה או שמיכה אהובה','לכל ילד'],
+  ]} : null,
+  h.pe ? {t:'חיות מחמד', items:[
+    ['petfood','אוכל לחיות',`ל־${h.da} ימים`],
+    ['petwater','מים לחיות','לפי הגודל','כלב בינוני שותה בערך ליטר ביום'],
+    ['leash','רצועה, מנשא או כלוב','לכל חיה'],
+    ['petmed','תרופות וחיסונים של החיה','']
+  ]} : null,
+  ].filter(Boolean);
+};
+function render(){
+  const h=H(), groups=G(h); let all=0, ok=0;
+  $('list').innerHTML=groups.map(g=>{
+    const c=g.items.filter(i=>done[i[0]]).length; all+=g.items.length; ok+=c;
+    return `<section class="group"><div class="ghead"><h2>${g.t}</h2><span>${c}/${g.items.length}</span></div>`+
+      g.items.map(([id,t,q,s])=>`<label class="item" for="i_${id}"><input type="checkbox" id="i_${id}" data-id="${id}" ${done[id]?'checked':''}><span class="t">${t}${s?`<small>${s}</small>`:''}</span>${q?`<span class="q">${q}</span>`:'<span></span>'}</label>`).join('')+`</section>`;
+  }).join('');
+  $('pnum').textContent=`${ok}/${all}`; $('pbar').style.width=(all?ok/all*100:0)+'%';
+  $('ptitle').textContent = ok===all ? 'הבית מוכן. כל הכבוד!' : ok===0 ? 'מתחילים. כל פריט שמסמנים מקרב' : 'מה כבר מוכן';
+  $('list').querySelectorAll('input').forEach(cb=>cb.addEventListener('change',()=>{ if(cb.checked) done[cb.dataset.id]=1; else delete done[cb.dataset.id]; saveDone(); render(); }));
+  render.groups=groups;
+}
+['ad','ki','ba','pe','da'].forEach(k=>$(k).addEventListener('input',render));
+function toast(m){ const t=$('toast'); t.textContent=m; t.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(()=>t.hidden=true,1800); }
+$('copy').addEventListener('click',()=>{
+  const miss=render.groups.flatMap(g=>g.items.filter(i=>!done[i[0]]).map(i=>`☐ ${i[1]}${i[2]?` (${i[2]})`:''}`));
+  const text = miss.length ? 'חסר לנו לחירום:\n'+miss.join('\n') : 'הכל מוכן ✔';
+  navigator.clipboard.writeText(text).then(()=>toast('הרשימה הועתקה. אפשר לשלוח בווטסאפ'),()=>toast('ההעתקה נחסמה בדפדפן'));
+});
+let armed=false;
+$('reset').addEventListener('click',()=>{ if(!armed){ armed=true; $('reset').textContent='ללחוץ שוב כדי לנקות'; setTimeout(()=>{armed=false; $('reset').textContent='ניקוי כל הסימונים';},3000); return; }
+  done={}; saveDone(); armed=false; $('reset').textContent='ניקוי כל הסימונים'; render(); });
+render();
+})();
+</script>

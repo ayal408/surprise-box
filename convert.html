@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הממיר</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@200;300;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f0ea;--ink:#2b2a27;--mute:#9a958b;--line:#dcd6cb;--acc:#b5412c}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:Heebo,"Arial Hebrew",Arial,sans-serif;font-weight:300;padding:48px 20px}
+.wrap{max-width:640px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:48px}
+h1{margin:0;font-weight:200;font-size:2.4rem;letter-spacing:.02em}
+h1::after{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--acc);margin-inline-start:10px;vertical-align:middle}
+a{color:var(--mute);text-decoration:none;font-size:.9rem}
+a:hover{color:var(--ink)}
+nav{display:flex;flex-wrap:wrap;gap:4px 22px;margin-bottom:40px}
+nav button{font:inherit;background:none;border:0;padding:4px 0;color:var(--mute);cursor:pointer;border-bottom:1px solid transparent;font-size:1rem}
+nav button.on{color:var(--ink);border-bottom-color:var(--acc)}
+.row{display:grid;grid-template-columns:1fr auto;align-items:end;gap:14px;border-bottom:1px solid var(--line);padding:18px 0}
+.row input{font:inherit;font-weight:200;font-size:2.6rem;border:0;background:none;color:var(--ink);width:100%;outline:0;padding:0;direction:ltr;text-align:right}
+select{font:inherit;font-size:1rem;background:none;border:0;color:var(--mute);cursor:pointer;padding:4px;max-width:180px}
+.swap{display:block;margin:10px auto;background:none;border:1px solid var(--line);border-radius:50%;width:40px;height:40px;cursor:pointer;color:var(--mute);font-size:1.1rem}
+.swap:hover{border-color:var(--acc);color:var(--acc)}
+.all{margin-top:40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.all div{background:var(--bg);padding:12px 14px}
+.all small{display:block;color:var(--mute);font-size:.8rem}
+.all b{font-weight:500;direction:ltr;display:inline-block}
+.note{color:var(--mute);font-size:.82rem;margin-top:28px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1>הממיר</h1><a href="התחל כאן.html">חזרה ←</a></header>
+  <nav id="nav"></nav>
+  <div class="row"><input id="a" inputmode="decimal" value="1"><select id="ua"></select></div>
+  <button class="swap" id="sw" title="החלפה">⇅</button>
+  <div class="row"><input id="b" inputmode="decimal"><select id="ub"></select></div>
+  <div class="all" id="all"></div>
+  <p class="note" id="note"></p>
+</div>
+<script>
+const CAT={
+ 'אורך':{u:{'מילימטר':.001,'סנטימטר':.01,'מטר':1,'קילומטר':1000,'אינץ׳':.0254,'רגל':.3048,'יארד':.9144,'מייל':1609.344,'מייל ימי':1852},d:['סנטימטר','אינץ׳']},
+ 'משקל':{u:{'גרם':1,'קילוגרם':1000,'טון':1e6,'אונקיה':28.349523,'ליברה (פאונד)':453.59237,'קראט':.2},d:['קילוגרם','ליברה (פאונד)']},
+ 'טמפרטורה':{u:{'צלזיוס':'C','פרנהייט':'F','קלווין':'K'},d:['צלזיוס','פרנהייט']},
+ 'מטבח':{u:{'כפית':5,'כף':15,'כוס':240,'מיליליטר':1,'ליטר':1000,'אונקיה נוזלית':29.5735,'כוס (ארה״ב)':236.588},d:['כוס','מיליליטר'],n:'כוס ישראלית מקובלת = 240 מ״ל. כמויות בגרם תלויות במצרך: כוס קמח ≈ 140 גר׳, כוס סוכר ≈ 200 גר׳.'},
+ 'שטח':{u:{'מ״ר':1,'דונם':1000,'דונם (עות׳מאני)':919.3,'הקטר':10000,'קמ״ר':1e6,'רגל מרובעת':.092903,'אקר':4046.856},d:['דונם','מ״ר']},
+ 'נפח':{u:{'מיליליטר':1,'ליטר':1000,'מ״ק':1e6,'גלון (ארה״ב)':3785.41,'גלון (בריטי)':4546.09,'חבית נפט':158987},d:['ליטר','גלון (ארה״ב)']},
+ 'מהירות':{u:{'קמ״ש':1,'מ׳/שנ׳':3.6,'מייל לשעה':1.609344,'קשר':1.852,'מאך':1234.8},d:['קמ״ש','מייל לשעה']},
+ 'נתונים':{u:{'בייט':1,'קילובייט':1024,'מגהבייט':1048576,'ג׳יגהבייט':1073741824,'טרהבייט':1099511627776,'ביט':.125},d:['ג׳יגהבייט','מגהבייט']},
+ 'זמן':{u:{'שנייה':1,'דקה':60,'שעה':3600,'יום':86400,'שבוע':604800,'חודש (ממוצע)':2629746,'שנה':31556952},d:['שעה','דקה']},
+ 'דלק':{u:{'ק״מ לליטר':'kpl','ליטר ל־100 ק״מ':'l100','מייל לגלון (ארה״ב)':'mpg'},d:['ק״מ לליטר','ליטר ל־100 ק״מ']}};
+const $=id=>document.getElementById(id);let cat='אורך';
+const toBase=(v,u)=>{const f=CAT[cat].u[u];if(typeof f==='number')return v*f;
+  if(f==='C')return v;if(f==='F')return (v-32)*5/9;if(f==='K')return v-273.15;
+  if(f==='kpl')return v;if(f==='l100')return v?100/v:0;if(f==='mpg')return v*.425144};
+const fromBase=(v,u)=>{const f=CAT[cat].u[u];if(typeof f==='number')return v/f;
+  if(f==='C')return v;if(f==='F')return v*9/5+32;if(f==='K')return v+273.15;
+  if(f==='kpl')return v;if(f==='l100')return v?100/v:0;if(f==='mpg')return v/.425144};
+const fmt=v=>!isFinite(v)?'—':Math.abs(v)>=1e9||(Math.abs(v)<1e-4&&v)?v.toExponential(4):(+v.toPrecision(8)).toLocaleString('en-US',{maximumFractionDigits:6});
+const num=s=>parseFloat(String(s).replace(/,/g,''));
+function setCat(c){cat=c;[...$('nav').children].forEach(b=>b.classList.toggle('on',b.textContent===c));const us=Object.keys(CAT[c].u);
+  [$('ua'),$('ub')].forEach((s,i)=>{s.innerHTML=us.map(u=>`<option>${u}</option>`).join('');s.value=CAT[c].d[i]});$('note').textContent=CAT[c].n||'';calc('a')}
+function calc(from){const [s,d,us,ud]=from==='a'?['a','b','ua','ub']:['b','a','ub','ua'];const v=num($(s).value);
+  if(isNaN(v)){$(d).value='';$('all').innerHTML='';return}const base=toBase(v,$(us).value);$(d).value=fmt(fromBase(base,$(ud).value));
+  const va=num($('a').value),ba=toBase(va,$('ua').value);$('all').innerHTML=Object.keys(CAT[cat].u).map(u=>`<div><small>${u}</small><b>${fmt(fromBase(ba,u))}</b></div>`).join('')}
+Object.keys(CAT).forEach(c=>{const b=document.createElement('button');b.textContent=c;b.onclick=()=>setCat(c);$('nav').appendChild(b)});
+$('a').oninput=()=>calc('a');$('b').oninput=()=>calc('b');$('ua').onchange=()=>calc('a');$('ub').onchange=()=>calc('a');
+$('sw').onclick=()=>{const t=$('ua').value;$('ua').value=$('ub').value;$('ub').value=t;$('a').value=$('b').value.replace(/,/g,'');calc('a')};
+setCat('אורך');
+</script>
+</body>
+</html>

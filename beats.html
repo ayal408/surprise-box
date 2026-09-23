@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>סטודיו הביטים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;800&family=Space+Mono:wght@700&display=swap">
+<style>
+/* single dark "studio" look on purpose */
+:root{color-scheme:dark;--bg:#0B0B12;--panel:#15151F;--pad:#22222F;--line:#2C2C3C;--ink:#F1F0FA;--muted:#8D8CA8;
+  --c0:#FF5470;--c1:#FFB547;--c2:#3DDCB1;--c3:#6BA6FF;--c4:#C47BFF;--c5:#FF7BD0;--mel:#6BE3FF}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 50% -20%,#2a1f4d 0%,transparent 55%),var(--bg);color:var(--ink);font-family:"Rubik","Segoe UI",Arial,sans-serif;min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:16px;padding-block:20px 50px;display:flex;flex-direction:column;gap:16px}
+h1{margin:0;font-family:"Space Mono",monospace;font-size:clamp(1.8rem,6vw,3rem);letter-spacing:-.02em;background:linear-gradient(90deg,var(--c0),var(--c1),var(--c2),var(--c3));-webkit-background-clip:text;background-clip:text;color:transparent}
+p{margin:0}.muted{color:var(--muted)}
+#viz{width:100%;height:90px;display:block;border-radius:14px;background:var(--panel);border:1px solid var(--line)}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.bar button,.bar select{font:inherit;font-size:.92rem;color:var(--ink);background:var(--pad);border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer}
+.bar button:hover{border-color:var(--c2)}
+#play{background:var(--c2);color:#06140f;font-weight:800;min-width:110px;border:0}
+#play.on{background:var(--c0);color:#fff}
+.bar label{display:flex;align-items:center;gap:8px;font-size:.9rem;color:var(--muted)}
+.bar input[type=range]{accent-color:var(--c2);width:120px}
+.bar output{font-family:"Space Mono",monospace;color:var(--ink);min-width:3ch}
+.gridbox{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;overflow-x:auto}
+.grid{display:grid;grid-template-columns:92px repeat(16,minmax(28px,1fr));gap:5px;min-width:620px;direction:ltr}
+.name{font-size:.82rem;color:var(--muted);display:flex;align-items:center;justify-content:flex-end;padding-inline-end:6px;direction:rtl;cursor:pointer;user-select:none}
+.name:hover{color:var(--ink)}
+.cell{aspect-ratio:1;border-radius:7px;border:0;background:var(--pad);cursor:pointer;transition:transform .08s,background .12s,box-shadow .12s;padding:0}
+.cell.q{background:#2a2a3a}
+.cell:hover{outline:1px solid var(--line)}
+.cell.on{background:var(--c);box-shadow:0 0 12px -2px var(--c)}
+.cell.now{outline:2px solid rgba(255,255,255,.55)}
+.cell.hit{transform:scale(1.18);box-shadow:0 0 22px var(--c)}
+.sep{grid-column:1/-1;height:6px}
+.hint{font-size:.85rem;color:var(--muted)}
+kbd{background:var(--pad);border:1px solid var(--line);border-radius:5px;padding:0 6px;font-size:.8rem}
+:focus-visible{outline:2px solid var(--c1);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:4px">
+    <h1>סטודיו הביטים</h1>
+    <p class="muted">לוחצים על משבצות ובונים ביט. השורות העליונות הן תופים והתחתונות הן מלודיה (בסולם פנטטוני, אז כל שילוב נשמע טוב). כל הצלילים מסונתזים בזמן אמת.</p>
+  </header>
+
+  <canvas id="viz" aria-hidden="true"></canvas>
+
+  <div class="bar" role="toolbar" aria-label="בקרה">
+    <button id="play" type="button">▶ נגן</button>
+    <label for="bpm">קצב <input type="range" id="bpm" min="60" max="180" value="104"><output id="bpmOut">104</output></label>
+    <label for="swing">סווינג <input type="range" id="swing" min="0" max="60" value="10"><output id="swOut">10</output></label>
+    <select id="preset" aria-label="ביט מוכן">
+      <option value="">ביטים מוכנים…</option>
+      <option value="house">האוס</option>
+      <option value="hiphop">היפ־הופ</option>
+      <option value="reggaeton">רגאטון</option>
+      <option value="rock">רוק</option>
+    </select>
+    <button id="rand" type="button">🎲 הפתעה</button>
+    <button id="clear" type="button">ניקוי</button>
+  </div>
+
+  <div class="gridbox"><div class="grid" id="grid"></div></div>
+  <p class="hint"><kbd>רווח</kbd> מנגן ועוצר. לחיצה על שם של שורה משמיעה אותה. הביט נשמר בדפדפן.</p>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const DRUMS=[{id:"kick",he:"בס תוף",c:"--c0"},{id:"snare",he:"סנר",c:"--c1"},{id:"clap",he:"מחיאה",c:"--c5"},{id:"hat",he:"היי־האט",c:"--c2"},{id:"open",he:"האט פתוח",c:"--c3"},{id:"tom",he:"טום",c:"--c4"}];
+const NOTES=[880,783.99,659.25,587.33,523.25,440,392,329.63]; // A pentatonic-ish, high to low
+const NOTE_NAMES=["לה","סול","מי","רה","דו","לה","סול","מי"];
+const ROWS=DRUMS.length+NOTES.length, STEPS=16;
+let pat=Array.from({length:ROWS},()=>Array(STEPS).fill(false));
+try{ const s=JSON.parse(localStorage.getItem("beats.pat")||"null"); if(s&&s.length===ROWS) pat=s; }catch(e){}
+const save=()=>{ try{ localStorage.setItem("beats.pat",JSON.stringify(pat)); }catch(e){} };
+
+/* audio */
+let ac=null, master, analyser, noiseBuf;
+function audio(){
+  if(ac){ if(ac.state==="suspended") ac.resume(); return ac; }
+  ac=new (window.AudioContext||window.webkitAudioContext)();
+  master=ac.createGain(); master.gain.value=.8;
+  const comp=ac.createDynamicsCompressor(); analyser=ac.createAnalyser(); analyser.fftSize=256;
+  master.connect(comp).connect(analyser).connect(ac.destination);
+  noiseBuf=ac.createBuffer(1,ac.sampleRate,ac.sampleRate); const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  return ac;
+}
+function env(g,t,a,v,dec){ g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+a); g.gain.exponentialRampToValueAtTime(1e-4,t+a+dec); }
+function noise(t,dec,type,freq,v){ const s=ac.createBufferSource(); s.buffer=noiseBuf; const f=ac.createBiquadFilter(); f.type=type; f.frequency.value=freq; const g=ac.createGain(); env(g,t,.001,v,dec); s.connect(f).connect(g).connect(master); s.start(t); s.stop(t+dec+.05); }
+function osc(t,type,f0,f1,dec,v){ const o=ac.createOscillator(), g=ac.createGain(); o.type=type; o.frequency.setValueAtTime(f0,t); if(f1) o.frequency.exponentialRampToValueAtTime(f1,t+dec*.8); env(g,t,.002,v,dec); o.connect(g).connect(master); o.start(t); o.stop(t+dec+.05); }
+function play(row,t){
+  if(row<DRUMS.length){
+    switch(DRUMS[row].id){
+      case "kick": osc(t,"sine",150,40,.45,1); break;
+      case "snare": noise(t,.18,"highpass",1200,.55); osc(t,"triangle",220,120,.12,.35); break;
+      case "clap": [0,.012,.024].forEach(d=>noise(t+d,.09,"bandpass",1500,.5)); break;
+      case "hat": noise(t,.05,"highpass",7000,.3); break;
+      case "open": noise(t,.3,"highpass",6500,.25); break;
+      case "tom": osc(t,"sine",180,90,.3,.7); break;
+    }
+  } else {
+    const f=NOTES[row-DRUMS.length], o=ac.createOscillator(), o2=ac.createOscillator(), g=ac.createGain(), fl=ac.createBiquadFilter();
+    o.type="sawtooth"; o2.type="square"; o.frequency.value=f; o2.frequency.value=f*1.005; fl.type="lowpass"; fl.frequency.setValueAtTime(3000,t); fl.frequency.exponentialRampToValueAtTime(500,t+.3);
+    env(g,t,.005,.18,.35); o.connect(fl); o2.connect(fl); fl.connect(g).connect(master); o.start(t); o2.start(t); o.stop(t+.45); o2.stop(t+.45);
+  }
+}
+
+/* grid */
+const cells=[];
+function build(){
+  const g=$("grid"); g.innerHTML="";
+  for(let r=0;r<ROWS;r++){
+    if(r===DRUMS.length){ const s=document.createElement("div"); s.className="sep"; g.appendChild(s); }
+    const drum=r<DRUMS.length, col=drum?`var(${DRUMS[r].c})`:"var(--mel)";
+    const n=document.createElement("div"); n.className="name"; n.textContent=drum?DRUMS[r].he:"♪ "+NOTE_NAMES[r-DRUMS.length]; n.title="להשמיע";
+    n.addEventListener("click",()=>{ audio(); play(r,ac.currentTime+.01); }); g.appendChild(n);
+    cells[r]=[];
+    for(let s=0;s<STEPS;s++){
+      const b=document.createElement("button"); b.type="button"; b.className="cell"+(Math.floor(s/4)%2?" q":"")+(pat[r][s]?" on":"");
+      b.style.setProperty("--c",col); b.setAttribute("aria-label",`${drum?DRUMS[r].he:NOTE_NAMES[r-DRUMS.length]} צעד ${s+1}`); b.setAttribute("aria-pressed",pat[r][s]);
+      b.addEventListener("click",()=>{ pat[r][s]=!pat[r][s]; b.classList.toggle("on",pat[r][s]); b.setAttribute("aria-pressed",pat[r][s]); save(); if(pat[r][s]){ audio(); play(r,ac.currentTime+.01); } });
+      g.appendChild(b); cells[r][s]=b;
+    }
+  }
+}
+function refresh(){ for(let r=0;r<ROWS;r++) for(let s=0;s<STEPS;s++){ cells[r][s].classList.toggle("on",pat[r][s]); cells[r][s].setAttribute("aria-pressed",pat[r][s]); } save(); }
+
+/* presets */
+const P={
+  house:{kick:"x...x...x...x...",clap:"....x.......x...",hat:"..x...x...x...x.",open:"......x.......x.",mel:["","","x.......x.......","","..x.......x.....","","",""]},
+  hiphop:{kick:"x......x..x.....",snare:"....x.......x...",hat:"x.x.x.x.x.x.x.x.",mel:["","","","x.....x.........","","x.........x.....","",""]},
+  reggaeton:{kick:"x...x...x...x...",snare:"...x..x....x..x.",hat:"x.x.x.x.x.x.x.x.",mel:["","x.......","","","x...x.......x...","","",""]},
+  rock:{kick:"x.......x.x.....",snare:"....x.......x...",hat:"x.x.x.x.x.x.x.x.",tom:"..............xx",mel:["","","","","x.......x.......","","x...x...........",""]}
+};
+function loadPreset(k){
+  const p=P[k]; if(!p) return; pat=Array.from({length:ROWS},()=>Array(STEPS).fill(false));
+  DRUMS.forEach((d,r)=>{ const s=p[d.id]; if(s) [...s].forEach((c,i)=>pat[r][i]=c==="x"); });
+  (p.mel||[]).forEach((s,i)=>[...s].forEach((c,j)=>{ if(j<STEPS) pat[DRUMS.length+i][j]=c==="x"; }));
+  refresh();
+}
+$("preset").addEventListener("change",e=>{ loadPreset(e.target.value); e.target.value=""; });
+$("clear").addEventListener("click",()=>{ pat=pat.map(r=>r.map(()=>false)); refresh(); });
+$("rand").addEventListener("click",()=>{
+  const prob=[.3,.15,.12,.55,.1,.08];
+  pat=Array.from({length:ROWS},(_,r)=>Array.from({length:STEPS},(_,s)=>{
+    if(r===0) return s%4===0 || Math.random()<.12;
+    if(r===1) return s%8===4;
+    if(r<DRUMS.length) return Math.random()<prob[r];
+    return Math.random()<.07;
+  }));
+  refresh();
+});
+
+/* transport */
+let playing=false, step=0, nextT=0, timer=null; const queue=[];
+const bpm=()=>+$("bpm").value;
+$("bpm").addEventListener("input",e=>$("bpmOut").textContent=e.target.value);
+$("swing").addEventListener("input",e=>$("swOut").textContent=e.target.value);
+function sched(){
+  const spb=60/bpm()/4;
+  while(nextT<ac.currentTime+.12){
+    const sw=(step%2)?spb*(+$("swing").value/100)*.5:0;
+    for(let r=0;r<ROWS;r++) if(pat[r][step]) play(r,nextT+sw);
+    queue.push({s:step,t:nextT+sw});
+    nextT+=spb; step=(step+1)%STEPS;
+  }
+}
+let lastDrawn=-1;
+function drawStep(){
+  while(queue.length && queue[0].t<=ac.currentTime){
+    const {s}=queue.shift();
+    if(lastDrawn>=0) for(let r=0;r<ROWS;r++) cells[r][lastDrawn].classList.remove("now","hit");
+    for(let r=0;r<ROWS;r++){ cells[r][s].classList.add("now"); if(pat[r][s]) cells[r][s].classList.add("hit"); }
+    lastDrawn=s;
+  }
+}
+function toggle(){
+  audio();
+  if(playing){ playing=false; clearInterval(timer); queue.length=0; if(lastDrawn>=0) for(let r=0;r<ROWS;r++) cells[r][lastDrawn].classList.remove("now","hit"); lastDrawn=-1; $("play").textContent="▶ נגן"; $("play").classList.remove("on"); return; }
+  playing=true; step=0; nextT=ac.currentTime+.06; timer=setInterval(sched,25); sched();
+  $("play").textContent="■ עצור"; $("play").classList.add("on");
+}
+$("play").addEventListener("click",toggle);
+document.addEventListener("keydown",e=>{ if(e.key===" " && e.target.tagName!=="BUTTON" && e.target.tagName!=="INPUT" && e.target.tagName!=="SELECT"){ e.preventDefault(); toggle(); } });
+
+/* visualizer */
+const cv=$("viz"), cx=cv.getContext("2d"); let W,H;
+function size(){ const d=devicePixelRatio||1, r=cv.getBoundingClientRect(); W=r.width; H=r.height; cv.width=W*d; cv.height=H*d; cx.setTransform(d,0,0,d,0,0); }
+addEventListener("resize",size); size();
+const data=new Uint8Array(128);
+function loop(t){
+  cx.clearRect(0,0,W,H);
+  if(ac&&playing) drawStep();
+  const n=64, bw=W/n;
+  if(analyser) analyser.getByteFrequencyData(data);
+  for(let i=0;i<n;i++){
+    const v=analyser?data[i]/255:.04+.03*Math.sin(t*.002+i*.3);
+    const h=Math.max(2,v*H*.95), hue=340+i/n*200;
+    cx.fillStyle=`hsl(${hue%360},85%,${55+v*15}%)`; cx.fillRect(i*bw+1,H-h,bw-2,h);
+  }
+  requestAnimationFrame(loop);
+}
+build(); if(!pat.some(r=>r.some(Boolean))) loadPreset("house"); requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>הפסנתר הקסום</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;800&display=swap">
+<style>
+:root{color-scheme:dark;--bg:#0E0B1A;--ink:#F2EEFF;--muted:#A49CC4;--line:rgba(180,160,255,.18);--glass:rgba(24,18,48,.7);--acc:#FF6FB5;--acc2:#7C9CFF;--gold:#FFD166}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -10%,#3A1F6E,transparent 60%),var(--bg);color:var(--ink);font-family:"Rubik","Segoe UI",Arial,sans-serif;display:flex;flex-direction:column}
+.wrap{max-width:1100px;width:100%;margin:0 auto;padding-inline:16px;padding-block:18px 24px;display:flex;flex-direction:column;gap:14px;flex:1}
+h1{margin:0;font-weight:800;font-size:clamp(1.8rem,6vw,2.6rem);background:linear-gradient(90deg,var(--gold),var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+p{margin:0;color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bar button,.bar select{font:inherit;font-size:.92rem;color:var(--ink);background:var(--glass);border:1px solid var(--line);border-radius:12px;padding:8px 14px;cursor:pointer}
+.bar button.on{background:var(--acc);border-color:var(--acc);color:#1a0b14;font-weight:700}
+.score{margin-inline-start:auto;font-weight:700}
+.fall{position:relative;height:clamp(180px,34vh,320px);border-radius:16px 16px 0 0;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(124,156,255,.08));border:1px solid var(--line);border-bottom:0;overflow:hidden;direction:ltr}
+.fall .line{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--gold);box-shadow:0 0 16px var(--gold)}
+.note{position:absolute;border-radius:8px;background:linear-gradient(180deg,var(--acc),var(--acc2));box-shadow:0 0 14px rgba(255,111,181,.6);display:flex;align-items:flex-end;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;padding-bottom:3px}
+.note.hit{background:linear-gradient(180deg,#7CF2C4,#34C759);animation:pop .35s forwards}
+@keyframes pop{to{transform:scale(1.3);opacity:0}}
+.msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;font-size:1.2rem;color:var(--muted);direction:rtl;padding:12px}
+.kbd{position:relative;height:clamp(150px,26vh,230px);direction:ltr;user-select:none;touch-action:none}
+.w{position:absolute;top:0;bottom:0;background:linear-gradient(180deg,#fff,#EDE9F7);border:1px solid #bdb5d6;border-radius:0 0 10px 10px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:8px;color:#5b5378;font-size:.78rem;transition:background .06s}
+.b{position:absolute;top:0;height:62%;background:linear-gradient(180deg,#2A2440,#0F0C1C);border-radius:0 0 7px 7px;z-index:2;box-shadow:0 4px 8px rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;color:#9d95bd;font-size:.65rem}
+.w.down{background:linear-gradient(180deg,#FFD1EA,#FF9FD0)}
+.b.down{background:linear-gradient(180deg,#7C9CFF,#4B5EC9)}
+.w.target{background:linear-gradient(180deg,#FFF6D6,#FFD166)} .b.target{background:linear-gradient(180deg,#B8860B,#6B4F00)}
+.w kbd,.b kbd{font-family:inherit;font-size:.68rem;opacity:.7}
+.spark{position:fixed;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:9;animation:fly .7s ease-out forwards}
+@keyframes fly{to{transform:translate(var(--dx),var(--dy));opacity:0}}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1>הפסנתר הקסום 🎹</h1><p>מנגנים בעכבר, במגע או במקלדת: השורה האמצעית (A S D F…) מנגנת את הקלידים הלבנים והשורה העליונה את השחורים. במצב לימוד התווים יורדים ומחכים שתנגני אותם.</p></header>
+  <div class="bar">
+    <button id="free" class="on" type="button">🎵 נגינה חופשית</button>
+    <select id="song" aria-label="שיר ללימוד"></select>
+    <button id="learn" type="button">🎓 ללמוד את השיר</button>
+    <select id="sound" aria-label="צליל"><option value="piano">פסנתר</option><option value="organ">עוגב</option><option value="bell">פעמונים</option><option value="synth">סינתיסייזר</option></select>
+    <span class="score" id="score"></span>
+  </div>
+  <div class="fall" id="fall"><div class="line"></div><div class="msg" id="msg">בוחרים שיר ולוחצים "ללמוד את השיר", או פשוט מנגנים 🎶</div></div>
+  <div class="kbd" id="kbd"></div>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const SOL=["דו","דו#","רה","רה#","מי","פה","פה#","סול","סול#","לה","לה#","סי"];
+const FIRST=48, LAST=76; // C3..E5
+const KEYMAP={KeyZ:48,KeyS:49,KeyX:50,KeyD:51,KeyC:52,KeyV:53,KeyG:54,KeyB:55,KeyH:56,KeyN:57,KeyJ:58,KeyM:59,
+  KeyA:60,KeyW:61,KeyQ:60,KeyE:63,KeyF:65,KeyT:66,KeyR:62,KeyY:68,KeyU:70,KeyK:72,KeyO:73,KeyL:74,KeyP:75,Semicolon:76};
+// clearer layout: middle row = white keys from C4, upper row = black keys
+const MAP2={KeyA:60,KeyS:62,KeyD:64,KeyF:65,KeyG:67,KeyH:69,KeyJ:71,KeyK:72,KeyL:74,Semicolon:76,KeyW:61,KeyE:63,KeyT:66,KeyY:68,KeyU:70,KeyO:73,KeyP:75,
+  KeyZ:48,KeyX:50,KeyC:52,KeyV:53,KeyB:55,KeyN:57,KeyM:59};
+const KEYLBL={}; Object.entries(MAP2).forEach(([c,m])=>KEYLBL[m]=c.replace("Key","").replace("Semicolon",";"));
+const isBlack=m=>[1,3,6,8,10].includes(m%12);
+/* build keyboard */
+const kbd=$("kbd"), keyEl={}; const whites=[]; for(let m=FIRST;m<=LAST;m++) if(!isBlack(m)) whites.push(m);
+const ww=100/whites.length;
+whites.forEach((m,i)=>{ const d=document.createElement("div"); d.className="w"; d.style.left=(i*ww)+"%"; d.style.width=ww+"%";
+  d.innerHTML=`${KEYLBL[m]?`<kbd>${KEYLBL[m]}</kbd>`:""}<span>${SOL[m%12]}</span>`; kbd.appendChild(d); keyEl[m]=d; d.dataset.m=m; });
+for(let m=FIRST;m<=LAST;m++) if(isBlack(m)){ const i=whites.indexOf(m-1); const d=document.createElement("div"); d.className="b"; d.style.left=((i+1)*ww-ww*.3)+"%"; d.style.width=(ww*.6)+"%";
+  d.innerHTML=KEYLBL[m]?`<kbd>${KEYLBL[m]}</kbd>`:""; kbd.appendChild(d); keyEl[m]=d; d.dataset.m=m; }
+const keyX=m=>{ const r=keyEl[m].getBoundingClientRect(), f=$("fall").getBoundingClientRect(); return {x:r.left-f.left, w:r.width}; };
+
+/* sound */
+let ac=null, master=null;
+function A(){ if(!ac){ ac=new (window.AudioContext||window.webkitAudioContext)(); master=ac.createGain(); master.gain.value=.5; const comp=ac.createDynamicsCompressor(); master.connect(comp).connect(ac.destination); } if(ac.state==="suspended") ac.resume(); return ac; }
+const freq=m=>440*Math.pow(2,(m-69)/12);
+function play(m){
+  const c=A(), t=c.currentTime, type=$("sound").value, g=c.createGain(); g.connect(master);
+  const parts = type==="organ"?[[1,"sine",.4],[2,"sine",.25],[3,"sine",.12],[4,"sine",.08]]:type==="bell"?[[1,"sine",.5],[2.76,"sine",.18],[5.4,"sine",.08]]:type==="synth"?[[1,"sawtooth",.18],[1.005,"sawtooth",.18]]:[[1,"triangle",.5],[2,"sine",.12],[3,"sine",.05]];
+  const dur = type==="organ"?1.1:type==="bell"?2.4:type==="synth"?.9:1.6;
+  parts.forEach(([mul,wave,vol])=>{ const o=c.createOscillator(), og=c.createGain(); o.type=wave; o.frequency.value=freq(m)*mul;
+    og.gain.setValueAtTime(0,t); og.gain.linearRampToValueAtTime(vol,t+.008); og.gain.exponentialRampToValueAtTime(1e-4,t+dur*(type==="bell"?1/mul*1.5:1));
+    if(type==="synth"){ const f=c.createBiquadFilter(); f.type="lowpass"; f.frequency.setValueAtTime(3000,t); f.frequency.exponentialRampToValueAtTime(400,t+.5); o.connect(f).connect(og); } else o.connect(og);
+    og.connect(g); o.start(t); o.stop(t+dur+.1); });
+}
+function sparkle(m){ if(matchMedia("(prefers-reduced-motion: reduce)").matches) return; const r=keyEl[m].getBoundingClientRect();
+  for(let i=0;i<8;i++){ const s=document.createElement("div"); s.className="spark"; s.style.left=(r.left+r.width/2)+"px"; s.style.top=(r.top)+"px";
+    s.style.background=["#FFD166","#FF6FB5","#7C9CFF","#7CF2C4"][i%4]; s.style.setProperty("--dx",(Math.random()*80-40)+"px"); s.style.setProperty("--dy",(-40-Math.random()*70)+"px");
+    document.body.appendChild(s); setTimeout(()=>s.remove(),700); } }
+function press(m){ if(!keyEl[m]) return; play(m); keyEl[m].classList.add("down"); sparkle(m); onPlayed(m); }
+function release(m){ if(keyEl[m]) keyEl[m].classList.remove("down"); }
+/* pointer (with glissando) */
+let ptrDown=new Map();
+kbd.addEventListener("pointerdown",e=>{ const k=e.target.closest("[data-m]"); if(!k) return; kbd.setPointerCapture(e.pointerId); const m=+k.dataset.m; ptrDown.set(e.pointerId,m); press(m); });
+kbd.addEventListener("pointermove",e=>{ if(!ptrDown.has(e.pointerId)) return; const el=document.elementFromPoint(e.clientX,e.clientY), k=el&&el.closest("[data-m]"); if(!k) return; const m=+k.dataset.m, prev=ptrDown.get(e.pointerId); if(m!==prev){ release(prev); ptrDown.set(e.pointerId,m); press(m); } });
+const up=e=>{ if(ptrDown.has(e.pointerId)){ release(ptrDown.get(e.pointerId)); ptrDown.delete(e.pointerId); } };
+kbd.addEventListener("pointerup",up); kbd.addEventListener("pointercancel",up);
+const held=new Set();
+addEventListener("keydown",e=>{ const m=MAP2[e.code]; if(m===undefined||e.repeat||e.ctrlKey||e.metaKey) return; e.preventDefault(); held.add(e.code); press(m); });
+addEventListener("keyup",e=>{ const m=MAP2[e.code]; if(m===undefined) return; held.delete(e.code); release(m); });
+
+/* songs: [midi, beats] */
+const N={C4:60,D4:62,E4:64,F4:65,G4:67,A4:69,B4:71,C5:72,D5:74,E5:76,Bb4:70};
+const S=(str)=>str.trim().split(/\s+/).map(t=>{ const [n,b]=t.split(":"); return [N[n],+(b||1)]; });
+const SONGS={
+  "יונתן הקטן":S("G4 E4 E4:2 F4 D4 D4:2 C4 D4 E4 F4 G4 G4 G4:2 G4 E4 E4:2 F4 D4 D4:2 C4 E4 G4 G4 C4:4"),
+  "נצנץ כוכב קטן":S("C4 C4 G4 G4 A4 A4 G4:2 F4 F4 E4 E4 D4 D4 C4:2 G4 G4 F4 F4 E4 E4 D4:2 G4 G4 F4 F4 E4 E4 D4:2 C4 C4 G4 G4 A4 A4 G4:2 F4 F4 E4 E4 D4 D4 C4:2"),
+  "יום הולדת שמח":S("G4:0.75 G4:0.25 A4 G4 C5 B4:2 G4:0.75 G4:0.25 A4 G4 D5 C5:2 G4:0.75 G4:0.25 G4 E5 C5 B4 A4:2 F4:0.75 F4:0.25 E4 C4 D4 C4:2".replace(/G4 E5/,"G4 E5").replace("G4:0.75 G4:0.25 G4 E5","G4:0.75 G4:0.25 G4 E5")),
+  "אודה לשמחה":S("E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 E4:1.5 D4:0.5 D4:2 E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 D4:1.5 C4:0.5 C4:2"),
+  "שלום עליכם":S("D4 G4 G4 G4:2 A4 Bb4 A4 G4:2 G4 A4 Bb4 C5 D5:2 C5 Bb4 A4:2 G4 A4 Bb4 A4 G4:3")
+};
+Object.keys(SONGS).forEach(n=>{ const o=document.createElement("option"); o.textContent=n; $("song").appendChild(o); });
+
+/* learn mode */
+let learning=false, seq=[], idx=0, hits=0, misses=0, notesEl=[], rafId=null;
+const BEAT=70; // px per beat
+function layout(){ // absolute y (from line upward) for each note
+  let y=0; return seq.map(([m,b])=>{ const o={m,b,y}; y+=b*BEAT; return o; }); }
+let pos=[], scroll=0, target=0;
+function startLearn(){
+  learning=true; seq=SONGS[$("song").value]; pos=layout(); idx=0; hits=0; misses=0; scroll=-60; target=0;
+  $("free").classList.remove("on"); $("learn").classList.add("on"); $("msg").hidden=true;
+  const fall=$("fall"); notesEl.forEach(n=>n.remove()); notesEl=pos.map(p=>{ const d=document.createElement("div"); d.className="note"; d.textContent=SOL[p.m%12]; fall.appendChild(d); return d; });
+  updateScore(); markTarget(); cancelAnimationFrame(rafId); rafId=requestAnimationFrame(tick);
+}
+function stopLearn(msg){
+  learning=false; $("learn").classList.remove("on"); $("free").classList.add("on"); cancelAnimationFrame(rafId);
+  Object.values(keyEl).forEach(k=>k.classList.remove("target"));
+  if(msg){ $("msg").hidden=false; $("msg").textContent=msg; notesEl.forEach(n=>n.remove()); notesEl=[]; }
+}
+function markTarget(){ Object.values(keyEl).forEach(k=>k.classList.remove("target")); if(learning&&pos[idx]) keyEl[pos[idx].m].classList.add("target"); }
+function updateScore(){ $("score").textContent=learning?`🎯 ${idx}/${pos.length} · טעויות: ${misses}`:""; }
+function tick(){
+  // glide so that the current note's bottom sits on the line
+  if(pos[idx]) target=pos[idx].y; scroll+=(target-scroll)*.12;
+  const H=$("fall").clientHeight;
+  pos.forEach((p,i)=>{ const el=notesEl[i]; if(!el||el.classList.contains("gone")) return; const k=keyX(p.m); const h=Math.max(22,p.b*BEAT-6);
+    const bottom=p.y-scroll; el.style.left=(k.x+2)+"px"; el.style.width=(k.w-4)+"px"; el.style.height=h+"px"; el.style.bottom=(bottom+3)+"px";
+    el.style.display=bottom>H?"none":""; });
+  rafId=requestAnimationFrame(tick);
+}
+function onPlayed(m){
+  if(!learning||!pos[idx]) return;
+  if(m===pos[idx].m){ const el=notesEl[idx]; el.classList.add("hit"); setTimeout(()=>el.classList.add("gone"),350); hits++; idx++;
+    if(idx>=pos.length){ updateScore(); setTimeout(()=>{ stopLearn(misses===0?"🏆 מושלם! ניגנת את כל השיר בלי אף טעות!":`🎉 כל הכבוד! סיימת את השיר עם ${misses} טעויות. שוב?`); fanfare(); },500); return; }
+  } else misses++;
+  markTarget(); updateScore();
+}
+function fanfare(){ [72,76,79,84].forEach((m,i)=>setTimeout(()=>play(m),i*120)); }
+$("learn").addEventListener("click",()=>{ A(); startLearn(); });
+$("free").addEventListener("click",()=>stopLearn("נגינה חופשית 🎶 מנגנים מה שרוצים"));
+$("song").addEventListener("change",()=>{ if(learning) startLearn(); });
+addEventListener("resize",()=>{});
+})();
+</script>
+</body>
+</html>

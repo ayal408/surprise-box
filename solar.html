@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>מערכת השמש עכשיו</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;500;800&family=JetBrains+Mono:wght@500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{color-scheme:dark;--ink:#EEF1FF;--muted:#9AA3C7;--glass:rgba(12,16,40,.72);--line:rgba(150,170,255,.18);--sun:#FFC24B;--acc:#6FD3FF}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#02030A;color:var(--ink);font-family:"Heebo","Segoe UI",Arial,sans-serif;overflow:hidden}
+#stage{position:fixed;inset:0;touch-action:none;cursor:grab}
+#stage:active{cursor:grabbing}
+.panel{position:fixed;background:var(--glass);border:1px solid var(--line);border-radius:18px;backdrop-filter:blur(10px);padding:14px 16px}
+.top{top:14px;inset-inline-start:14px;max-width:min(420px,calc(100vw - 28px));display:flex;flex-direction:column;gap:6px}
+h1{margin:0;font-weight:800;font-size:clamp(1.3rem,4vw,1.9rem);background:linear-gradient(90deg,var(--sun),#FF7AB6,var(--acc));-webkit-background-clip:text;background-clip:text;color:transparent}
+.date{font-family:"JetBrains Mono",monospace;font-size:1.05rem;direction:ltr;text-align:right}
+.hebdate{color:var(--muted);font-size:.9rem}
+.ctrl{bottom:14px;inset-inline:14px;margin:auto;max-width:760px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}
+.ctrl button,.ctrl select,.ctrl input{font:inherit;font-size:.92rem;color:var(--ink);background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:7px 12px;cursor:pointer}
+.ctrl button:hover{border-color:var(--acc)}
+.ctrl button.on{background:var(--acc);color:#04101a;border-color:var(--acc)}
+.info{top:14px;inset-inline-end:14px;width:min(320px,calc(100vw - 28px));display:flex;flex-direction:column;gap:8px;transition:opacity .25s,transform .25s}
+.info.hide{opacity:0;transform:translateY(-8px);pointer-events:none}
+.info h2{margin:0;font-size:1.5rem;font-weight:800}
+.info .row{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:6px;font-size:.93rem}
+.info .row b{font-family:"JetBrains Mono",monospace;font-weight:500;direction:ltr}
+.info p{margin:0;color:var(--muted);line-height:1.55;font-size:.93rem}
+.info .x{position:absolute;top:8px;inset-inline-end:10px;background:none;border:0;color:var(--muted);font-size:1.1rem;cursor:pointer}
+.label{position:fixed;transform:translate(-50%,-150%);font-size:.8rem;font-weight:500;color:var(--ink);text-shadow:0 1px 4px #000;pointer-events:none;white-space:nowrap;opacity:.9}
+.label.sel{color:var(--sun);font-weight:800}
+.hint{color:var(--muted);font-size:.8rem}
+.err{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:1.1rem;color:var(--muted)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media (max-width:640px){.info{top:auto;bottom:118px;inset-inline:14px;width:auto}.top .hint{display:none}}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="labels"></div>
+
+<div class="panel top">
+  <h1>מערכת השמש עכשיו</h1>
+  <div class="date" id="date"></div>
+  <div class="hebdate" id="hebdate"></div>
+  <div class="hint">המיקומים מחושבים לפי נתוני המסלול של NASA/JPL. המרחקים והגדלים מוקטנים כדי שהכל ייכנס למסך. גוררים כדי לסובב, גוללים או צובטים כדי להתקרב, ולוחצים על כוכב לכת.</div>
+</div>
+
+<div class="panel info hide" id="info">
+  <button class="x" id="closeInfo" aria-label="סגירה">✕</button>
+  <h2 id="iName"></h2>
+  <div class="row"><span>מרחק מהשמש</span><b id="iSun"></b></div>
+  <div class="row"><span>מרחק מכדור הארץ</span><b id="iEarth"></b></div>
+  <div class="row"><span>האור מגיע אלינו תוך</span><b id="iLight"></b></div>
+  <div class="row"><span>שנה אחת שם</span><b id="iYear"></b></div>
+  <p id="iFact"></p>
+  <button id="follow" style="font:inherit;background:rgba(255,255,255,.08);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:7px;cursor:pointer">🎥 לעקוב במצלמה</button>
+</div>
+
+<div class="panel ctrl" role="toolbar" aria-label="שליטה בזמן">
+  <button id="rev" title="אחורה">⏪</button>
+  <button id="play" title="עצירה/המשך">⏸</button>
+  <select id="speed" aria-label="מהירות">
+    <option value="1">זמן אמת</option>
+    <option value="3600">שעה בשנייה</option>
+    <option value="86400" selected>יום בשנייה</option>
+    <option value="604800">שבוע בשנייה</option>
+    <option value="2629800">חודש בשנייה</option>
+    <option value="31557600">שנה בשנייה</option>
+  </select>
+  <button id="today">היום</button>
+  <input type="date" id="jump" aria-label="מעבר לתאריך" min="1800-01-01" max="2050-12-31">
+  <button id="orbits" class="on">מסלולים</button>
+  <button id="names" class="on">שמות</button>
+</div>
+
+<script>
+(function(){
+if(typeof THREE==="undefined"){ document.body.insertAdjacentHTML("beforeend",'<div class="err">כדי להציג את מערכת השמש בתלת־ממד צריך חיבור לאינטרנט בפעם הראשונה (לטעינת ספריית Three.js).</div>'); return; }
+const $=id=>document.getElementById(id);
+const D2R=Math.PI/180, AU_KM=149597870.7;
+
+/* JPL approximate Keplerian elements (1800–2050): a, e, I, L, varpi, Omega + rates per century */
+const P=[
+ {id:"mercury",he:"כוכב חמה",el:[0.38709927,0.20563593,7.00497902,252.25032350,77.45779628,48.33076593],r:[0.00000037,0.00001906,-0.00594749,149472.67411175,0.16047689,-0.12534081],size:.55,col:0x9e9a95,yr:.241,
+  fact:"שנה על כוכב חמה נמשכת 88 ימים בלבד, אבל יום אחד מזריחה לזריחה נמשך 176 ימים של כדור הארץ."},
+ {id:"venus",he:"נוגה",el:[0.72333566,0.00677672,3.39467605,181.97909950,131.60246718,76.67984255],r:[0.00000390,-0.00004107,-0.00078890,58517.81538729,0.00268329,-0.27769418],size:.95,col:0xe8c483,yr:.615,
+  fact:"הכוכב החם ביותר במערכת השמש, כ־465°C, בגלל אפקט חממה קיצוני. הוא גם מסתובב סביב עצמו הפוך מרוב כוכבי הלכת."},
+ {id:"earth",he:"כדור הארץ",el:[1.00000261,0.01671123,-0.00001531,100.46457166,102.93768193,0],r:[0.00000562,-0.00004392,-0.01294668,35999.37244981,0.32327364,0],size:1,col:0x3b7fd6,yr:1,
+  fact:"אנחנו כאן! זה הכוכב היחיד שידוע לנו שיש בו חיים, ו־71% מהשטח שלו מכוסה מים."},
+ {id:"mars",he:"מאדים",el:[1.52371034,0.09339410,1.84969142,-4.55343205,-23.94362959,49.55953891],r:[0.00001847,0.00007882,-0.00813131,19140.30268499,0.44441088,-0.29257343],size:.75,col:0xc1502e,yr:1.881,
+  fact:"במאדים נמצא הר הגעש הגבוה במערכת השמש, אולימפוס מונס, שגבוה כמעט פי 2.5 מהאוורסט."},
+ {id:"jupiter",he:"צדק",el:[5.20288700,0.04838624,1.30439695,34.39644051,14.72847983,100.47390909],r:[-0.00011607,-0.00013253,-0.00183714,3034.74612775,0.21252668,0.20469106],size:2.5,col:0xd4a877,yr:11.86,bands:["#c9a27a","#e8d3b3","#a8724b","#f0e2c8","#b98a60"],
+  fact:"צדק גדול כל כך שכל שאר כוכבי הלכת יחד היו נכנסים בתוכו. הסערה הענקית שלו, הכתם האדום הגדול, רחבה יותר מכדור הארץ."},
+ {id:"saturn",he:"שבתאי",el:[9.53667594,0.05386179,2.48599187,49.95424423,92.59887831,113.66242448],r:[-0.00125060,-0.00050991,0.00193609,1222.49362201,-0.41897216,-0.28867794],size:2.1,col:0xe3cf9a,yr:29.46,bands:["#e8d7a8","#d6bf86","#f2e6c4","#c9ad73"],ring:true,
+  fact:"הצפיפות של שבתאי נמוכה מזו של מים. באמבטיה ענקית מספיק הוא היה צף!"},
+ {id:"uranus",he:"אורנוס",el:[19.18916464,0.04725744,0.77263783,313.23810451,170.95427630,74.01692503],r:[-0.00196176,-0.00004397,-0.00242939,428.48202785,0.40805281,0.04240589],size:1.55,col:0x9fd9e0,yr:84.01,
+  fact:"אורנוס מסתובב על הצד, עם ציר נטוי בכ־98°. לכן בכל קוטב יש בו 42 שנים של אור ואחריהן 42 שנים של חושך."},
+ {id:"neptune",he:"נפטון",el:[30.06992276,0.00859048,1.77004347,-55.12002969,44.96476227,131.78422574],r:[0.00026291,0.00005105,0.00035372,218.45945325,-0.32241464,-0.00508664],size:1.5,col:0x4a6fe3,yr:164.8,
+  fact:"בנפטון נושבות הרוחות המהירות ביותר במערכת השמש, מעל 2,000 קמ\"ש. מאז שהתגלה ב־1846 הוא השלים רק סיבוב אחד סביב השמש."}
+];
+
+function helio(p, jd, Moverride){
+  const T=(jd-2451545)/36525, E=p.el.map((v,i)=>v+p.r[i]*T);
+  const [a,e,I,L,wbar,Om]=E, w=(wbar-Om)*D2R, O=Om*D2R, inc=I*D2R;
+  let M=(Moverride!==undefined?Moverride:((L-wbar)%360+540)%360-180)*D2R;
+  let Ea=M+e*Math.sin(M); for(let k=0;k<8;k++) Ea=Ea-(Ea-e*Math.sin(Ea)-M)/(1-e*Math.cos(Ea));
+  const xp=a*(Math.cos(Ea)-e), yp=a*Math.sqrt(1-e*e)*Math.sin(Ea);
+  const cw=Math.cos(w),sw=Math.sin(w),cO=Math.cos(O),sO=Math.sin(O),cI=Math.cos(inc),sI=Math.sin(inc);
+  return {x:(cw*cO-sw*sO*cI)*xp+(-sw*cO-cw*sO*cI)*yp, y:(cw*sO+sw*cO*cI)*xp+(-sw*sO+cw*cO*cI)*yp, z:(sw*sI)*xp+(cw*sI)*yp};
+}
+const scaleR=r=>9+16*Math.sqrt(r);
+function toScene(v){ const r=Math.hypot(v.x,v.y,v.z)||1e-9, s=scaleR(r)/r; return new THREE.Vector3(v.x*s, v.z*s, -v.y*s); }
+const jdOf=ms=>ms/864e5+2440587.5;
+
+/* scene */
+const renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+$("stage").appendChild(renderer.domElement);
+const scene=new THREE.Scene(), camera=new THREE.PerspectiveCamera(50,1,.1,5000);
+function resize(){ renderer.setSize(innerWidth,innerHeight); camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); }
+addEventListener("resize",resize); resize();
+scene.add(new THREE.AmbientLight(0x334466,.55));
+const sunLight=new THREE.PointLight(0xfff2d6,2.2,0,0); scene.add(sunLight);
+
+function canvasTex(w,h,draw){ const c=document.createElement("canvas"); c.width=w; c.height=h; draw(c.getContext("2d"),w,h); const t=new THREE.CanvasTexture(c); return t; }
+/* stars */
+{ const g=new THREE.BufferGeometry(), n=4000, pos=new Float32Array(n*3);
+  for(let i=0;i<n;i++){ const r=900+Math.random()*900, th=Math.random()*6.283, ph=Math.acos(2*Math.random()-1); pos.set([r*Math.sin(ph)*Math.cos(th),r*Math.cos(ph),r*Math.sin(ph)*Math.sin(th)],i*3); }
+  g.setAttribute("position",new THREE.BufferAttribute(pos,3));
+  scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:0xffffff,size:1.6,sizeAttenuation:false,transparent:true,opacity:.8}))); }
+/* sun */
+const sun=new THREE.Mesh(new THREE.SphereGeometry(4.2,48,48),new THREE.MeshBasicMaterial({map:canvasTex(256,128,(c,w,h)=>{ c.fillStyle="#ffb52e"; c.fillRect(0,0,w,h); for(let i=0;i<900;i++){ c.fillStyle=`rgba(255,${200+Math.random()*55|0},${80+Math.random()*80|0},.35)`; c.beginPath(); c.arc(Math.random()*w,Math.random()*h,Math.random()*4+1,0,6.283); c.fill(); } })}));
+scene.add(sun);
+const glowTex=canvasTex(256,256,(c,w)=>{ const g=c.createRadialGradient(w/2,w/2,0,w/2,w/2,w/2); g.addColorStop(0,"rgba(255,220,140,1)"); g.addColorStop(.2,"rgba(255,180,60,.6)"); g.addColorStop(.5,"rgba(255,120,40,.15)"); g.addColorStop(1,"rgba(255,120,40,0)"); c.fillStyle=g; c.fillRect(0,0,w,w); });
+const glow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,blending:THREE.AdditiveBlending,depthWrite:false})); glow.scale.set(34,34,1); scene.add(glow);
+
+/* planets */
+const meshes=[], orbitLines=[], labelsEl=$("labels");
+P.forEach(p=>{
+  const tex=canvasTex(512,256,(c,w,h)=>{
+    const base="#"+p.col.toString(16).padStart(6,"0");
+    if(p.bands){ let y=0; while(y<h){ const bh=6+Math.random()*22; c.fillStyle=p.bands[Math.floor(Math.random()*p.bands.length)]; c.fillRect(0,y,w,bh); y+=bh; }
+      if(p.id==="jupiter"){ c.fillStyle="#b5523a"; c.beginPath(); c.ellipse(w*.62,h*.62,26,13,0,0,6.283); c.fill(); } }
+    else { c.fillStyle=base; c.fillRect(0,0,w,h);
+      for(let i=0;i<260;i++){ const tint=p.id==="earth"?(Math.random()<.55?"rgba(60,140,70,.55)":"rgba(240,240,255,.25)"):`rgba(${Math.random()<.5?0:255},${Math.random()<.5?0:255},${Math.random()<.5?0:255},.06)`;
+        c.fillStyle=tint; c.beginPath(); c.arc(Math.random()*w,Math.random()*h,Math.random()*(p.id==="earth"?26:14)+3,0,6.283); c.fill(); } }
+  });
+  const m=new THREE.Mesh(new THREE.SphereGeometry(p.size,40,40),new THREE.MeshStandardMaterial({map:tex,roughness:.9,metalness:0}));
+  m.userData.p=p; scene.add(m); meshes.push(m); p.mesh=m;
+  if(p.ring){ const rg=new THREE.RingGeometry(p.size*1.35,p.size*2.3,96);
+    const rt=canvasTex(256,8,(c,w,h)=>{ for(let x=0;x<w;x++){ c.fillStyle=`rgba(230,210,160,${.25+.55*Math.abs(Math.sin(x*.19))*(x>w*.55&&x<w*.6?.1:1)})`; c.fillRect(x,0,1,h);} });
+    const pos=rg.attributes.position, uv=rg.attributes.uv, v=new THREE.Vector3();
+    for(let i=0;i<pos.count;i++){ v.fromBufferAttribute(pos,i); uv.setXY(i,(v.length()-p.size*1.35)/(p.size*.95),.5); }
+    const ring=new THREE.Mesh(rg,new THREE.MeshBasicMaterial({map:rt,side:THREE.DoubleSide,transparent:true,depthWrite:false}));
+    ring.rotation.x=-Math.PI/2+.47; m.add(ring); }
+  // orbit line (current elements, sampled over mean anomaly)
+  const pts=[]; const jd=jdOf(Date.now());
+  for(let k=0;k<=240;k++) pts.push(toScene(helio(p,jd,-180+k*1.5)));
+  const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:p.id==="earth"?0x6fd3ff:0x8090c0,transparent:true,opacity:p.id==="earth"?.55:.28}));
+  scene.add(line); orbitLines.push(line);
+  const lab=document.createElement("div"); lab.className="label"; lab.textContent=p.he; labelsEl.appendChild(lab); p.label=lab;
+});
+const sunLabel=document.createElement("div"); sunLabel.className="label"; sunLabel.textContent="השמש"; labelsEl.appendChild(sunLabel);
+
+/* camera controls (drag / wheel / pinch) */
+const target=new THREE.Vector3(); let theta=.9, phi=1.05, radius=150, tRadius=110, follow=null;
+function placeCam(){ camera.position.set(target.x+radius*Math.sin(phi)*Math.cos(theta), target.y+radius*Math.cos(phi), target.z+radius*Math.sin(phi)*Math.sin(theta)); camera.lookAt(target); }
+const el=renderer.domElement, ptrs=new Map(); let downAt=null, pinch0=0;
+el.addEventListener("pointerdown",e=>{ el.setPointerCapture(e.pointerId); ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY}); downAt={x:e.clientX,y:e.clientY,t:performance.now()};
+  if(ptrs.size===2){ const [a,b]=[...ptrs.values()]; pinch0=Math.hypot(a.x-b.x,a.y-b.y); } });
+el.addEventListener("pointermove",e=>{ if(!ptrs.has(e.pointerId)) return; const prev=ptrs.get(e.pointerId); ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(ptrs.size===1){ theta+=(e.clientX-prev.x)*.006; phi=Math.min(Math.PI-.08,Math.max(.08,phi-(e.clientY-prev.y)*.006)); }
+  else if(ptrs.size===2){ const [a,b]=[...ptrs.values()], d=Math.hypot(a.x-b.x,a.y-b.y); if(pinch0){ tRadius=Math.min(600,Math.max(8,tRadius*pinch0/d)); } pinch0=d; } });
+const up=e=>{ ptrs.delete(e.pointerId); if(ptrs.size<2) pinch0=0;
+  if(downAt && Math.hypot(e.clientX-downAt.x,e.clientY-downAt.y)<6 && performance.now()-downAt.t<400) pick(e.clientX,e.clientY); downAt=null; };
+el.addEventListener("pointerup",up); el.addEventListener("pointercancel",e=>{ ptrs.delete(e.pointerId); downAt=null; });
+el.addEventListener("wheel",e=>{ e.preventDefault(); tRadius=Math.min(600,Math.max(8,tRadius*Math.exp(e.deltaY*.001))); },{passive:false});
+
+/* picking + info */
+const ray=new THREE.Raycaster(), ndc=new THREE.Vector2(); let selected=null;
+function pick(x,y){
+  ndc.set(x/innerWidth*2-1,-(y/innerHeight)*2+1); ray.setFromCamera(ndc,camera);
+  const hit=ray.intersectObjects(meshes,false)[0];
+  let p=hit?hit.object.userData.p:null;
+  if(!p){ // generous screen-space pick
+    let best=null,bd=28; P.forEach(q=>{ const v=q.mesh.position.clone().project(camera); const sx=(v.x+1)/2*innerWidth, sy=(1-v.y)/2*innerHeight; const d=Math.hypot(sx-x,sy-y); if(v.z<1&&d<bd){bd=d;best=q;} }); p=best; }
+  select(p);
+}
+function select(p){ selected=p; P.forEach(q=>q.label.classList.toggle("sel",q===p)); $("info").classList.toggle("hide",!p); if(!p){ follow=null; $("follow").textContent="🎥 לעקוב במצלמה"; } updateInfo(); }
+$("closeInfo").addEventListener("click",()=>select(null));
+$("follow").addEventListener("click",()=>{ follow=follow?null:selected; $("follow").textContent=follow?"🎥 הפסקת מעקב":"🎥 לעקוב במצלמה"; if(follow) tRadius=Math.max(14,selected.size*9); else tRadius=110; });
+const fmtN=(n,d=0)=>n.toLocaleString("he-IL",{maximumFractionDigits:d,minimumFractionDigits:d});
+function updateInfo(){
+  if(!selected) return; const p=selected, jd=jdOf(simMs);
+  const h=helio(p,jd), e=helio(P[2],jd), rs=Math.hypot(h.x,h.y,h.z);
+  $("iName").textContent=p.he; $("iFact").textContent=p.fact;
+  $("iSun").textContent=`${fmtN(rs,3)} AU · ${fmtN(rs*AU_KM/1e6)}M km`;
+  if(p.id==="earth"){ $("iEarth").textContent="—"; $("iLight").textContent="8.3 min מהשמש"; }
+  else { const de=Math.hypot(h.x-e.x,h.y-e.y,h.z-e.z), km=de*AU_KM, sec=km/299792.458;
+    $("iEarth").textContent=`${fmtN(km/1e6)}M km`;
+    $("iLight").textContent= sec<3600?`${fmtN(sec/60,1)} min`:`${fmtN(sec/3600,2)} h`; }
+  $("iYear").textContent= p.yr<2?`${fmtN(p.yr*365.25)} ימים`:`${fmtN(p.yr,1)} שנים`;
+}
+
+/* time */
+let simMs=Date.now(), speed=86400, dir=1, playing=true, last=performance.now();
+$("speed").addEventListener("change",e=>{ speed=+e.target.value; });
+$("play").addEventListener("click",()=>{ playing=!playing; $("play").textContent=playing?"⏸":"▶"; });
+$("rev").addEventListener("click",()=>{ dir*=-1; $("rev").textContent=dir>0?"⏪":"⏩"; $("rev").title=dir>0?"אחורה":"קדימה"; });
+$("today").addEventListener("click",()=>{ simMs=Date.now(); speed=1; $("speed").value="1"; dir=1; $("rev").textContent="⏪"; });
+$("jump").addEventListener("change",e=>{ if(!e.target.value) return; const [y,m,d]=e.target.value.split("-").map(Number); simMs=new Date(y,m-1,d,12).getTime(); });
+$("orbits").addEventListener("click",()=>{ const on=!$("orbits").classList.contains("on"); $("orbits").classList.toggle("on",on); orbitLines.forEach(l=>l.visible=on); });
+$("names").addEventListener("click",()=>{ const on=!$("names").classList.contains("on"); $("names").classList.toggle("on",on); labelsEl.style.display=on?"":"none"; });
+const MIN=Date.UTC(1800,0,1), MAX=Date.UTC(2050,11,31);
+let lastInfo=0;
+function frame(now){
+  const dt=Math.min(.1,(now-last)/1000); last=now;
+  if(playing){ simMs+=dt*1000*speed*dir; if(simMs<MIN) simMs=MIN; if(simMs>MAX) simMs=MAX; }
+  const jd=jdOf(simMs);
+  P.forEach(p=>{ p.mesh.position.copy(toScene(helio(p,jd))); p.mesh.rotation.y+=dt*(p.id==="venus"?-.2:1.2)*(playing?1:.2); });
+  sun.rotation.y+=dt*.05; glow.scale.setScalar(33+Math.sin(now*.002)*1.5);
+  // camera
+  radius+=(tRadius-radius)*.08;
+  const want=follow?follow.mesh.position:new THREE.Vector3(); target.lerp(want,.08); placeCam();
+  // labels
+  const lab=(obj,elx,off)=>{ const v=obj.clone().project(camera); if(v.z>1||Math.abs(v.x)>1.2||Math.abs(v.y)>1.2){ elx.style.display="none"; return; } elx.style.display=""; elx.style.left=((v.x+1)/2*innerWidth)+"px"; elx.style.top=((1-v.y)/2*innerHeight-off)+"px"; };
+  P.forEach(p=>lab(p.mesh.position,p.label,p.size*2)); lab(new THREE.Vector3(),sunLabel,10);
+  const d=new Date(simMs);
+  $("date").textContent=d.toLocaleString("he-IL",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+  if(now-lastInfo>250){ lastInfo=now; try{ $("hebdate").textContent=new Intl.DateTimeFormat("he-IL-u-ca-hebrew",{day:"numeric",month:"long",year:"numeric"}).format(d); }catch(e){} updateInfo(); }
+  renderer.render(scene,camera); requestAnimationFrame(frame);
+}
+placeCam(); requestAnimationFrame(frame);
+setTimeout(()=>select(P[2]),600);
+})();
+</script>
+</body>
+</html>
