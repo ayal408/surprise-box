@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מס לעצמאי</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#7ee0b0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🧾 מחשבון מס לעצמאי (שנתי)</h1>
+<p class="sub">מההכנסה החייבת לנטו: מס הכנסה לפי מדרגות, נקודות זיכוי, ביטוח לאומי ומס בריאות לעצמאי, והטבות מס על פנסיה וקרן השתלמות. כולל מקדמות חודשיות מומלצות.</p>
+<div class="grid2">
+  <div class="panel">
+    <label>הכנסה חייבת שנתית מעסק (₪, אחרי הוצאות)<input id="inc" type="number" value="240000" step="1000"></label>
+    <div class="row" style="margin-top:8px"><label style="flex:1">נקודות זיכוי<input id="pts" type="number" value="2.25" step="0.25"></label><label style="flex:1">הכנסה ממשכורת במקביל (₪ לשנה)<input id="sal" type="number" value="0"></label></div>
+    <div class="row" style="margin-top:8px"><label style="flex:1">הפקדה לפנסיה בשנה (₪)<input id="pen" type="number" value="26000"></label><label style="flex:1">הפקדה לקרן השתלמות (₪)<input id="kh" type="number" value="10800"></label></div>
+    <div class="row" style="margin-top:8px"><button id="optP">פנסיה חובה מינימלית</button><button id="maxP">פנסיה מיטבית</button><button id="maxK">השתלמות מרבית</button></div>
+  </div>
+  <div class="panel">
+    <div class="stats">
+      <div class="stat"><small>נטו לשנה</small><b id="net"></b></div>
+      <div class="stat"><small>נטו לחודש</small><b id="netm"></b></div>
+      <div class="stat"><small>מס שולי</small><b id="marg"></b></div>
+      <div class="stat"><small>נטל כולל</small><b id="eff"></b></div>
+    </div>
+    <table style="margin-top:12px"><tbody id="t"></tbody></table>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel"><h2>📅 מקדמות חודשיות מומלצות</h2><table><tbody id="adv"></tbody></table><p class="hint" style="margin-top:6px">בפועל, שיעור המקדמות נקבע על ידי פקיד השומה לפי הדוח האחרון, וביטוח לאומי קובע מקדמות לפי ההכנסה המוצהרת. אם ההכנסה השתנתה, כדאי לעדכן.</p></div>
+  <div class="panel"><h2>💡 חיסכון במס מהפקדות</h2><table><tbody id="ben"></tbody></table></div>
+</div>
+<p class="hint">מבוסס על מדרגות המס, ערך נקודת זיכוי (2,904 ₪ בשנה) ותקרות ביטוח לאומי שהוקפאו לשנים 2025–2027. ביטוח לאומי לעצמאי: 5.97% עד 7,522 ₪ לחודש ו־17.83% מעל, עד התקרה. 52% מדמי הביטוח הלאומי (בלי מס בריאות) מותרים בניכוי. פנסיה: ניכוי עד 11% וזיכוי של 35% עד 5.5% מההכנסה המזכה. השתלמות: ניכוי עד 4.5% מההכנסה עד התקרה. זו הערכה בלבד ולא ייעוץ מס.</p>
+<script>
+const $=id=>document.getElementById(id);
+const BR=[[84120,.10],[120720,.14],[193800,.20],[269280,.31],[560280,.35],[721560,.47],[Infinity,.50]];
+const PT=2904,LOW=7522*12,MAX=50695*12,AVG=13316*12,QCAP=232800,KHCAP=293397;
+const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');
+function tax(ti){let p=0,t=0,m=0;for(const[top,r]of BR){const part=Math.max(0,Math.min(ti,top)-p);if(part>0){t+=part*r;m=r}p=top}return[t,m]}
+function blSelf(y){const b=Math.min(Math.max(0,y),MAX),lo=Math.min(b,LOW),hi=Math.max(0,b-LOW);return{bl:lo*.0287+hi*.1283,health:lo*.031+hi*.05}}
+function calc(){const inc=+$('inc').value||0,sal=+$('sal').value||0,pen=+$('pen').value||0,kh=+$('kh').value||0,pts=+$('pts').value||0;
+  const Q=Math.min(inc,QCAP),penDed=Math.min(pen,Q*.11),penCr=Math.min(pen-penDed,Q*.055)*.35;
+  const khDed=Math.min(kh,Math.min(inc,KHCAP)*.045);
+  const {bl,health}=blSelf(inc-penDed-khDed),blDed=bl*.52;
+  const ti=Math.max(0,inc+sal-penDed-khDed-blDed);const[t0,m]=tax(ti);const it=Math.max(0,t0-pts*PT-penCr);
+  const net=inc+sal-it-bl-health-pen-kh;
+  $('net').textContent=f(net);$('netm').textContent=f(net/12);$('marg').textContent=Math.round(m*100)+'%';$('eff').textContent=inc?((it+bl+health)/(inc+sal)*100).toFixed(1)+'%':'—';
+  $('t').innerHTML=[['הכנסה מעסק',inc],['משכורת',sal],['ניכוי פנסיה',-penDed],['ניכוי השתלמות',-khDed],['ניכוי 52% מביטוח לאומי',-blDed],['הכנסה חייבת',ti],['מס לפני זיכויים',t0],['נקודות זיכוי',-pts*PT],['זיכוי פנסיה (35%)',-penCr],['מס הכנסה לתשלום',it],['ביטוח לאומי',bl],['מס בריאות',health],['הפקדות (פנסיה + השתלמות)',pen+kh]].filter(r=>r[1]).map(([a,b])=>`<tr><td>${a}</td><td class="num">${f(b)}</td></tr>`).join('')+`<tr><td><b>נטו בכיס</b></td><td class="num"><b>${f(net)}</b></td></tr>`;
+  $('adv').innerHTML=[['מס הכנסה',it/12],['ביטוח לאומי + בריאות',(bl+health)/12],['סה״כ לחודש',(it+bl+health)/12]].map(([a,b])=>`<tr><td>${a}</td><td class="num">${f(b)}</td></tr>`).join('')+`<tr><td>שיעור מקדמה מהמחזור</td><td class="num">${inc?(it/inc*100).toFixed(1)+'%':'—'}</td></tr>`;
+  const[tNo]=tax(Math.max(0,inc+sal-blSelf(inc).bl*.52));const itNo=Math.max(0,tNo-pts*PT),{bl:b2,health:h2}=blSelf(inc);const saved=(itNo+b2+h2)-(it+bl+health);
+  $('ben').innerHTML=[['מס + ביטוח לאומי בלי הפקדות',itNo+b2+h2],['עם ההפקדות',it+bl+health],['חיסכון במס',saved],['כל 100 ₪ שהופקדו עלו לך בפועל',pen+kh?100*(1-saved/(pen+kh)):0]].map(([a,b],i)=>`<tr><td>${a}</td><td class="num">${i===3?Math.round(b)+' ₪':f(b)}</td></tr>`).join('');
+  try{localStorage.setItem('selfemp',JSON.stringify(['inc','pts','sal','pen','kh'].map(k=>$(k).value)))}catch{}}
+try{const s=JSON.parse(localStorage.getItem('selfemp'));if(s)['inc','pts','sal','pen','kh'].forEach((k,i)=>$(k).value=s[i])}catch{}
+document.querySelectorAll('input').forEach(i=>i.oninput=calc);
+$('optP').onclick=()=>{const i=+$('inc').value||0,half=AVG/2;$('pen').value=Math.round(Math.min(i,half)*.0445+Math.max(0,Math.min(i,AVG)-half)*.1255);calc()};
+$('maxP').onclick=()=>{const Q=Math.min(+$('inc').value||0,QCAP);$('pen').value=Math.round(Q*.165);calc()};
+$('maxK').onclick=()=>{$('kh').value=Math.round(Math.min(+$('inc').value||0,KHCAP)*.045);calc()};
+calc();
+</script>
+</div>
+</body>
+</html>

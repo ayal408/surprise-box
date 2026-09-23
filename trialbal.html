@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מאזן בוחן ודוחות</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#9bd1ff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+textarea{width:100%;min-height:180px;font-family:Consolas,monospace;font-size:.88rem}
+.acc{display:grid;grid-template-columns:70px 1fr 110px 170px;gap:6px;align-items:center;padding:3px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.acc select{padding:3px 6px;font-size:.82rem}
+.rep td:first-child{padding-inline-start:18px}
+.rep tr.h td{font-weight:800;padding-inline-start:4px;color:var(--acc)}
+.rep tr.t td{font-weight:800;border-top:2px solid var(--line)}
+.ok{color:#90e0a0}.bad{color:#ff8fab}
+@media(max-width:640px){.acc{grid-template-columns:1fr 100px}.acc span:first-child{display:none}.acc select{grid-column:1/-1}}
+@media print{body{background:#fff;color:#000}.noprint,.back,.sub{display:none}.panel{border-color:#999}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>📑 ממאזן בוחן לדוחות כספיים</h1>
+<p class="sub">מדביקים מאזן בוחן מהנהלת החשבונות או מאקסל, והכלי בודק שהחובה שווה לזכות, מסווג את החשבונות ובונה דוח רווח והפסד, מאזן מקוצר ויחסים פיננסיים.</p>
+<div class="panel noprint">
+  <h2>1. הדבקת מאזן בוחן</h2>
+  <textarea id="src" placeholder="מפתח חשבון, שם, חובה, זכות  (או: מפתח, שם, יתרה)"></textarea>
+  <div class="row" style="margin-top:8px"><button class="pri" id="go">ניתוח</button><button id="demo">נתוני דוגמה</button><span class="muted" style="font-size:.85rem">בעמודת יתרה אחת: חובה בחיובי, זכות בשלילי</span></div>
+  <p class="hint" style="margin-top:6px">עובד עם העתקה מאקסל (טאבים), CSV או רווחים. הסיווג האוטומטי לפי שם החשבון ומספרו, ואפשר לתקן אותו בכל שורה.</p>
+</div>
+<div class="stats" id="chk"></div>
+<div class="panel noprint"><h2>2. סיווג החשבונות</h2><div id="accs" style="max-height:340px;overflow:auto"></div></div>
+<div class="grid2">
+  <div class="panel"><h2>📈 דוח רווח והפסד</h2><table class="rep"><tbody id="pl"></tbody></table></div>
+  <div class="panel"><h2>⚖️ מאזן מקוצר</h2><table class="rep"><tbody id="bs"></tbody></table></div>
+</div>
+<div class="panel"><h2>🔍 יחסים פיננסיים</h2><table><tbody id="ratios"></tbody></table></div>
+<div class="row noprint"><button onclick="print()">🖨️ הדפסת הדוחות</button><button id="csv">⬇ CSV מסווג</button></div>
+<script>
+const $=id=>document.getElementById(id);const f=v=>{const r=Math.round(v);return(r<0?'(':'')+Math.abs(r).toLocaleString('he-IL')+(r<0?')':'')};
+const CAT={rev:'הכנסות',cogs:'עלות המכירות',sell:'הוצאות מכירה ושיווק',ga:'הוצאות הנהלה וכלליות',fin:'הוצאות (הכנסות) מימון',ca:'רכוש שוטף',fa:'רכוש קבוע',cl:'התחייבויות שוטפות',ll:'התחייבויות לזמן ארוך',eq:'הון עצמי'};
+const KW=[['rev',/הכנס|מכיר|פדיון|שירותים ל/],['cogs',/עלות המכ|קניות|חומרי גלם|מלאי פתיחה|קבלני משנה/],['fin',/מימון|ריבית|עמלות בנק|הפרשי שער/],['sell',/פרסום|שיווק|עמלות מכירה|הובלה/],['fa',/רכוש קבוע|ציוד|ריהוט|מחשבים|רכב|מבנה|פחת נצבר|שיפורים במושכר/],['ll',/הלווא|משכנתא|התחייבות לזמן ארוך/],['ca',/קופה|בנק|לקוחות|חייבים|מלאי|הוצאות מראש|מע.?מ תשומות|מקדמות מס|שיקים לגבייה|פקדון/],['cl',/ספקים|זכאים|מע.?מ עסקאות|מוסדות|ביטוח לאומי לשלם|מס הכנסה לשלם|שכר לשלם|הוצאות לשלם|אשראי לזמן קצר|משיכת יתר|מע.?מ לשלם/],['ll',/הלווא|משכנתא|התחייבות לזמן ארוך|הלוואת בעלים/],['eq',/הון|עודפים|משיכות|רווח.*צבור|יתרת פתיחה/],['ga',/שכר|שכירות|חשמל|טלפון|משרד|ביטוח|הנהלת חשבונות|רואה חשבון|אחזקה|דלק|פחת|כיבוד|תקשורת|מים|ארנונה|נסיעות|אגרות/]];
+function guess(code,name){for(const[c,re]of KW)if(re.test(name))return c;const n=+code;if(n){if(n<200)return'ca';if(n<300)return'fa';if(n<400)return'cl';if(n<500)return'll';if(n<600)return'eq';if(n<700)return'rev';if(n<800)return'cogs';if(n<900)return'ga';return'fin'}return'ga'}
+const num=s=>{s=String(s).trim();if(!/^[(-]?[\d,]+(\.\d+)?\)?-?$/.test(s))return null;const neg=/^\(|-/.test(s);return+s.replace(/[^\d.]/g,'')*(neg?-1:1)};
+let A=[];
+const cell=s=>s===''?0:num(s);
+function parse(){A=$('src').value.split('\n').filter(l=>l.trim()).map(l=>{let t=l.includes('\t')?l.split('\t').map(s=>s.trim()):l.trim().split(/,(?=\S)|\s{2,}/).map(s=>s.trim());let bal=null;
+  if(t.length>=4&&cell(t[t.length-1])!==null&&cell(t[t.length-2])!==null&&t.slice(0,-2).some(Boolean)){const cr=cell(t.pop()),dr=cell(t.pop());bal=dr-cr}
+  t=t.filter(Boolean);if(t.length<2&&bal===null)t=l.trim().split(/\s+/);
+  const nums=[];if(bal===null)while(t.length&&num(t[t.length-1])!==null)nums.unshift(num(t.pop()));let code='';if(t.length&&/^\d+$/.test(t[0]))code=t.shift();const name=t.join(' ');
+  if(bal===null){if(!nums.length)return null;bal=nums.length>=2?nums[nums.length-2]-nums[nums.length-1]:nums[0]}if(!name)return null;return{code,name,bal,cat:guess(code,name)}}).filter(Boolean);ui();report()}
+function ui(){$('accs').innerHTML=A.map((a,i)=>`<div class="acc"><span class="muted">${a.code}</span><span>${a.name.replace(/</g,'&lt;')}</span><span class="num">${f(a.bal)}</span><select data-i="${i}">${Object.entries(CAT).map(([k,v])=>`<option value="${k}" ${k===a.cat?'selected':''}>${v}</option>`).join('')}</select></div>`).join('')}
+function report(){const S={};Object.keys(CAT).forEach(k=>S[k]=0);A.forEach(a=>S[a.cat]+=a.bal);
+  const dr=A.filter(a=>a.bal>0).reduce((s,a)=>s+a.bal,0),cr=-A.filter(a=>a.bal<0).reduce((s,a)=>s+a.bal,0),diff=dr-cr;
+  $('chk').innerHTML=[['חשבונות',A.length],['סה״כ חובה',f(dr)],['סה״כ זכות',f(cr)],['הפרש',`<span class="${Math.abs(diff)<1?'ok':'bad'}">${Math.abs(diff)<1?'✔ מאוזן':f(diff)}</span>`]].map(([a,b])=>`<div class="stat"><small>${a}</small><b style="font-size:1.1rem">${b}</b></div>`).join('');
+  const rev=-S.rev,cogs=S.cogs,gp=rev-cogs,op=gp-S.sell-S.ga,np=op-S.fin;
+  const L=(rows)=>rows.map(r=>r[0]==='h'?`<tr class="h"><td colspan="2">${r[1]}</td></tr>`:r[0]==='t'?`<tr class="t"><td>${r[1]}</td><td class="num">${f(r[2])}</td></tr>`:`<tr><td>${r[0]}</td><td class="num">${f(r[1])}</td></tr>`).join('');
+  $('pl').innerHTML=L([['הכנסות',rev],['עלות המכירות',-cogs],['t','רווח גולמי',gp],['הוצאות מכירה ושיווק',-S.sell],['הוצאות הנהלה וכלליות',-S.ga],['t','רווח תפעולי',op],['מימון',-S.fin],['t','רווח (הפסד) לפני מס',np]]);
+  const ca=S.ca,fa=S.fa,ta=ca+fa,cl=-S.cl,ll=-S.ll,eq=-S.eq+np;
+  $('bs').innerHTML=L([['h','נכסים'],['רכוש שוטף',ca],['רכוש קבוע, נטו',fa],['t','סה״כ נכסים',ta],['h','התחייבויות והון'],['התחייבויות שוטפות',cl],['התחייבויות לזמן ארוך',ll],['הון עצמי (כולל רווח השנה)',eq],['t','סה״כ התחייבויות והון',cl+ll+eq]]);
+  const inv=A.filter(a=>a.cat==='ca'&&/מלאי/.test(a.name)).reduce((s,a)=>s+a.bal,0),cash=A.filter(a=>a.cat==='ca'&&/קופה|בנק|פקדון/.test(a.name)).reduce((s,a)=>s+a.bal,0),ar=A.filter(a=>a.cat==='ca'&&/לקוחות|חייבים|שיקים/.test(a.name)).reduce((s,a)=>s+a.bal,0);
+  const R=(n,v,fmt,good,hint)=>`<tr><td>${n}<div class="muted" style="font-size:.78rem">${hint}</div></td><td class="num ${isFinite(v)?(good(v)?'ok':'bad'):''}">${isFinite(v)?fmt(v):'—'}</td></tr>`;const pc=v=>(v*100).toFixed(1)+'%',x2=v=>v.toFixed(2);
+  $('ratios').innerHTML=R('יחס שוטף',ca/cl,x2,v=>v>=1.2,'רכוש שוטף חלקי התחייבויות שוטפות. מעל 1.2 נחשב נוח')+R('יחס מהיר',(ca-inv)/cl,x2,v=>v>=1,'בלי מלאי. מעל 1 נחשב טוב')+R('יחס מזומנים',cash/cl,x2,v=>v>=.3,'מזומן ופיקדונות חלקי התחייבויות שוטפות')+
+    R('שיעור רווח גולמי',gp/rev,pc,v=>v>.25,'רווח גולמי חלקי הכנסות')+R('שיעור רווח נקי',np/rev,pc,v=>v>.05,'רווח לפני מס חלקי הכנסות')+R('תשואה להון (ROE)',np/eq,pc,v=>v>.1,'רווח חלקי הון עצמי')+
+    R('מינוף (התחייבויות להון)',(cl+ll)/eq,x2,v=>v<2,'כמה חוב יש על כל שקל הון. מתחת ל־2 נחשב סביר')+R('ימי לקוחות (DSO)',ar/(rev*1.18)*365,v=>Math.round(v)+' ימים',v=>v<75,'כמה ימים בממוצע לוקח לגבות, כולל מע״מ')}
+$('accs').onchange=e=>{const i=e.target.dataset.i;if(i!==undefined){A[i].cat=e.target.value;report()}};
+$('go').onclick=parse;
+$('demo').onclick=()=>{$('src').value=`100\tקופה\t2,350\t\n101\tבנק לאומי\t48,200\t\n120\tלקוחות\t86,400\t\n130\tמלאי\t32,000\t\n140\tמע"מ תשומות\t9,100\t\n200\tציוד ומחשבים\t64,000\t\n201\tפחת נצבר ציוד\t\t22,000\n300\tספקים\t\t41,300\n310\tמע"מ עסקאות\t\t18,700\n320\tמוסדות\t\t7,900\n400\tהלוואה מבנק\t\t55,000\n500\tהון בעלים\t\t30,000\n600\tהכנסות ממכירות\t\t412,000\n700\tקניות\t168,000\t\n800\tשכר עבודה\t96,000\t\n810\tשכירות\t42,000\t\n820\tהנהלת חשבונות\t12,000\t\n830\tפרסום\t14,500\t\n840\tפחת\t8,000\t\n900\tעמלות בנק וריבית\t4,350\t`;parse()};
+$('csv').onclick=()=>{const c='﻿מפתח,שם,יתרה,סיווג\n'+A.map(a=>[a.code,'"'+a.name.replace(/"/g,'""')+'"',a.bal,CAT[a.cat]].join(',')).join('\n');const l=document.createElement('a');l.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));l.download='מאזן-בוחן-מסווג.csv';l.click()};
+$('demo').click();
+</script>
+</div>
+</body>
+</html>

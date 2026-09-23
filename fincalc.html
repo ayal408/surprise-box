@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחשבון פיננסי</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#5fc1cf}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+textarea{width:100%;min-height:120px;font-family:Consolas,monospace;direction:ltr;text-align:left}.big{font-size:1.8rem;font-weight:800;color:var(--acc);text-align:center;margin:8px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🧮 מחשבון פיננסי</h1>
+<p class="sub">הפונקציות הפיננסיות של אקסל בלי אקסל: ערך נוכחי נקי (NPV), שיעור תשואה פנימי (IRR), תשלום תקופתי (PMT), ערך עתידי ונוכחי, ותקופת החזר.</p>
+<div class="panel row" id="tabs"><button class="on" data-p="npv">NPV / IRR</button><button data-p="pmt">תשלום (PMT)</button><button data-p="tvm">ערך עתידי / נוכחי</button><button data-p="rate">ריבית אפקטיבית</button></div>
+<div class="panel pane" id="npv">
+  <div class="grid2">
+    <div><label>תזרימים (שורה לכל תקופה, השקעה בשלילי)</label><textarea id="cf">-100000
+25000
+30000
+35000
+40000
+20000</textarea>
+      <label style="margin-top:8px">שיעור היוון לתקופה (%)<input id="dr" type="number" value="8" step="0.25"></label></div>
+    <div><div class="stats"><div class="stat"><small>NPV</small><b id="npvr"></b></div><div class="stat"><small>IRR</small><b id="irrr"></b></div><div class="stat"><small>תקופת החזר</small><b id="pb"></b></div><div class="stat"><small>מדד רווחיות</small><b id="pi"></b></div></div>
+      <table style="margin-top:10px"><thead><tr><th>תקופה</th><th class="num">תזרים</th><th class="num">ערך מהוון</th><th class="num">מצטבר</th></tr></thead><tbody id="cft"></tbody></table></div>
+  </div>
+</div>
+<div class="panel pane" id="pmt" style="display:none">
+  <div class="grid2"><div>
+    <label>סכום (₪)<input id="pv" type="number" value="200000"></label>
+    <label style="margin-top:8px">ריבית שנתית (%)<input id="pr" type="number" value="6" step="0.1"></label>
+    <label style="margin-top:8px">מספר חודשים<input id="pn" type="number" value="60"></label>
+    <label style="margin-top:8px">ערך שיורי / בלון בסוף (₪)<input id="pf" type="number" value="0"></label>
+  </div><div><div class="big" id="pmtr"></div><table><tbody id="pmtt"></tbody></table></div></div>
+</div>
+<div class="panel pane" id="tvm" style="display:none">
+  <div class="grid2"><div>
+    <label>סכום היום (PV)<input id="tpv" type="number" value="50000"></label>
+    <label style="margin-top:8px">הפקדה חודשית (PMT)<input id="tpm" type="number" value="1000"></label>
+    <label style="margin-top:8px">ריבית שנתית (%)<input id="tr" type="number" value="5" step="0.1"></label>
+    <label style="margin-top:8px">שנים<input id="ty" type="number" value="10"></label>
+  </div><div><div class="stats"><div class="stat"><small>ערך עתידי (FV)</small><b id="fvr"></b></div><div class="stat"><small>סך הפקדות</small><b id="dep"></b></div><div class="stat"><small>ערך נוכחי של יעד</small><b id="pvr"></b></div></div>
+    <label style="margin-top:10px">יעד עתידי (₪) לחישוב ערך נוכחי<input id="tg" type="number" value="1000000"></label></div></div>
+</div>
+<div class="panel pane" id="rate" style="display:none">
+  <div class="grid2"><div>
+    <label>ריבית שנתית נומינלית (%)<input id="rn" type="number" value="6" step="0.1"></label>
+    <label style="margin-top:8px">מספר חישובים בשנה<select id="rc"><option value="1">שנתי</option><option value="4">רבעוני</option><option value="12" selected>חודשי</option><option value="365">יומי</option></select></label>
+    <label style="margin-top:8px">אינפלציה (%)<input id="ri" type="number" value="2.5" step="0.1"></label>
+  </div><div><div class="stats"><div class="stat"><small>ריבית אפקטיבית</small><b id="re"></b></div><div class="stat"><small>ריבית ריאלית</small><b id="rr"></b></div><div class="stat"><small>כלל 72: הכפלת כסף</small><b id="r72"></b></div></div></div></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');const p=v=>(v*100).toFixed(2)+'%';
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.pane').forEach(x=>x.style.display=x.id===b.dataset.p?'':'none')});
+const npv=(r,c)=>c.reduce((s,v,t)=>s+v/Math.pow(1+r,t),0);
+function irr(c){let lo=-.99,hi=10;if(npv(lo,c)*npv(hi,c)>0)return NaN;for(let i=0;i<200;i++){const m=(lo+hi)/2;npv(m,c)>0===npv(lo,c)>0?lo=m:hi=m}return(lo+hi)/2}
+function c1(){const c=$('cf').value.split(/[\n;]+/).map(s=>s.replace(/[^\d.-]/g,'')).filter(Boolean).map(Number).filter(v=>!isNaN(v)),r=(+$('dr').value||0)/100;const n=npv(r,c),i=irr(c);
+  $('npvr').textContent=f(n);$('npvr').style.color=n>=0?'#90e0a0':'#ff8fab';$('irrr').textContent=isNaN(i)?'—':p(i);
+  let acc=0,pb=null;const rows=c.map((v,t)=>{const dv=v/Math.pow(1+r,t),prev=acc;acc+=dv;if(pb===null&&prev<0&&acc>=0)pb=t-1+(-prev/dv);return`<tr><td>${t}</td><td class="num">${f(v)}</td><td class="num">${f(dv)}</td><td class="num" style="color:${acc>=0?'#90e0a0':'#ff8fab'}">${f(acc)}</td></tr>`});
+  $('cft').innerHTML=rows.join('');$('pb').textContent=pb===null?'לא מוחזר':pb.toFixed(1)+' תק׳';const inv=-c.filter(v=>v<0).reduce((s,v,t)=>s+v,0);$('pi').textContent=inv?((n+inv)/inv).toFixed(2):'—'}
+function c2(){const P=+$('pv').value||0,r=(+$('pr').value||0)/1200,n=+$('pn').value||1,F=+$('pf').value||0;const m=r?(P-F/Math.pow(1+r,n))*r/(1-Math.pow(1+r,-n)):(P-F)/n;
+  $('pmtr').textContent=f(m)+' לחודש';$('pmtt').innerHTML=[['סך התשלומים',m*n+F],['סך הריבית',m*n+F-P],['ריבית אפקטיבית שנתית',null]].map(([a,b])=>`<tr><td>${a}</td><td class="num">${b===null?p(Math.pow(1+r,12)-1):f(b)}</td></tr>`).join('')}
+function c3(){const PV=+$('tpv').value||0,PM=+$('tpm').value||0,r=(+$('tr').value||0)/1200,n=(+$('ty').value||0)*12;const g=Math.pow(1+r,n);const FV=PV*g+(r?PM*(g-1)/r:PM*n);
+  $('fvr').textContent=f(FV);$('dep').textContent=f(PV+PM*n);$('pvr').textContent=f((+$('tg').value||0)/g)}
+function c4(){const n=(+$('rn').value||0)/100,k=+$('rc').value,i=(+$('ri').value||0)/100,e=Math.pow(1+n/k,k)-1;$('re').textContent=p(e);$('rr').textContent=p((1+e)/(1+i)-1);$('r72').textContent=e>0?(Math.log(2)/Math.log(1+e)).toFixed(1)+' שנים':'—'}
+['cf','dr'].forEach(k=>$(k).oninput=c1);['pv','pr','pn','pf'].forEach(k=>$(k).oninput=c2);['tpv','tpm','tr','ty','tg'].forEach(k=>$(k).oninput=c3);['rn','rc','ri'].forEach(k=>$(k).oninput=c4);
+c1();c2();c3();c4();
+</script>
+</div>
+</body>
+</html>

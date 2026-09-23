@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>תזרים מזומנים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#58d68d}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+canvas{width:100%;height:260px;display:block}
+.it{display:grid;grid-template-columns:1fr 110px 120px 90px 60px 34px;gap:6px;margin-bottom:6px;align-items:center}
+.neg{color:#ff8fab;font-weight:700}
+@media(max-width:640px){.it{grid-template-columns:1fr 90px 1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>💧 תחזית תזרים מזומנים</h1>
+<p class="sub">תחזית ל־12 חודשים: יתרת פתיחה, הכנסות והוצאות קבועות, תשלומים חד־פעמיים ותשלומי מע״מ. רואים מראש באיזה חודש החשבון עלול להיכנס למינוס.</p>
+<div class="panel row">
+  <label>יתרת פתיחה (₪)<input id="ob" type="number" value="45000"></label>
+  <label>חודש התחלה<input type="month" id="sm"></label>
+  <label>מסגרת אשראי (₪)<input id="od" type="number" value="20000"></label>
+  <label class="inline" style="align-self:end"><input type="checkbox" id="vat" checked> לחשב תשלום מע״מ דו־חודשי</label>
+</div>
+<div class="panel">
+  <h2>שורות תזרים</h2>
+  <div class="it muted" style="font-size:.82rem"><span>תיאור</span><span>סכום (+/−)</span><span>תדירות</span><span>מחודש</span><span>מע״מ</span><span></span></div>
+  <div id="rows"></div>
+  <div class="row"><button id="addI">+ הכנסה</button><button id="addE">+ הוצאה</button><button id="demo">נתוני דוגמה</button></div>
+</div>
+<div class="panel"><canvas id="cv"></canvas><p class="hint" id="alert" style="margin-top:6px"></p></div>
+<div class="panel" style="overflow:auto"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div>
+<div class="row"><button id="csv">⬇ CSV לאקסל</button></div>
+<p class="hint">מע״מ: אם מסומן, 18% מההכנסות (עסקאות) פחות 18% מההוצאות שמסומנות "כולל מע״מ", ישולם ב־15 לחודש שאחרי כל תקופה דו־חודשית. זו הערכה גסה לתכנון בלבד.</p>
+<script>
+const $=id=>document.getElementById(id);const f=v=>Math.round(v).toLocaleString('he-IL');
+const FR={m:'כל חודש',b:'כל חודשיים',q:'כל רבעון',y:'פעם בשנה',o:'חד־פעמי'};
+let L;try{L=JSON.parse(localStorage.getItem('cashflow'))}catch{}
+const DEMO=[{n:'הכנסות מלקוחות',a:62000,fr:'m',s:0,v:1},{n:'שכר עובדים',a:-28000,fr:'m',s:0,v:0},{n:'שכירות משרד',a:-7500,fr:'m',s:0,v:1},{n:'ביטוח לאומי ומס (ניכויים)',a:-6200,fr:'m',s:0,v:0},{n:'מקדמות מס הכנסה',a:-3100,fr:'m',s:0,v:0},{n:'ספקים',a:-14000,fr:'m',s:0,v:1},{n:'ביטוח עסק',a:-4800,fr:'y',s:2,v:0},{n:'רכישת ציוד',a:-18000,fr:'o',s:3,v:1},{n:'פרויקט גדול',a:40000,fr:'o',s:5,v:1}];
+if(!L)L=DEMO.map(x=>({...x}));
+const save=()=>{try{localStorage.setItem('cashflow',JSON.stringify(L))}catch{}};
+function hits(x,i){const k=i-x.s;if(k<0)return false;return x.fr==='m'||(x.fr==='b'&&k%2===0)||(x.fr==='q'&&k%3===0)||(x.fr==='y'&&k%12===0)||(x.fr==='o'&&k===0)}
+function months(){const[y,m]=($('sm').value||'2026-01').split('-').map(Number);return[...Array(12)].map((_,i)=>new Date(y,m-1+i,1))}
+function rowsUI(){const ms=months();$('rows').innerHTML=L.map((x,i)=>`<div class="it"><input data-i="${i}" data-k="n" value="${String(x.n).replace(/"/g,'&quot;')}"><input data-i="${i}" data-k="a" type="number" value="${x.a}" style="color:${x.a<0?'#ff8fab':'#90e0a0'}"><select data-i="${i}" data-k="fr">${Object.entries(FR).map(([k,v])=>`<option value="${k}" ${k===x.fr?'selected':''}>${v}</option>`).join('')}</select><select data-i="${i}" data-k="s">${ms.map((d,j)=>`<option value="${j}" ${j==x.s?'selected':''}>${d.toLocaleDateString('he-IL',{month:'short'})}</option>`).join('')}</select><label class="inline" title="הסכום כולל מע״מ"><input type="checkbox" data-i="${i}" data-k="v" ${x.v?'checked':''}></label><button data-x="${i}" style="padding:4px">✕</button></div>`).join('')}
+function calc(){const ms=months(),ob=+$('ob').value||0,od=+$('od').value||0;let bal=ob;const vatOn=$('vat').checked;let vatAcc=0;const R=[];
+  ms.forEach((d,i)=>{let vat=0;if(vatOn&&(d.getMonth()%2===0)&&i>0){vat=-Math.max(0,vatAcc);vatAcc=0}
+    let inc=0,exp=0;L.forEach(x=>{if(hits(x,i)){x.a>=0?inc+=x.a:exp+=x.a;if(vatOn&&x.v)vatAcc+=x.a*18/118}});
+    const open=bal;bal+=inc+exp+vat;R.push({d,open,inc,exp,vat,close:bal})});
+  $('th').innerHTML=`<tr><th></th>${R.map(r=>`<th class="num">${r.d.toLocaleDateString('he-IL',{month:'short',year:'2-digit'})}</th>`).join('')}</tr>`;
+  const line=(n,k,c)=>`<tr><td>${n}</td>${R.map(r=>`<td class="num ${c&&r[k]<0?'neg':''}">${r[k]?f(r[k]):'—'}</td>`).join('')}</tr>`;
+  $('tb').innerHTML=line('יתרת פתיחה','open',1)+line('הכנסות','inc')+line('הוצאות','exp')+(vatOn?line('מע״מ לתשלום','vat'):'')+line('<b>יתרת סגירה</b>','close',1);
+  const first=R.find(r=>r.close<0),over=R.find(r=>r.close<-od);
+  $('alert').innerHTML=over?`🚨 ב${over.d.toLocaleDateString('he-IL',{month:'long'})} היתרה צפויה לחרוג ממסגרת האשראי (${f(over.close)} ₪). כדאי להקדים גבייה, לדחות הוצאה או לתאם מסגרת.`:first?`⚠️ ב${first.d.toLocaleDateString('he-IL',{month:'long'})} היתרה צפויה לרדת למינוס (${f(first.close)} ₪), אבל בתוך המסגרת.`:`✅ היתרה נשארת חיובית בכל 12 החודשים. יתרה צפויה בסוף התקופה: ${f(bal)} ₪.`;
+  chart(R,od);save();return R}
+function chart(R,od){const cv=$('cv'),d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;cv.width=W*d;cv.height=H*d;const x=cv.getContext('2d');x.scale(d,d);
+  const vals=R.flatMap(r=>[r.close,r.inc,r.exp]).concat([-od,0]),mn=Math.min(...vals),mx=Math.max(...vals),Y=v=>H-24-(v-mn)/(mx-mn||1)*(H-36),bw=(W-60)/12,X=i=>54+i*bw;
+  x.font='11px Segoe UI';x.fillStyle='#a9a3c9';x.textAlign='right';x.strokeStyle='rgba(255,255,255,.1)';[mn,0,mx].forEach(v=>{x.beginPath();x.moveTo(50,Y(v));x.lineTo(W,Y(v));x.stroke();x.fillText(Math.round(v/1000)+'K',46,Y(v)+4)});
+  x.setLineDash([5,4]);x.strokeStyle='#ff8fab';x.beginPath();x.moveTo(50,Y(-od));x.lineTo(W,Y(-od));x.stroke();x.setLineDash([]);
+  R.forEach((r,i)=>{x.fillStyle='rgba(144,224,160,.55)';x.fillRect(X(i)+bw*.15,Y(r.inc),bw*.3,Y(0)-Y(r.inc));x.fillStyle='rgba(255,143,171,.55)';x.fillRect(X(i)+bw*.5,Y(0),bw*.3,Y(r.exp+r.vat)-Y(0));x.fillStyle='#a9a3c9';x.textAlign='center';x.fillText(r.d.toLocaleDateString('he-IL',{month:'short'}),X(i)+bw/2,H-6)});
+  x.strokeStyle='#58d68d';x.lineWidth=3;x.beginPath();R.forEach((r,i)=>{const px=X(i)+bw/2;i?x.lineTo(px,Y(r.close)):x.moveTo(px,Y(r.close))});x.stroke();
+  R.forEach((r,i)=>{x.fillStyle=r.close<0?'#ff8fab':'#fff';x.beginPath();x.arc(X(i)+bw/2,Y(r.close),4,0,7);x.fill()})}
+const val=t=>t.dataset.k==='v'?(t.checked?1:0):t.dataset.k==='n'||t.dataset.k==='fr'?t.value:+t.value;
+$('rows').oninput=e=>{const{i,k}=e.target.dataset;if(i===undefined)return;L[i][k]=val(e.target);calc()};
+$('rows').onchange=e=>{const{i,k}=e.target.dataset;if(i!==undefined){L[i][k]=val(e.target);calc()}};
+$('rows').onclick=e=>{const x=e.target.dataset.x;if(x!==undefined){L.splice(+x,1);rowsUI();calc()}};
+$('addI').onclick=()=>{L.push({n:'הכנסה',a:1000,fr:'m',s:0,v:1});rowsUI();calc()};$('addE').onclick=()=>{L.push({n:'הוצאה',a:-1000,fr:'m',s:0,v:1});rowsUI();calc()};
+$('demo').onclick=()=>{L=DEMO.map(x=>({...x}));rowsUI();calc()};
+['ob','od','vat'].forEach(k=>$(k).oninput=calc);$('sm').oninput=()=>{rowsUI();calc()};
+$('csv').onclick=()=>{const R=calc();const c='﻿חודש,פתיחה,הכנסות,הוצאות,מע"מ,סגירה\n'+R.map(r=>[r.d.toLocaleDateString('he-IL',{month:'2-digit',year:'numeric'}),...[r.open,r.inc,r.exp,r.vat,r.close].map(Math.round)].join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));a.download='תזרים.csv';a.click()};
+const t=new Date();$('sm').value=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}`;
+addEventListener('resize',calc);rowsUI();calc();
+</script>
+</div>
+</body>
+</html>

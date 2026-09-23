@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>שעות נוספות</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff9f68}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.day{display:grid;grid-template-columns:90px 1fr 1fr 70px auto;gap:6px;align-items:center;margin-bottom:5px}
+.day input[type=time]{direction:ltr}
+.day .h{text-align:center;font-weight:700}
+@media(max-width:600px){.day{grid-template-columns:70px 1fr 1fr 50px}.day label{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>⏰ מחשבון שעות נוספות ושכר שעתי</h1>
+<p class="sub">מזינים שעות כניסה ויציאה לכל יום, והכלי מחלק לשעות רגילות, 125% ו־150%, מוסיף תוספת שבת וחג ומחשב את השכר לשבוע או לחודש.</p>
+<div class="grid2">
+  <div class="panel">
+    <div class="row"><label style="flex:1">שכר לשעה (₪)<input id="rate" type="number" value="45" step="0.5"></label><label style="flex:1">שעות רגילות ביום<input id="norm" type="number" value="8.6" step="0.1"></label><label style="flex:1">הפסקה (דקות, לא בתשלום)<input id="brk" type="number" value="30"></label></div>
+    <div class="row" style="margin-top:8px"><button class="pre" data-p="5">שבוע של 5 ימים (8.6 ש׳)</button><button class="pre" data-p="6">שבוע של 6 ימים (8 ש׳)</button></div>
+  </div>
+  <div class="panel">
+    <div class="stats">
+      <div class="stat"><small>שעות רגילות</small><b id="r100"></b></div>
+      <div class="stat"><small>125%</small><b id="r125"></b></div>
+      <div class="stat"><small>150%</small><b id="r150"></b></div>
+      <div class="stat"><small>שכר לשבוע</small><b id="pay"></b></div>
+    </div>
+    <div class="muted" id="mon" style="text-align:center;margin-top:8px"></div>
+  </div>
+</div>
+<div class="panel">
+  <div class="day muted" style="font-size:.82rem"><span>יום</span><span>כניסה</span><span>יציאה</span><span>שעות</span><span></span></div>
+  <div id="days"></div>
+</div>
+<div class="panel"><table><thead><tr><th>יום</th><th class="num">100%</th><th class="num">125%</th><th class="num">150%</th><th class="num">175%</th><th class="num">200%</th><th class="num">שכר</th></tr></thead><tbody id="tb"></tbody></table></div>
+<p class="hint">לפי חוק שעות עבודה ומנוחה: שעתיים נוספות ראשונות ביום ב־125%, ומהשלישית ב־150%. עבודה במנוחה השבועית או בחג: 150%, ושעות נוספות בה 175% ו־200%. משמרת לילה מקוצרת לא מחושבת כאן. הסכם קיבוצי או חוזה אישי יכולים לקבוע תנאים טובים יותר.</p>
+<script>
+const $=id=>document.getElementById(id);const f=v=>'₪'+(Math.round(v*100)/100).toLocaleString('he-IL');const h2=v=>(Math.round(v*100)/100).toString();
+const DN=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+let D;try{D=JSON.parse(localStorage.getItem('overtime'))}catch{}
+if(!D)D=DN.map((_,i)=>({in:i<5?'08:00':'',out:i<5?(i===3?'19:30':'17:30'):'',sh:i===6}));
+function mins(t){if(!t)return null;const[h,m]=t.split(':').map(Number);return h*60+m}
+function hours(d){const a=mins(d.in),b=mins(d.out);if(a===null||b===null)return 0;let m=b-a;if(m<0)m+=1440;m-=m>360?(+$('brk').value||0):0;return Math.max(0,m/60)}
+function split(h,sh){const n=+$('norm').value||8.6,reg=Math.min(h,n),o=h-reg,o1=Math.min(o,2),o2=o-o1;return sh?{100:0,125:0,150:reg,175:o1,200:o2}:{100:reg,125:o1,150:o2,175:0,200:0}}
+function ui(){$('days').innerHTML=D.map((d,i)=>`<div class="day"><b>${DN[i]}</b><input type="time" data-i="${i}" data-k="in" value="${d.in}"><input type="time" data-i="${i}" data-k="out" value="${d.out}"><span class="h" id="h${i}"></span><label class="inline"><input type="checkbox" data-i="${i}" data-k="sh" ${d.sh?'checked':''}> שבת/חג</label></div>`).join('')}
+function calc(){const r=+$('rate').value||0,T={100:0,125:0,150:0,175:0,200:0};let pay=0;
+  $('tb').innerHTML=D.map((d,i)=>{const h=hours(d);$('h'+i).textContent=h?h2(h):'—';const s=split(h,d.sh);let p=0;for(const k in s){T[k]+=s[k];p+=s[k]*r*k/100}pay+=p;
+    return h?`<tr><td>${DN[i]}</td>${[100,125,150,175,200].map(k=>`<td class="num">${s[k]?h2(s[k]):'—'}</td>`).join('')}<td class="num">${f(p)}</td></tr>`:''}).join('')+`<tr><td><b>סה״כ</b></td>${[100,125,150,175,200].map(k=>`<td class="num"><b>${T[k]?h2(T[k]):'—'}</b></td>`).join('')}<td class="num"><b>${f(pay)}</b></td></tr>`;
+  $('r100').textContent=h2(T[100]);$('r125').textContent=h2(T[125]);$('r150').textContent=h2(T[150]+T[175]+T[200]);$('pay').textContent=f(pay);
+  const tot=Object.values(T).reduce((a,b)=>a+b,0);$('mon').textContent=`בחודש (×4.33): בערך ${f(pay*4.33)} ברוטו · ${h2(tot)} שעות בשבוע${tot>42?` · ${h2(tot-42)} מעבר ל־42 השעות השבועיות`:''}`;
+  try{localStorage.setItem('overtime',JSON.stringify(D))}catch{}}
+$('days').oninput=e=>{const{i,k}=e.target.dataset;if(i===undefined)return;D[i][k]=k==='sh'?e.target.checked:e.target.value;calc()};
+['rate','norm','brk'].forEach(k=>$(k).oninput=calc);
+document.querySelectorAll('.pre').forEach(b=>b.onclick=()=>{$('norm').value=b.dataset.p==='5'?8.6:8;calc()});
+ui();calc();
+</script>
+</div>
+</body>
+</html>

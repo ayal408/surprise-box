@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>משכורת מול דיבידנד</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#c49bff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+canvas{width:100%;height:260px;display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>⚖️ משכורת מול דיבידנד (בעל שליטה)</h1>
+<p class="sub">לבעלי חברות: איך למשוך את הרווח עם הכי פחות מס. משווים משכורת, דיבידנד ושילוב שלהם, ורואים בגרף את נקודת החלוקה המיטבית.</p>
+<div class="grid2">
+  <div class="panel">
+    <label>רווח החברה לפני משיכת בעלים (₪ לשנה)<input id="p" type="number" value="600000" step="10000"></label>
+    <label style="margin-top:8px">משכורת שנתית לבעלים (₪)<input id="s" type="range" min="0" max="600000" step="6000" value="240000"></label>
+    <div class="muted" style="text-align:center"><b id="sv" style="color:var(--ink)"></b> משכורת, השאר כדיבידנד</div>
+    <div class="row" style="margin-top:8px"><label style="flex:1">מס חברות (%)<input id="ct" type="number" value="23"></label><label style="flex:1">מס דיבידנד בעל מניות מהותי (%)<input id="dt" type="number" value="30"></label><label style="flex:1">נקודות זיכוי<input id="pts" type="number" value="2.25" step="0.25"></label></div>
+    <button class="pri" id="opt" style="margin-top:10px">🎯 מצא חלוקה מיטבית</button>
+  </div>
+  <div class="panel">
+    <div class="stats"><div class="stat"><small>נטו לבעלים</small><b id="net"></b></div><div class="stat"><small>סה״כ מסים</small><b id="tax"></b></div><div class="stat"><small>נטל מס כולל</small><b id="eff"></b></div></div>
+    <table style="margin-top:12px"><tbody id="t"></tbody></table>
+  </div>
+</div>
+<div class="panel"><h2>נטו לבעלים לפי גובה המשכורת</h2><canvas id="cv"></canvas><p class="hint" id="best" style="margin-top:6px"></p></div>
+<p class="hint">הנחות: עלות המשכורת כוללת ביטוח לאומי מעסיק ומותרת בניכוי בחברה. הבעלים משלם מס הכנסה לפי מדרגות, ביטוח לאומי ומס בריאות כשכיר. דיבידנד: מס חברות ואז מס דיבידנד. מס יסף: 3% מעל 721,560 ₪, ועוד 2% על הכנסה הונית (דיבידנד) מעל הסף. לא כולל הפקדות לפנסיה, רווחים כלואים, חברת מעטים (סעיף 62) או סעיף 77. זו הערכה בלבד ולא ייעוץ מס.</p>
+<script>
+const $=id=>document.getElementById(id);
+const BR=[[84120,.10],[120720,.14],[193800,.20],[269280,.31],[560280,.35],[721560,.47],[Infinity,.47]];
+const SUR=721560,PT=2904,LOW=7522*12,MAX=50695*12;
+const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');
+function itax(y){let p=0,t=0;for(const[top,r]of BR){t+=Math.max(0,Math.min(y,top)-p)*r;p=top}return t}
+function sim(P,S){const ct=(+$('ct').value||0)/100,dt=(+$('dt').value||0)/100,pts=+$('pts').value||0;
+  // salary S gross; employer BL on top
+  const b=Math.min(S,MAX),erBL=Math.min(b,LOW)*.0451+Math.max(0,b-LOW)*.076;let cost=S+erBL;if(cost>P){const k=P/cost;S*=k;cost=P}
+  const b2=Math.min(S,MAX),erBL2=Math.min(b2,LOW)*.0451+Math.max(0,b2-LOW)*.076;cost=S+erBL2;
+  const eeBL=Math.min(b2,LOW)*.0427+Math.max(0,b2-LOW)*.1217;const it=Math.max(0,itax(S)-pts*PT);
+  const profit=Math.max(0,P-cost),corp=profit*ct,div=profit-corp,dtax=div*dt;
+  const total=S+div,sur=Math.max(0,total-SUR)*.03+Math.max(0,Math.min(div,total-SUR))*.02;
+  const net=S-it-eeBL+div-dtax-sur;return{S,erBL:erBL2,eeBL,it,corp,div,dtax,sur,net,taxes:erBL2+eeBL+it+corp+dtax+sur}}
+function calc(){const P=+$('p').value||0;$('s').max=Math.max(6000,Math.round(P/6000)*6000);const S=Math.min(+$('s').value,P);$('sv').textContent=f(S);const r=sim(P,S);
+  $('net').textContent=f(r.net);$('tax').textContent=f(r.taxes);$('eff').textContent=P?(r.taxes/P*100).toFixed(1)+'%':'—';
+  $('t').innerHTML=[['משכורת ברוטו',r.S],['ביטוח לאומי מעסיק',r.erBL],['מס הכנסה על המשכורת',r.it],['ביטוח לאומי ובריאות עובד',r.eeBL],['מס חברות',r.corp],['דיבידנד מחולק',r.div],['מס דיבידנד',r.dtax],['מס יסף',r.sur]].filter(x=>x[1]>.5).map(([a,b])=>`<tr><td>${a}</td><td class="num">${f(b)}</td></tr>`).join('')+`<tr><td><b>נטו לבעלים</b></td><td class="num"><b>${f(r.net)}</b></td></tr>`;chart(P,S)}
+function best(P){let b={net:-1,S:0};for(let S=0;S<=P;S+=Math.max(1000,P/300)){const r=sim(P,S);if(r.net>b.net)b={net:r.net,S}}return b}
+function chart(P,S){const cv=$('cv'),d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;cv.width=W*d;cv.height=H*d;const x=cv.getContext('2d');x.scale(d,d);
+  const N=120,pts=[...Array(N+1)].map((_,i)=>{const s=P*i/N;return[s,sim(P,s).net]}),mn=Math.min(...pts.map(p=>p[1])),mx=Math.max(...pts.map(p=>p[1]));
+  const X=s=>50+(W-60)*(P?s/P:0),Y=v=>H-26-(v-mn)/(mx-mn||1)*(H-40);x.strokeStyle='rgba(255,255,255,.08)';x.fillStyle='#a9a3c9';x.font='11px Segoe UI';x.textAlign='right';
+  for(let i=0;i<=3;i++){const v=mn+(mx-mn)*i/3;x.beginPath();x.moveTo(50,Y(v));x.lineTo(W,Y(v));x.stroke();x.fillText(Math.round(v/1000)+'K',44,Y(v)+4)}
+  x.textAlign='center';for(let i=0;i<=4;i++)x.fillText(Math.round(P*i/4/1000)+'K',X(P*i/4),H-8);
+  x.strokeStyle='#c49bff';x.lineWidth=3;x.beginPath();pts.forEach(([s,v],i)=>i?x.lineTo(X(s),Y(v)):x.moveTo(X(s),Y(v)));x.stroke();
+  const b=best(P);x.fillStyle='#90e0a0';x.beginPath();x.arc(X(b.S),Y(b.net),6,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(X(S),Y(sim(P,S).net),5,0,7);x.fill();
+  $('best').innerHTML=`🎯 חלוקה מיטבית משוערת: משכורת של <b>${f(b.S)}</b> בשנה (${f(b.S/12)} בחודש), והשאר כדיבידנד. נטו לבעלים: <b>${f(b.net)}</b>. הנקודה הירוקה בגרף היא המיטבית, הלבנה היא הבחירה הנוכחית.`}
+$('opt').onclick=()=>{const b=best(+$('p').value||0);$('s').value=b.S;calc()};
+document.querySelectorAll('input').forEach(i=>i.oninput=calc);addEventListener('resize',calc);calc();
+</script>
+</div>
+</body>
+</html>

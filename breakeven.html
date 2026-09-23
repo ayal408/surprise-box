@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>נקודת איזון</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffb703}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+canvas{width:100%;height:280px;display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>📊 נקודת איזון ורווחיות</h1>
+<p class="sub">כמה צריך למכור כדי לכסות את ההוצאות הקבועות, מה מרווח הביטחון, וכמה מכירות נדרשות כדי להגיע לרווח שרוצים. עם גרף עלויות והכנסות.</p>
+<div class="grid2">
+  <div class="panel">
+    <label>הוצאות קבועות בחודש (₪)<input id="fc" type="number" value="35000"></label>
+    <div class="muted" style="font-size:.82rem">שכירות, שכר קבוע, ביטוחים, הנהלת חשבונות, ליסינג...</div>
+    <div class="row" style="margin-top:8px"><label style="flex:1">מחיר ליחידה (₪)<input id="pr" type="number" value="250"></label><label style="flex:1">עלות משתנה ליחידה (₪)<input id="vc" type="number" value="110"></label></div>
+    <div class="row" style="margin-top:8px"><label style="flex:1">מכירות צפויות (יחידות בחודש)<input id="q" type="number" value="320"></label><label style="flex:1">רווח יעד בחודש (₪)<input id="tp" type="number" value="15000"></label></div>
+    <label class="inline" style="margin-top:8px"><input type="checkbox" id="vat"> המחירים כוללים מע״מ (18%)</label>
+  </div>
+  <div class="panel">
+    <div class="stats">
+      <div class="stat"><small>נקודת איזון (יחידות)</small><b id="beu"></b></div>
+      <div class="stat"><small>נקודת איזון (₪)</small><b id="bes"></b></div>
+      <div class="stat"><small>שולי תרומה</small><b id="cm"></b></div>
+      <div class="stat"><small>רווח צפוי</small><b id="pf"></b></div>
+      <div class="stat"><small>מרווח ביטחון</small><b id="ms"></b></div>
+      <div class="stat"><small>ליעד הרווח צריך</small><b id="tu"></b></div>
+    </div>
+  </div>
+</div>
+<div class="panel"><canvas id="cv"></canvas><p class="hint" id="ins" style="margin-top:8px"></p></div>
+<div class="panel"><h2>🔀 מה אם?</h2><table><thead><tr><th>תרחיש</th><th class="num">נקודת איזון</th><th class="num">רווח בחודש</th></tr></thead><tbody id="wf"></tbody></table></div>
+<script>
+const $=id=>document.getElementById(id);const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');const n=v=>Math.ceil(v).toLocaleString('he-IL');
+function get(){const k=$('vat').checked?1.18:1;return{F:+$('fc').value||0,P:(+$('pr').value||0)/k,V:(+$('vc').value||0)/k,Q:+$('q').value||0,T:+$('tp').value||0}}
+const calcS=({F,P,V,Q})=>{const cm=P-V;return{cm,be:cm>0?F/cm:Infinity,profit:Q*cm-F}};
+function calc(){const g=get(),{cm,be,profit}=calcS(g);
+  $('beu').textContent=isFinite(be)?n(be):'∞';$('bes').textContent=isFinite(be)?f(be*g.P):'∞';$('cm').textContent=f(cm)+' ('+(g.P?Math.round(cm/g.P*100):0)+'%)';
+  $('pf').textContent=f(profit);$('pf').style.color=profit>=0?'#90e0a0':'#ff8fab';$('ms').textContent=g.Q&&isFinite(be)?Math.round((g.Q-be)/g.Q*100)+'%':'—';$('tu').textContent=cm>0?n((g.F+g.T)/cm)+' יח׳':'—';
+  $('ins').textContent=cm<=0?'⚠️ המחיר נמוך מהעלות המשתנה. כל מכירה מגדילה את ההפסד.':profit<0?`⚠️ כרגע יש הפסד. חסרות עוד ${n(be-g.Q)} יחידות בחודש כדי להגיע לאיזון.`:`✅ מעל נקודת האיזון. המכירות יכולות לרדת ב־${Math.round((g.Q-be)/g.Q*100)}% לפני שנכנסים להפסד.`;
+  const S=[['המצב הנוכחי',g],['העלאת מחיר ב־10%',{...g,P:g.P*1.1}],['הורדת מחיר ב־10% ועלייה של 20% במכירות',{...g,P:g.P*.9,Q:g.Q*1.2}],['הוזלת עלות משתנה ב־10%',{...g,V:g.V*.9}],['קיצוץ של 10% בהוצאות הקבועות',{...g,F:g.F*.9}],['גידול של 20% במכירות',{...g,Q:g.Q*1.2}]];
+  $('wf').innerHTML=S.map(([name,s])=>{const r=calcS(s);return`<tr><td>${name}</td><td class="num">${isFinite(r.be)?n(r.be):'∞'}</td><td class="num" style="color:${r.profit>=0?'#90e0a0':'#ff8fab'}">${f(r.profit)}</td></tr>`}).join('');chart(g,be)}
+function chart(g,be){const cv=$('cv'),d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;cv.width=W*d;cv.height=H*d;const x=cv.getContext('2d');x.scale(d,d);
+  const Qm=Math.max(g.Q,isFinite(be)?be:0)*1.5||100,Ym=Math.max(Qm*g.P,g.F+Qm*g.V)*1.05,X=q=>50+(W-60)*q/Qm,Y=v=>H-26-(v/Ym)*(H-40);
+  x.font='11px Segoe UI';x.fillStyle='#a9a3c9';x.strokeStyle='rgba(255,255,255,.08)';for(let i=0;i<=4;i++){x.beginPath();x.moveTo(50,Y(Ym*i/4));x.lineTo(W,Y(Ym*i/4));x.stroke();x.textAlign='right';x.fillText(Math.round(Ym*i/4/1000)+'K',44,Y(Ym*i/4)+4);x.textAlign='center';x.fillText(Math.round(Qm*i/4),X(Qm*i/4),H-8)}
+  const line=(c,fn,w=3)=>{x.strokeStyle=c;x.lineWidth=w;x.beginPath();x.moveTo(X(0),Y(fn(0)));x.lineTo(X(Qm),Y(fn(Qm)));x.stroke()};
+  line('#ff8fab',()=>g.F,2);line('#ffb703',q=>g.F+q*g.V);line('#90e0a0',q=>q*g.P);
+  if(isFinite(be)){x.fillStyle='#fff';x.beginPath();x.arc(X(be),Y(be*g.P),6,0,7);x.fill();x.fillText('נקודת איזון',X(be),Y(be*g.P)-14)}
+  x.setLineDash([4,4]);x.strokeStyle='#c49bff';x.beginPath();x.moveTo(X(g.Q),Y(0));x.lineTo(X(g.Q),Y(Ym));x.stroke();x.setLineDash([]);
+  x.textAlign='right';[['הכנסות','#90e0a0'],['עלות כוללת','#ffb703'],['עלות קבועה','#ff8fab'],['מכירות צפויות','#c49bff']].forEach(([t,c],i)=>{x.fillStyle=c;x.fillText('● '+t,W-10,16+i*15)})}
+document.querySelectorAll('input').forEach(i=>i.oninput=calc);addEventListener('resize',calc);calc();
+</script>
+</div>
+</body>
+</html>
