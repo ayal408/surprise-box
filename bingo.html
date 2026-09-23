@@ -1,0 +1,28 @@
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>בינגו אישי</title><link rel="icon" href="icon.svg" type="image/svg+xml"><style>
+*{box-sizing:border-box}body{margin:0;padding:22px;background:radial-gradient(circle at 80% 0%,#422078,transparent 55%),#0f0c24;color:#f3efff;font:16px 'Segoe UI',Arial,sans-serif}.wrap{max-width:850px;margin:auto}a{color:#bdb5df}h1{color:#ffd166}p{color:#bdb5df}.panel{background:#ffffff0e;border:1px solid #ffffff25;border-radius:18px;padding:18px;margin:16px 0}textarea,input,select,button{font:inherit;border-radius:10px;padding:10px;background:#211b40;color:#fff;border:1px solid #ffffff35}textarea{width:100%;min-height:130px;resize:vertical}input{max-width:260px}button{cursor:pointer;background:#6631a4}button:hover{background:#8245bd}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #ffd166}label{display:inline-flex;align-items:center;gap:8px;margin:5px 0 10px 12px}.actions{display:flex;flex-wrap:wrap;gap:8px}.board{display:grid;gap:5px;max-width:620px;margin:20px auto;direction:rtl}.cell{min-width:0;aspect-ratio:1;display:grid;place-items:center;text-align:center;overflow-wrap:anywhere;padding:5px;background:#251d47;border:2px solid #9c78dc;border-radius:9px;cursor:pointer}.cell.marked{background:#238c74;border-color:#9df5c6}.cell.free{background:#665020;border-color:#ffd166}.status{min-height:1.5em;color:#ffd166}@media print{body{background:#fff;color:#111;padding:0}.controls,a,.status{display:none}.panel{border:0;padding:0}.board{max-width:100%;gap:2px}.cell{background:#fff!important;color:#111;border:2px solid #111;border-radius:0;print-color-adjust:exact}.cell.marked{background:#ddd!important}h1{color:#111}}
+</style></head><body><main class="wrap"><a href="התחל כאן.html#games">← לכל ההפתעות</a><h1>🎟️ בינגו אישי</h1><p>מכינים כרטיס מהמילים שלכם, משחקים בלחיצה או מדפיסים.</p><section class="panel controls"><label>כותרת <input id="title" value="הבינגו שלנו" maxlength="60"></label><label>גודל <select id="size"><option value="3">3 × 3</option><option value="4">4 × 4</option><option value="5" selected>5 × 5</option></select></label><label><input id="free" type="checkbox" checked> משבצת חופשית באמצע (בלוח אי־זוגי)</label><p>פריטים להגרלה, כל פריט בשורה נפרדת. לפריטים חסרים יופיעו מספרים.</p><textarea id="items" aria-label="פריטים לבינגו">חיוך
+שמש
+כוכב
+ספר
+עץ
+פרח
+בית
+שיר
+מים
+חבר
+צבע
+מתנה
+מסע
+חלום
+לב
+אור
+ים
+קשת
+כדור
+ריקוד
+משחק
+מפתח
+ענן
+ירח</textarea><div class="actions"><button id="make">🎲 ערבוב לוח</button><button id="clear">ניקוי סימונים</button><button id="print">🖨️ הדפסה</button></div></section><section class="panel"><h2 id="heading"></h2><div id="board" class="board" aria-label="לוח בינגו"></div><p id="status" class="status" role="status"></p></section></main><script>
+const $=id=>document.getElementById(id);let cells=[],marks=new Set();function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}function check(){const n=+$('size').value,lines=[];for(let y=0;y<n;y++){lines.push(Array.from({length:n},(_,x)=>y*n+x));lines.push(Array.from({length:n},(_,x)=>x*n+y))}lines.push(Array.from({length:n},(_,i)=>i*n+i),Array.from({length:n},(_,i)=>i*n+n-1-i));$('status').textContent=lines.some(line=>line.every(i=>marks.has(i)))?'🎉 בינגו! השלמת שורה.':`${marks.size} משבצות סומנו`}function render(){const n=+$('size').value;marks=new Set();const unique=[...new Set($('items').value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean))];const free=$('free').checked&&n%2===1,need=n*n-(free?1:0);while(unique.length<need)unique.push(`פריט ${unique.length+1}`);shuffle(unique);cells=Array.from({length:n*n},(_,i)=>free&&i===Math.floor(n*n/2)?'⭐ חופשי':unique.pop());$('heading').textContent=$('title').value.trim()||'הבינגו שלנו';$('board').style.gridTemplateColumns=`repeat(${n},1fr)`;$('board').replaceChildren(...cells.map((v,i)=>{const b=document.createElement('button');b.className='cell'+(free&&i===Math.floor(n*n/2)?' free marked':'');b.type='button';b.textContent=v;b.setAttribute('aria-pressed',free&&i===Math.floor(n*n/2)?'true':'false');if(free&&i===Math.floor(n*n/2)){b.disabled=true;marks.add(i)}else b.onclick=()=>{if(marks.has(i))marks.delete(i);else marks.add(i);b.classList.toggle('marked',marks.has(i));b.setAttribute('aria-pressed',String(marks.has(i)));check()};return b}));check()}$('make').onclick=render;$('clear').onclick=()=>{$('board').querySelectorAll('.cell:not(.free)').forEach(b=>{b.classList.remove('marked');b.setAttribute('aria-pressed','false')});marks=new Set($('board').querySelector('.free')?[Math.floor(cells.length/2)]:[]);check()};$('print').onclick=()=>window.print();render();
+</script><script src="dl.js" defer></script></body></html>
