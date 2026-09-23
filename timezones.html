@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מתכנן אזורי זמן</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#9bd1ff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1200px!important}
+.tz{display:grid;grid-template-columns:170px 1fr;gap:8px;align-items:center;margin-bottom:6px}
+.hrs{display:grid;grid-template-columns:repeat(24,1fr);gap:2px;direction:ltr}
+.hrs div{height:34px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.7rem;cursor:pointer}
+.w{background:rgba(88,214,141,.35)}.e{background:rgba(255,209,102,.18)}.n{background:rgba(255,255,255,.04);color:var(--muted)}.off{background:rgba(255,77,109,.12);color:var(--muted)}
+.hrs div.sel{outline:2px solid #fff}
+.nm b{display:block}.nm small{color:var(--muted)}
+.best{font-size:1.1rem;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🌐 מתכנן אזורי זמן</h1>
+<p class="sub">מתאמים שיחה עם לקוחות וספקים בחו״ל: בוחרים ערים, מזיזים את השעה ורואים מתי כולם בשעות עבודה. הכלי מתחשב בשעון קיץ ובימי העבודה בכל מקום.</p>
+<div class="panel row"><select id="add"></select><button id="addb">+ הוספה</button><label class="inline">תאריך <input type="date" id="dt"></label><span class="muted" style="font-size:.85rem">🟩 שעות עבודה (9–18) · 🟨 מוקדם/מאוחר · 🟥 סוף שבוע</span></div>
+<div class="panel"><div id="rows"></div><p class="hint">לוחצים על משבצת כדי לבחור שעה. השורה הראשונה היא נקודת הייחוס.</p></div>
+<div class="panel best" id="best"></div>
+<div class="row"><button id="cp">📋 העתקת הזמנה לשיחה</button></div>
+<script>
+const $=id=>document.getElementById(id);
+const CITIES=[['ישראל','Asia/Jerusalem','56'],['ניו יורק','America/New_York','12345'],['לוס אנג׳לס','America/Los_Angeles','12345'],['שיקגו','America/Chicago','12345'],['טורונטו','America/Toronto','12345'],['לונדון','Europe/London','12345'],['פריז','Europe/Paris','12345'],['ברלין','Europe/Berlin','12345'],['אמסטרדם','Europe/Amsterdam','12345'],['מוסקבה','Europe/Moscow','12345'],['דובאי','Asia/Dubai','12345'],['מומבאי / בנגלור','Asia/Kolkata','12345'],['סינגפור','Asia/Singapore','12345'],['שנגחאי','Asia/Shanghai','12345'],['טוקיו','Asia/Tokyo','12345'],['סידני','Australia/Sydney','12345'],['סאו פאולו','America/Sao_Paulo','12345'],['קייב','Europe/Kyiv','12345'],['אנטוורפן','Europe/Brussels','12345'],['יוהנסבורג','Africa/Johannesburg','12345']];
+// third field: work days (0=Sun..6=Sat) as string; Israel works Sun-Thu
+CITIES[0][2]='01234';
+let sel;try{sel=JSON.parse(localStorage.getItem('tz'))}catch{}if(!sel)sel=[0,1,5,13];let pick=null;
+$('add').innerHTML=CITIES.map((c,i)=>`<option value="${i}">${c[0]}</option>`).join('');
+function partsAt(ms,tz){const p=new Intl.DateTimeFormat('en-US',{timeZone:tz,hour:'numeric',hourCycle:'h23',weekday:'short',minute:'2-digit'}).formatToParts(new Date(ms));const g=t=>p.find(x=>x.type===t)?.value;return{h:+g('hour'),m:+g('minute'),d:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(g('weekday'))}}
+function base(){const[y,m,d]=$('dt').value.split('-').map(Number);// midnight in reference tz
+  const ref=CITIES[sel[0]][1];let t=Date.UTC(y,m-1,d,0);const p=partsAt(t,ref);return t-(p.h*60+p.m)*6e4+(p.h>12?864e5:0)}
+function cls(p,c){if(!c[2].includes(String(p.d)))return'off';return p.h>=9&&p.h<18?'w':p.h>=7&&p.h<21?'e':'n'}
+function render(){const b=base();$('rows').innerHTML=sel.map((ci,k)=>{const c=CITIES[ci],now=partsAt(Date.now(),c[1]);
+  return`<div class="tz"><div class="nm"><b>${c[0]} ${k?`<button data-rm="${k}" style="padding:0 6px;font-size:.75rem">✕</button>`:'⭐'}</b><small>עכשיו ${String(now.h).padStart(2,'0')}:${String(now.m).padStart(2,'0')}</small></div><div class="hrs">${[...Array(24)].map((_,h)=>{const p=partsAt(b+h*36e5,c[1]);return`<div class="${cls(p,c)} ${pick===h?'sel':''}" data-h="${h}">${p.h}</div>`}).join('')}</div></div>`}).join('');
+  const good=[...Array(24).keys()].filter(h=>sel.every(ci=>cls(partsAt(b+h*36e5,CITIES[ci][1]),CITIES[ci])==='w')),ok=[...Array(24).keys()].filter(h=>sel.every(ci=>['w','e'].includes(cls(partsAt(b+h*36e5,CITIES[ci][1]),CITIES[ci]))));
+  const lbl=h=>sel.map(ci=>{const p=partsAt(b+h*36e5,CITIES[ci][1]);return`${CITIES[ci][0]} ${String(p.h).padStart(2,'0')}:00`}).join(' · ');
+  $('best').innerHTML=(good.length?`✅ שעות שבהן כולם בשעות עבודה: <b>${good.length}</b><br>${good.slice(0,3).map(lbl).join('<br>')}`:ok.length?`🟨 אין שעה שבה כולם בשעות עבודה. הכי קרוב:<br>${ok.slice(0,3).map(lbl).join('<br>')}`:'❌ אין שעה נוחה לכולם ביום הזה. נסו תאריך אחר או פחות ערים.')+(pick!==null?`<hr style="border-color:var(--line)">🕐 השעה שנבחרה: ${lbl(pick)}`:'');
+  try{localStorage.setItem('tz',JSON.stringify(sel))}catch{}}
+$('rows').onclick=e=>{const h=e.target.dataset.h,r=e.target.dataset.rm;if(h!==undefined){pick=+h;render()}else if(r!==undefined){sel.splice(+r,1);render()}};
+$('addb').onclick=()=>{const i=+$('add').value;if(!sel.includes(i))sel.push(i);render()};
+$('dt').oninput=render;
+$('cp').onclick=()=>{if(pick===null){alert('בחרו קודם שעה בטבלה');return}const b=base();const t='📞 שיחה:\n'+sel.map(ci=>{const c=CITIES[ci];return`${c[0]}: ${new Date(b+pick*36e5).toLocaleString('he-IL',{timeZone:c[1],weekday:'long',day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'})}`}).join('\n');navigator.clipboard.writeText(t);$('cp').textContent='✓ הועתק';setTimeout(()=>$('cp').textContent='📋 העתקת הזמנה לשיחה',1400)};
+const t=new Date();t.setDate(t.getDate()+((t.getDay()===5||t.getDay()===6)?(7-t.getDay()):0));$('dt').value=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+render();
+</script>
+</div>
+</body>
+</html>

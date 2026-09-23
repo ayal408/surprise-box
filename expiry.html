@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעקב תוקף מסמכים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffd166}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.doc{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px;border-radius:12px;background:rgba(255,255,255,.04);margin-bottom:6px;border-inline-start:5px solid var(--s)}
+.doc .ic{font-size:1.6rem}.doc .d{text-align:left}.doc .d b{display:block;color:var(--s)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>📄 מעקב תוקף מסמכים ואחריות</h1>
+<p class="sub">דרכון, תעודת זהות, רישיון נהיגה, טסט לרכב, ביטוחים ואחריות למוצרים: רושמים פעם אחת ומקבלים התראה לפני שהתוקף פג. אפשר גם לייצא תזכורות ליומן.</p>
+<div class="stats" id="st"></div>
+<div class="panel">
+  <form id="f" class="row">
+    <select id="type"></select>
+    <input id="who" placeholder="של מי? / איזה מוצר" style="flex:1;min-width:130px">
+    <label class="inline">בתוקף עד <input id="d" type="date" required></label>
+    <label class="inline">להתריע <select id="warn"><option value="30">חודש לפני</option><option value="60">חודשיים לפני</option><option value="90" selected>3 חודשים לפני</option><option value="180">חצי שנה לפני</option></select></label>
+    <button class="pri">הוספה</button>
+  </form>
+  <input id="note" placeholder="הערה (מספר פוליסה, איפה הקבלה...)" style="width:100%;margin-top:8px">
+</div>
+<div class="panel"><div class="row" style="justify-content:space-between"><h2 style="margin:0">📋 המסמכים שלי</h2><div class="row"><button id="ics">📅 ייצוא ליומן</button><button id="csv">⬇ CSV</button></div></div><div id="list" style="margin-top:10px"></div></div>
+<p class="hint">טיפים: לדרכון בדרך כלל נדרש תוקף של לפחות 6 חודשים ביום הכניסה למדינות רבות. טסט לרכב, רישיון נהיגה וביטוח חובה כדאי לחדש מראש. הנתונים נשמרים רק בדפדפן שלכם. לא לרשום כאן מספרי מסמכים מלאים.</p>
+<script>
+const $=id=>document.getElementById(id);
+const T=[['passport','🛂','דרכון',120],['id','🪪','תעודת זהות',120],['license','🚗','רישיון נהיגה',120],['test','🔧','טסט לרכב',12],['carins','🛡️','ביטוח רכב',12],['homeins','🏠','ביטוח דירה',12],['healthins','❤️','ביטוח בריאות',12],['warranty','🧾','אחריות למוצר',12],['visa','✈️','ויזה',12],['gun','📜','רישיון / היתר',12],['card','💳','כרטיס אשראי',36],['other','📦','אחר',12]];
+$('type').innerHTML=T.map(t=>`<option value="${t[0]}">${t[1]} ${t[2]}</option>`).join('');
+let L;try{L=JSON.parse(localStorage.getItem('expiry'))}catch{}
+if(!L){const n=new Date(),o=k=>new Date(n.getFullYear(),n.getMonth(),n.getDate()+k).toISOString().slice(0,10);L=[{type:'passport',who:'אבא',d:o(140),warn:180},{type:'test',who:'המאזדה',d:o(25),warn:30},{type:'warranty',who:'מקרר סמסונג',d:o(300),warn:30,note:'קבלה בתיק הביתי'},{type:'license',who:'אמא',d:o(-10),warn:90}]}
+const save=()=>{try{localStorage.setItem('expiry',JSON.stringify(L))}catch{}};
+const esc=s=>String(s||'').replace(/</g,'&lt;');
+function days(x){const t=new Date();t.setHours(0,0,0,0);return Math.round((new Date(x.d)-t)/864e5)}
+function status(x){const d=days(x);return d<0?['#ff4d6d','⛔ פג תוקף']:d<=x.warn?['#ffb703','⚠️ לחדש בקרוב']:['#58d68d','✔ בתוקף']}
+function render(){const R=L.map((x,i)=>({...x,i,dd:days(x)})).sort((a,b)=>a.dd-b.dd);
+  $('st').innerHTML=[['מסמכים',L.length],['פג תוקף',L.filter(x=>days(x)<0).length],['לחדש בקרוב',L.filter(x=>days(x)>=0&&days(x)<=x.warn).length],['בתוקף',L.filter(x=>days(x)>x.warn).length]].map(([a,b],i)=>`<div class="stat"><small>${a}</small><b style="color:${['var(--acc)','#ff4d6d','#ffb703','#58d68d'][i]}">${b}</b></div>`).join('');
+  $('list').innerHTML=R.map(x=>{const t=T.find(k=>k[0]===x.type)||T.at(-1),[c,s]=status(x),dd=x.dd;const rel=dd<0?`פג לפני ${-dd} ימים`:dd<60?`עוד ${dd} ימים`:dd<730?`עוד ${Math.round(dd/30)} חודשים`:`עוד ${(dd/365).toFixed(1)} שנים`;
+    return`<div class="doc" style="--s:${c}"><span class="ic">${t[1]}</span><div><b>${t[2]}${x.who?' · '+esc(x.who):''}</b><div class="muted" style="font-size:.82rem">${s}${x.note?' · '+esc(x.note):''}</div></div><div class="d"><b>${new Date(x.d).toLocaleDateString('he-IL')}</b><small class="muted">${rel}</small><br><button data-r="${x.i}" style="padding:1px 7px;font-size:.78rem" title="חודש, מעדכן תאריך">🔄 חודש</button> <button data-x="${x.i}" style="padding:1px 7px;font-size:.78rem">✕</button></div></div>`}).join('')||'<p class="muted">עוד לא נוספו מסמכים</p>';save()}
+$('type').onchange=()=>{const t=T.find(k=>k[0]===$('type').value);const d=new Date();d.setMonth(d.getMonth()+t[3]);$('d').value=d.toISOString().slice(0,10)};
+$('f').onsubmit=e=>{e.preventDefault();L.push({type:$('type').value,who:$('who').value,d:$('d').value,warn:+$('warn').value,note:$('note').value});$('who').value='';$('note').value='';render()};
+$('list').onclick=e=>{const d=e.target.dataset;if(d.x!==undefined&&confirm('למחוק?')){L.splice(+d.x,1);render()}else if(d.r!==undefined){const x=L[d.r],t=T.find(k=>k[0]===x.type)||T.at(-1),nd=new Date(Math.max(Date.now(),+new Date(x.d)));nd.setMonth(nd.getMonth()+t[3]);x.d=nd.toISOString().slice(0,10);render()}};
+$('ics').onclick=()=>{const ds=d=>d.toISOString().slice(0,10).replace(/-/g,'');let s='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//surprise-box//expiry//HE\r\n';L.forEach((x,i)=>{const t=T.find(k=>k[0]===x.type)||T.at(-1),d=new Date(x.d),e=new Date(+d+864e5);s+=`BEGIN:VEVENT\r\nUID:exp-${i}-${ds(d)}@surprise-box\r\nDTSTART;VALUE=DATE:${ds(d)}\r\nDTEND;VALUE=DATE:${ds(e)}\r\nSUMMARY:פג תוקף: ${t[2]} ${x.who||''}\r\nBEGIN:VALARM\r\nTRIGGER:-P${x.warn}D\r\nACTION:DISPLAY\r\nDESCRIPTION:לחדש ${t[2]}\r\nEND:VALARM\r\nEND:VEVENT\r\n`});s+='END:VCALENDAR';const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'text/calendar'}));a.download='תוקף-מסמכים.ics';a.click()};
+$('csv').onclick=()=>{const c='﻿סוג,של מי,בתוקף עד,ימים שנותרו,הערה\n'+L.map(x=>[(T.find(k=>k[0]===x.type)||T.at(-1))[2],'"'+(x.who||'')+'"',x.d,days(x),'"'+(x.note||'')+'"'].join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));a.download='מסמכים.csv';a.click()};
+$('type').onchange();render();
+</script>
+</div>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מסווג הוצאות מוכרות</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#7ee0b0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1200px!important}
+textarea{width:100%;min-height:150px;font-size:.92rem}
+.tbl{overflow:auto;max-height:60vh}
+.tbl select{padding:3px 6px;font-size:.82rem;max-width:190px}
+.tbl input{padding:3px 6px;width:70px}
+.no{color:#ff8fab}.part{color:#ffd166}.full{color:#90e0a0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🧾 מסווג הוצאות מוכרות</h1>
+<p class="sub">מדביקים רשימת הוצאות (מאקסל או מדף אשראי), והכלי מסווג כל הוצאה, מחשב כמה ממנה מוכר במס הכנסה וכמה מע״מ אפשר לקזז, לפי הכללים המקובלים בישראל.</p>
+<div class="panel">
+  <div class="row" style="margin-bottom:8px"><label class="inline">סוג עוסק <select id="os"><option value="m">עוסק מורשה / חברה</option><option value="p">עוסק פטור (אין קיזוז מע״מ)</option></select></label><label class="inline">חלק עסקי של הבית (%) <input id="home" type="number" value="25" style="width:70px"></label><label class="inline"><input type="checkbox" id="incl" checked> הסכומים כוללים מע״מ</label></div>
+  <textarea id="src" placeholder="שורה לכל הוצאה: תיאור וסכום. למשל: דלק פז 350"></textarea>
+  <div class="row" style="margin-top:8px"><button class="pri" id="go">סיווג</button><button id="demo">דוגמה</button><button id="csv">⬇ CSV לרואה החשבון</button></div>
+</div>
+<div class="stats" id="st"></div>
+<div class="panel tbl"><table><thead><tr><th>הוצאה</th><th class="num">סכום</th><th>קטגוריה</th><th class="num">מוכר במס</th><th class="num">מע״מ לקיזוז</th><th>הערה</th></tr></thead><tbody id="tb"></tbody></table></div>
+<div class="panel"><h2>📊 לפי קטגוריה</h2><table><tbody id="bycat"></tbody></table></div>
+<p class="hint">הכללים מקורבים ומבוססים על פקודת מס הכנסה ותקנותיה: רכב פרטי מוכר בערך 45% (או לפי שווי שימוש), ומע״מ על הוצאות שוטפות שלו 2/3. טלפון נייד מוכר 50% ומע״מ 2/3. כיבוד במשרד 80%, ארוחות במסעדה וכיבוד לאורחים לא מוכרים, ומתנות מוכרות עד תקרה לנותן. בית: לפי החלק העסקי. אין מע״מ על ארנונה, ביטוח, דמי ניהול בנק ותחבורה ציבורית. זה לא ייעוץ מס. ההחלטה הסופית בידי רואה החשבון.</p>
+<script>
+const $=id=>document.getElementById(id);const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');
+// [key, name, taxPct, vatPct (fraction of VAT claimable), note, regex]
+const C=[
+ ['car','רכב: דלק, תיקונים, חניה',.45,2/3,'רכב פרטי: כ־45% במס, 2/3 מהמע״מ',/דלק|פז|סונול|דור אלון|ten|yellow|דלקן|מוסך|צמיגים|טסט|חניה|חניון|פנגו|סלופארק|כביש 6|רישיון רכב|ליסינג/i],
+ ['phone','טלפון נייד ותקשורת',.5,2/3,'נייד: 50% במס, 2/3 מהמע״מ',/סלקום|פרטנר|פלאפון|הוט מובייל|גולן|019|012|רמי לוי תקשורת|we4g|אקספון|נייד/i],
+ ['net','אינטרנט וטלפון קווי',1,1,'',/בזק|אינטרנט|סיבים|בזק בינלאומי|נטוויז׳ן|הוט נט/i],
+ ['home','הוצאות בית (חשמל, מים, ארנונה)',null,null,'לפי החלק העסקי של הבית',/חשמל|חברת החשמל|מים|תאגיד|ארנונה|גז|ועד בית/i],
+ ['rent','שכירות משרד',1,1,'',/שכירות|שכר דירה משרד|דמי שכירות/i],
+ ['pro','שירותים מקצועיים',1,1,'',/רואה חשבון|רו״ח|הנהלת חשבונות|עורך דין|עו״ד|יועץ|גרפיקאי|מתכנת|פרילנס/i],
+ ['soft','תוכנה, אחסון ומנויים',1,1,'שירות מחו״ל: מע״מ לפי חשבונית ישראלית בלבד',/google|microsoft|office|adobe|zoom|canva|dropbox|aws|אחסון|דומיין|wix|מנוי|תוכנה|chatgpt|openai|anthropic|claude/i],
+ ['office','ציוד משרדי וקטן',1,1,'ציוד מעל ~2,000 ₪ נרשם כרכוש קבוע ומופחת',/ציוד משרדי|אופיס דיפו|נייר|דיו|טונר|מדפסת|כלי כתיבה|קלסר|ikea|איקאה/i],
+ ['comp','מחשבים וציוד (רכוש קבוע)',.33,1,'פחת 33% בשנה ולא הוצאה מלאה',/מחשב|לפטופ|מקבוק|אייפד|טאבלט|מסך|באג|ksp|איוורי|מחסני חשמל/i],
+ ['adv','פרסום ושיווק',1,1,'',/פרסום|פייסבוק|facebook|meta|גוגל אדס|google ads|שיווק|קמפיין|דפוס|כרטיסי ביקור|אינסטגרם/i],
+ ['snack','כיבוד במשרד',.8,1,'80% במס',/כיבוד|קפה למשרד|מים מינרליים|נספרסו|שופרסל|רמי לוי|ויקטורי|מגה/i],
+ ['meal','ארוחות ואירוח',0,0,'ארוחות במסעדה ואירוח בארץ בדרך כלל לא מוכרים',/מסעדה|ארוחה|קפה קפה|ארומה|מקדונלד|וולט|wolt|תן ביס|10bis|פיצה|סושי/i],
+ ['gift','מתנות ללקוחות',1,0,'מוכר עד תקרה שנתית לכל מקבל. אין קיזוז מע״מ',/מתנה|מתנות|שי לחג|סלסלה/i],
+ ['travel','נסיעות בארץ ותחבורה ציבורית',1,0,'אין מע״מ בתחבורה ציבורית',/רב קו|רב-קו|אוטובוס|רכבת|מונית|גט|gett|יאנגו|yango|אגד|דן/i],
+ ['abroad','נסיעות לחו״ל',1,0,'מוכר בתנאים ובתקרות. אין מע״מ',/טיסה|אל על|ישראייר|ארקיע|מלון|booking|airbnb|חו״ל/i],
+ ['edu','השתלמויות וספרות מקצועית',1,1,'',/קורס|השתלמות|כנס|סמינר|ספר מקצועי|udemy|לימודים/i],
+ ['ins','ביטוחים ואגרות',1,0,'אין מע״מ על ביטוח ואגרות',/ביטוח|הראל|מגדל|כלל|הפניקס|מנורה|איילון|אגרה|אגרת/i],
+ ['bank','עמלות בנק וסליקה',1,0,'עמלות בנק פטורות ממע״מ. עמלות סליקה חייבות לפי החשבונית',/עמלה|עמלות|בנק|דמי ניהול חשבון|ישראכרט|כאל|מקס|סליקה|paypal|פייפאל/i],
+ ['cloth','ביגוד',0,0,'ביגוד רגיל לא מוכר (למעט ביגוד עבודה ייעודי)',/ביגוד|בגדים|חולצה|נעליים|קסטרו|זארה|h&m|פוקס/i],
+ ['other','אחר, לבדיקה',1,1,'לא זוהה. כדאי לבדוק',/.*/]];
+let R=[];
+const parseLine=l=>{const m=l.match(/-?[\d,]+(?:\.\d+)?(?!.*\d)/);if(!m)return null;const a=Math.abs(+m[0].replace(/,/g,''));const d=l.replace(m[0],'').replace(/[₪\t;,]+/g,' ').replace(/\s+/g,' ').trim();return d?{d,a}:null};
+function classify(){R=$('src').value.split('\n').map(parseLine).filter(Boolean).map(x=>({...x,c:C.find(c=>c[5].test(x.d))[0]}));render()}
+function calcRow(x){const c=C.find(k=>k[0]===x.c),hp=(+$('home').value||0)/100,incl=$('incl').checked,net=incl?x.a/1.18:x.a,vat=incl?x.a-net:x.a*.18;
+  let tp=c[2]===null?hp:c[2],vp=c[3]===null?hp:c[3];if(x.c==='home'&&/ארנונה|ועד בית/.test(x.d))vp=0;
+  const mor=$('os').value==='m';const vatClaim=mor?vat*vp:0;const taxBase=mor?net+(vat-vatClaim):x.a;return{c,tax:taxBase*tp,vat:vatClaim,tp,vp}}
+function render(){let T=0,TX=0,TV=0;const by={};
+  $('tb').innerHTML=R.map((x,i)=>{const r=calcRow(x);T+=x.a;TX+=r.tax;TV+=r.vat;const b=by[r.c[1]]=by[r.c[1]]||[0,0,0];b[0]+=x.a;b[1]+=r.tax;b[2]+=r.vat;
+    const cls=r.tp===0?'no':r.tp<1?'part':'full';return`<tr><td>${x.d.replace(/</g,'&lt;')}</td><td class="num">${f(x.a)}</td><td><select data-i="${i}">${C.map(c=>`<option value="${c[0]}" ${c[0]===x.c?'selected':''}>${c[1]}</option>`).join('')}</select></td><td class="num ${cls}">${f(r.tax)} <small>(${Math.round(r.tp*100)}%)</small></td><td class="num">${f(r.vat)}</td><td class="muted" style="font-size:.8rem">${r.c[4]}</td></tr>`}).join('');
+  $('st').innerHTML=[['הוצאות',R.length],['סה״כ ששולם',f(T)],['מוכר במס הכנסה',f(TX)],['מע״מ לקיזוז',f(TV)],['חיסכון משוער במס (35%)',f(TX*.35+TV)]].map(([a,b])=>`<div class="stat"><small>${a}</small><b style="font-size:1.15rem">${b}</b></div>`).join('');
+  $('bycat').innerHTML=Object.entries(by).sort((a,b)=>b[1][0]-a[1][0]).map(([n,[a,t,v]])=>`<tr><td>${n}</td><td class="num">${f(a)}</td><td class="num">${f(t)}</td><td class="num">${f(v)}</td></tr>`).join('');
+  try{localStorage.setItem('expenses',$('src').value)}catch{}}
+$('tb').onchange=e=>{const i=e.target.dataset.i;if(i!==undefined){R[i].c=e.target.value;render()}};
+$('go').onclick=classify;['os','home','incl'].forEach(k=>$(k).oninput=render);
+$('demo').onclick=()=>{$('src').value='דלק פז 380\nסלקום חשבון חודשי 89\nבזק אינטרנט 120\nחשמל 640\nארנונה 520\nרואה חשבון 1,170\nGoogle Workspace 52\nקפה ועוגה מסעדה 96\nשופרסל כיבוד למשרד 210\nמחשב נייד KSP 4,680\nקורס אקסל מתקדם 890\nביטוח עסק הראל 310\nעמלות בנק 38\nחולצות לעבודה 240\nרב קו 90\nפרסום בפייסבוק 600';classify()};
+$('csv').onclick=()=>{const c='﻿תיאור,סכום,קטגוריה,מוכר במס,אחוז,מע"מ לקיזוז,הערה\n'+R.map(x=>{const r=calcRow(x);return['"'+x.d.replace(/"/g,'""')+'"',x.a,r.c[1],Math.round(r.tax),Math.round(r.tp*100)+'%',Math.round(r.vat),'"'+r.c[4]+'"'].join(',')}).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));a.download='הוצאות-מסווגות.csv';a.click()};
+try{$('src').value=localStorage.getItem('expenses')||''}catch{}
+if($('src').value)classify();else $('demo').click();
+</script>
+</div>
+</body>
+</html>

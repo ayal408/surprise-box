@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחשבון אחוזים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffb703}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.q{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:1.1rem}
+.q input{width:120px;font-size:1.1rem;text-align:center}
+.q b{color:var(--acc);font-size:1.4rem;min-width:90px;direction:ltr;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>％ מחשבון אחוזים</h1>
+<p class="sub">כל חישובי האחוזים במקום אחד: כמה זה X% מ־Y, כמה אחוז זה, שינוי באחוזים, הנחה ותוספת, ומחיר לפני הנחה.</p>
+<div class="panel"><h2>כמה זה X% מתוך Y?</h2><div class="q"><input id="a1" type="number" value="18">% מתוך<input id="b1" type="number" value="1250">=<b id="r1"></b></div></div>
+<div class="panel"><h2>X הוא כמה אחוז מ־Y?</h2><div class="q"><input id="a2" type="number" value="45">מתוך<input id="b2" type="number" value="60">=<b id="r2"></b></div></div>
+<div class="panel"><h2>שינוי באחוזים מ־A ל־B</h2><div class="q">מ־<input id="a3" type="number" value="80">ל־<input id="b3" type="number" value="100">=<b id="r3"></b></div><p class="hint" id="n3" style="margin-top:6px"></p></div>
+<div class="panel"><h2>הוספה או הורדה של אחוזים</h2><div class="q"><input id="a4" type="number" value="200"><select id="op4" style="font-size:1rem"><option value="1">ועוד</option><option value="-1">פחות</option></select><input id="b4" type="number" value="15">%=<b id="r4"></b></div></div>
+<div class="panel"><h2>מה היה המחיר לפני ההנחה או התוספת?</h2><div class="q">המחיר אחרי<input id="a5" type="number" value="340">אחרי<select id="op5" style="font-size:1rem"><option value="-1">הנחה של</option><option value="1">תוספת של</option></select><input id="b5" type="number" value="15">%=<b id="r5"></b></div></div>
+<div class="panel"><h2>הנחות מצטברות</h2><div class="q"><input id="a6" type="number" value="20">% ואז עוד<input id="b6" type="number" value="10">%=<b id="r6"></b></div><p class="hint" style="margin-top:6px">שתי הנחות ברצף הן לא סכום האחוזים. 20% ועוד 10% הן 28%, לא 30%.</p></div>
+<script>
+const $=id=>document.getElementById(id);const n=v=>(+(+v).toFixed(4)).toLocaleString('he-IL',{maximumFractionDigits:4});const v=id=>+$(id).value||0;
+function calc(){$('r1').textContent=n(v('a1')*v('b1')/100);$('r2').textContent=v('b2')?n(v('a2')/v('b2')*100)+'%':'—';
+  const c=v('a3')?(v('b3')-v('a3'))/Math.abs(v('a3'))*100:NaN;$('r3').textContent=isNaN(c)?'—':(c>0?'+':'')+n(c)+'%';$('n3').textContent=isNaN(c)?'':c>0?`עלייה של ${n(c)}%. כדי לחזור מ־${n(v('b3'))} ל־${n(v('a3'))} צריך ירידה של ${n((v('b3')-v('a3'))/v('b3')*100)}%.`:c<0?`ירידה של ${n(-c)}%. כדי לחזור צריך עלייה של ${n((v('a3')-v('b3'))/v('b3')*100)}%.`:'';
+  $('r4').textContent=n(v('a4')*(1+ +$('op4').value*v('b4')/100));const d=1+ +$('op5').value*v('b5')/100;$('r5').textContent=d?n(v('a5')/d):'—';$('r6').textContent=n(100-(100-v('a6'))*(100-v('b6'))/100)+'%'}
+document.querySelectorAll('input,select').forEach(i=>i.oninput=calc);calc();
+</script>
+</div>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>תכנון ארוחות שבועי</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff9f68}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1200px!important}
+.wk{overflow:auto}.wk table{min-width:720px}
+.wk td{vertical-align:top;padding:4px}
+.wk td:first-child{font-weight:700;white-space:nowrap}
+.cell{min-height:44px;border-radius:10px;background:rgba(255,255,255,.04);padding:6px;cursor:pointer;font-size:.9rem;line-height:1.4}
+.cell:hover{background:rgba(255,255,255,.09)}.cell.empty{color:var(--muted);text-align:center}
+.lib{display:flex;flex-wrap:wrap;gap:6px}.lib button{font-size:.85rem;padding:5px 10px}
+dialog{background:#1d1840;color:var(--ink);border:1px solid var(--line);border-radius:16px;max-width:520px;width:94%}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🍲 תכנון ארוחות שבועי</h1>
+<p class="sub">מתכננים מה אוכלים כל יום בשבוע, בוחרים מתוך מאגר מנות או כותבים לבד, ומקבלים רשימת קניות מרוכזת לכל השבוע בלחיצה.</p>
+<div class="panel row"><button id="rand">🎲 מילוי אקראי</button><button id="clr">ניקוי השבוע</button><label class="inline">סועדים <input id="ppl" type="number" value="5" min="1" style="width:70px"></label><span class="muted" style="font-size:.85rem">לוחצים על משבצת כדי לבחור מנה</span></div>
+<div class="panel wk"><table><thead><tr><th></th><th>🌅 בוקר</th><th>☀️ צהריים</th><th>🌙 ערב</th></tr></thead><tbody id="tb"></tbody></table></div>
+<div class="grid2">
+  <div class="panel"><h2>🛒 רשימת קניות לשבוע</h2><div id="shop" style="line-height:1.9;max-height:360px;overflow:auto"></div><div class="row" style="margin-top:8px"><button id="wa">📤 וואטסאפ</button><button id="cp">📋 העתקה</button></div></div>
+  <div class="panel"><h2>📖 המנות שלי</h2><div class="lib" id="lib"></div><form class="row" id="fl" style="margin-top:10px;flex-direction:column;align-items:stretch"><input id="ln" placeholder="שם המנה" required><input id="li" placeholder="מצרכים, מופרדים בפסיק (עוף, אורז, בצל)"><select id="lt"><option value="b">בוקר</option><option value="l" selected>צהריים</option><option value="d">ערב</option></select><button>+ הוספה למאגר</button></form></div>
+</div>
+<dialog id="dlg"><h3 id="dh" style="margin-top:0"></h3><div class="lib" id="dl"></div><div class="row" style="margin-top:10px"><input id="dc" placeholder="או כתבו מנה חופשית" style="flex:1"><button id="dok" class="pri">שמירה</button><button id="dclr">ריקון</button><button id="dx">סגירה</button></div></dialog>
+<script>
+const $=id=>document.getElementById(id);const DN=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'],ML={b:'בוקר',l:'צהריים',d:'ערב'};
+const LIB0=[['חביתה וסלט','b','ביצים,עגבניות,מלפפונים,לחם'],['שקשוקה','b','ביצים,עגבניות,פלפל,בצל'],['דייסה','b','שיבולת שועל,חלב,בננות'],['טוסטים','b','לחם,גבינה צהובה'],['יוגורט וגרנולה','b','יוגורט,גרנולה,פירות'],
+ ['שניצל ופירה','l','חזה עוף,פירורי לחם,ביצים,תפוחי אדמה'],['פסטה ברוטב עגבניות','l','פסטה,רסק עגבניות,בצל,שום'],['אורז ועוף בתנור','l','עוף,אורז,בצל'],['קציצות ברוטב','l','בשר טחון,רסק עגבניות,בצל,אורז'],['מג׳דרה','l','אורז,עדשים,בצל'],['דג אפוי וירקות','l','דג,תפוחי אדמה,גזר,לימון'],['מרק עוף','l','עוף,גזר,קישוא,בצל,שקדי מרק'],
+ ['פיצה ביתית','d','קמח,שמרים,רסק עגבניות,גבינה צהובה'],['מרק ירקות','d','גזר,קישוא,בטטה,בצל'],['פנקייקים','d','קמח,ביצים,חלב,סוכר'],['סלט טונה','d','טונה,ביצים,מלפפונים,לחם'],['בורקס וסלט','d','בורקס,עגבניות,מלפפונים'],['חמין','l','בשר,תפוחי אדמה,ביצים,שעועית,גריסים'],['חלה, דגים וסלטים','d','חלות,דגים,חומוס,טחינה,מלפפונים']];
+let S;try{S=JSON.parse(localStorage.getItem('meals'))}catch{}if(!S)S={w:{},lib:LIB0.map(([n,t,i])=>({n,t,i}))};
+const save=()=>{try{localStorage.setItem('meals',JSON.stringify(S))}catch{}};let cur=null;
+function render(){$('tb').innerHTML=DN.map((d,di)=>`<tr><td>${d}</td>${['b','l','d'].map(m=>{const v=S.w[di+m];return`<td><div class="cell ${v?'':'empty'}" data-k="${di+m}">${v?v.replace(/</g,'&lt;'):'+'}</div></td>`}).join('')}</tr>`).join('');
+  $('lib').innerHTML=S.lib.map((x,i)=>`<span class="tag">${x.n} <button data-lx="${i}" style="padding:0 4px;border:0;background:none">✕</button></span>`).join('');shop();save()}
+function shop(){const cnt={};Object.values(S.w).forEach(v=>{const r=S.lib.find(x=>x.n===v);(r&&r.i?r.i.split(','):[]).map(s=>s.trim()).filter(Boolean).forEach(s=>cnt[s]=(cnt[s]||0)+1)});
+  const E=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);$('shop').innerHTML=E.length?E.map(([s,n])=>`<label class="inline"><input type="checkbox"> ${s}${n>1?` <span class="muted">(${n} ארוחות)</span>`:''}</label>`).join('<br>'):'<span class="muted">בחרו מנות מהמאגר כדי לקבל רשימה</span>';return E}
+function open2(k){cur=k;const m=k.slice(-1);$('dh').textContent=`${DN[+k[0]]} · ${ML[m]}`;$('dl').innerHTML=S.lib.filter(x=>x.t===m).concat(S.lib.filter(x=>x.t!==m)).map(x=>`<button data-pick="${x.n.replace(/"/g,'&quot;')}" style="${x.t===m?'':'opacity:.6'}">${x.n}</button>`).join('');$('dc').value=S.w[k]||'';$('dlg').showModal()}
+$('tb').onclick=e=>{const c=e.target.closest('.cell');if(c)open2(c.dataset.k)};
+$('dl').onclick=e=>{const p=e.target.dataset.pick;if(p){S.w[cur]=p;$('dlg').close();render()}};
+$('dok').onclick=()=>{const v=$('dc').value.trim();if(v)S.w[cur]=v;else delete S.w[cur];$('dlg').close();render()};
+$('dclr').onclick=()=>{delete S.w[cur];$('dlg').close();render()};$('dx').onclick=()=>$('dlg').close();
+$('lib').onclick=e=>{const x=e.target.dataset.lx;if(x!==undefined){S.lib.splice(+x,1);render()}};
+$('fl').onsubmit=e=>{e.preventDefault();S.lib.push({n:$('ln').value,i:$('li').value,t:$('lt').value});$('ln').value='';$('li').value='';render()};
+$('rand').onclick=()=>{DN.forEach((_,di)=>['b','l','d'].forEach(m=>{if(S.w[di+m])return;const o=S.lib.filter(x=>x.t===m);if(o.length)S.w[di+m]=o[Math.random()*o.length|0].n}));render()};
+$('clr').onclick=()=>{if(confirm('לנקות את כל השבוע?')){S.w={};render()}};
+const txt=()=>'🛒 קניות לשבוע ('+$('ppl').value+' סועדים)\n'+shop().map(([s])=>'• '+s).join('\n');
+$('wa').onclick=()=>open('https://wa.me/?text='+encodeURIComponent(txt()),'_blank');
+$('cp').onclick=()=>{navigator.clipboard.writeText(txt());$('cp').textContent='✓ הועתק';setTimeout(()=>$('cp').textContent='📋 העתקה',1400)};
+render();
+</script>
+</div>
+</body>
+</html>

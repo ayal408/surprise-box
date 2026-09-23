@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>יומן אישי</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#c49bff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.moods{display:flex;gap:6px;flex-wrap:wrap}
+.moods button{font-size:1.7rem;padding:6px 10px;border-radius:14px}
+textarea{width:100%;min-height:80px;line-height:1.7}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal div{border-radius:8px;padding:4px 0;font-size:.8rem;cursor:pointer;background:rgba(255,255,255,.03)}
+.cal div.has{background:rgba(196,155,255,.18)}.cal div.sel{outline:2px solid var(--acc)}
+.cal .m{font-size:1.1rem;display:block}
+.prompt{font-style:italic;color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>📓 יומן אישי</h1>
+<p class="sub">כמה דקות ביום: מצב רוח, על מה אני מודה, מה הצליח ומה ללמוד. עם שאלה מעוררת מחשבה לכל יום, לוח חודשי של מצבי רוח וחיפוש ברשומות. הכל נשמר רק במכשיר שלך.</p>
+<div class="panel row" style="justify-content:space-between"><button id="prev">→</button><h2 id="day" style="margin:0"></h2><button id="next">←</button></div>
+<div class="grid2">
+  <div class="panel">
+    <h2>איך היה היום?</h2>
+    <div class="moods" id="moods"></div>
+    <label style="margin-top:12px">🙏 שלושה דברים שאני מודה עליהם<textarea id="grat" placeholder="1.&#10;2.&#10;3."></textarea></label>
+    <label style="margin-top:8px">🏆 מה הצליח היום<textarea id="win"></textarea></label>
+    <label style="margin-top:8px"><span class="prompt" id="pq"></span><textarea id="free"></textarea></label>
+    <p class="muted" id="saved" style="font-size:.8rem;margin:6px 0 0"></p>
+  </div>
+  <div>
+    <div class="panel"><div class="row" style="justify-content:space-between"><button id="pm">→</button><b id="mt"></b><button id="nm">←</button></div><div class="cal" id="cal" style="margin-top:8px"></div></div>
+    <div class="panel"><h2>📈 סיכום</h2><div class="stats" id="st"></div></div>
+    <div class="panel"><input id="q" placeholder="🔍 חיפוש ברשומות" style="width:100%"><div id="res" style="margin-top:8px;line-height:1.8;max-height:220px;overflow:auto"></div></div>
+    <div class="row"><button id="exp">⬇ ייצוא כקובץ טקסט</button></div>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);const MO=['😢','😕','😐','🙂','😄','🤩'];
+const PQ=['מה למדתי היום?','מי עשה לי טוב היום, ואיך אפשר להחזיר לו?','מה הייתי עושה אחרת?','במה אני רוצה להתמקד מחר?','מה גרם לי לחייך?','איזה הרגל קטן אני רוצה לחזק?','על מה דאגתי, ואיך זה נגמר בסוף?','מה אני גאה בו השבוע?','מה הדבר החשוב ביותר שקרה היום?','אם היום היה פרק בספר, מה היה שמו?'];
+let D=new Date();let J;try{J=JSON.parse(localStorage.getItem('journal'))||{}}catch{J={}}let cm=new Date(D.getFullYear(),D.getMonth(),1);
+const k=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const cur=()=>J[k(D)]||{};let tmr;
+function save(){const e={m:J[k(D)]?.m,grat:$('grat').value,win:$('win').value,free:$('free').value};if(!e.m&&!e.grat&&!e.win&&!e.free)delete J[k(D)];else J[k(D)]=e;clearTimeout(tmr);tmr=setTimeout(()=>{try{localStorage.setItem('journal',JSON.stringify(J));$('saved').textContent='✓ נשמר '+new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}catch{}},400);cal();stats()}
+function load(){const e=cur(),t=new Date();$('day').textContent=(k(D)===k(t)?'היום · ':'')+D.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  $('grat').value=e.grat||'';$('win').value=e.win||'';$('free').value=e.free||'';$('pq').textContent='✍️ '+PQ[Math.floor(D/864e5)%PQ.length];$('saved').textContent='';
+  $('moods').innerHTML=MO.map((m,i)=>`<button data-m="${i}" class="${e.m===i?'on':''}">${m}</button>`).join('');if(cm.getMonth()!==D.getMonth()||cm.getFullYear()!==D.getFullYear())cm=new Date(D.getFullYear(),D.getMonth(),1);cal();stats()}
+function cal(){$('mt').textContent=cm.toLocaleDateString('he-IL',{month:'long',year:'numeric'});const f=cm.getDay(),n=new Date(cm.getFullYear(),cm.getMonth()+1,0).getDate();let h='אבגדהוש'.split('').map(x=>`<b class="muted" style="font-size:.8rem">${x}׳</b>`).join('')+'<span></span>'.repeat(f);
+  for(let i=1;i<=n;i++){const d=new Date(cm.getFullYear(),cm.getMonth(),i),e=J[k(d)];h+=`<div class="${e?'has':''} ${k(d)===k(D)?'sel':''}" data-d="${k(d)}"><span class="m">${e&&e.m!=null?MO[e.m]:'·'}</span>${i}</div>`}$('cal').innerHTML=h}
+function stats(){const E=Object.entries(J).sort();const ms=E.map(([,e])=>e.m).filter(m=>m!=null);let streak=0,d=new Date();while(J[k(d)]){streak++;d.setDate(d.getDate()-1)}
+  const last30=E.filter(([d])=>new Date(d)>Date.now()-30*864e5).map(([,e])=>e.m).filter(m=>m!=null);
+  $('st').innerHTML=[['רשומות',E.length],['רצף ימים',streak+' 🔥'],['מצב רוח ממוצע (30 יום)',last30.length?MO[Math.round(last30.reduce((a,b)=>a+b,0)/last30.length)]:'—'],['הכי שכיח',ms.length?MO[[...Array(6).keys()].sort((a,b)=>ms.filter(x=>x===b).length-ms.filter(x=>x===a).length)[0]]:'—']].map(([a,b])=>`<div class="stat"><small>${a}</small><b>${b}</b></div>`).join('')}
+$('moods').onclick=e=>{const m=e.target.closest('[data-m]');if(!m)return;J[k(D)]={...cur(),m:+m.dataset.m};document.querySelectorAll('#moods button').forEach(b=>b.classList.toggle('on',b===m));save()};
+['grat','win','free'].forEach(x=>$(x).oninput=save);
+$('prev').onclick=()=>{D.setDate(D.getDate()-1);load()};$('next').onclick=()=>{D.setDate(D.getDate()+1);load()};
+$('pm').onclick=()=>{cm=new Date(cm.getFullYear(),cm.getMonth()-1,1);cal()};$('nm').onclick=()=>{cm=new Date(cm.getFullYear(),cm.getMonth()+1,1);cal()};
+$('cal').onclick=e=>{const c=e.target.closest('[data-d]');if(c){const[y,m,d]=c.dataset.d.split('-').map(Number);D=new Date(y,m-1,d);load()}};
+$('q').oninput=()=>{const q=$('q').value.trim();$('res').innerHTML=q?Object.entries(J).filter(([,e])=>[e.grat,e.win,e.free].join(' ').includes(q)).sort().reverse().map(([d,e])=>`<div><a href="#" data-go="${d}" style="color:var(--acc)">${new Date(d).toLocaleDateString('he-IL')}</a> ${e.m!=null?MO[e.m]:''} ${[e.grat,e.win,e.free].join(' · ').replace(/</g,'&lt;').slice(0,90)}…</div>`).join('')||'<span class="muted">לא נמצא</span>':''};
+$('res').onclick=e=>{const g=e.target.dataset.go;if(g){e.preventDefault();const[y,m,d]=g.split('-').map(Number);D=new Date(y,m-1,d);load()}};
+$('exp').onclick=()=>{const t=Object.entries(J).sort().map(([d,e])=>`=== ${d} ${e.m!=null?MO[e.m]:''} ===\n${e.grat?'🙏 '+e.grat+'\n':''}${e.win?'🏆 '+e.win+'\n':''}${e.free?'✍️ '+e.free+'\n':''}`).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+t],{type:'text/plain;charset=utf-8'}));a.download='יומן.txt';a.click()};
+load();
+</script>
+</div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>איקס עיגול</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff8fab}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:520px!important}
+.b{display:grid;gap:8px;width:min(100%,360px);margin:0 auto;direction:ltr}
+.c{aspect-ratio:1;border-radius:16px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:3.4rem;font-weight:900;cursor:pointer;transition:background .15s}
+.c:hover{background:rgba(255,255,255,.1)}.c.X{color:#ff8fab}.c.O{color:#4cc9f0}.c.win{background:rgba(255,209,102,.3)}
+.c span{animation:in .2s}@keyframes in{from{transform:scale(0)}}
+.st{text-align:center;font-size:1.3rem;font-weight:800;min-height:1.6em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>❌⭕ איקס עיגול</h1>
+<p class="sub">נגד חבר או נגד המחשב, בשלוש רמות. ברמה הקשה המחשב לא מפסיד אף פעם. אפשר גם לוח 4×4 לגרסה מאתגרת.</p>
+<div class="panel row" style="justify-content:center"><select id="mode"><option value="ai">🤖 נגד המחשב</option><option value="2p">👥 שני שחקנים</option></select><select id="lvl"><option value="0">קל</option><option value="1" selected>בינוני</option><option value="2">בלתי מנוצח</option></select><select id="size"><option value="3">3×3</option><option value="4">4×4 (ארבע בשורה)</option></select><button id="new" class="pri">משחק חדש</button></div>
+<div class="stats"><div class="stat"><small>❌ X</small><b id="sx">0</b></div><div class="stat"><small>תיקו</small><b id="sd">0</b></div><div class="stat"><small>⭕ O</small><b id="so">0</b></div></div>
+<div class="st" id="st"></div>
+<div class="b" id="b"></div>
+<script>
+const $=id=>document.getElementById(id);let N=3,B,turn,over,sc={X:0,O:0,D:0},first='X';
+function lines(){const L=[];for(let i=0;i<N;i++){L.push([...Array(N)].map((_,j)=>i*N+j));L.push([...Array(N)].map((_,j)=>j*N+i))}L.push([...Array(N)].map((_,j)=>j*N+j));L.push([...Array(N)].map((_,j)=>j*N+N-1-j));return L}
+let LN=lines();
+const winner=b=>{for(const l of LN){const v=b[l[0]];if(v&&l.every(i=>b[i]===v))return[v,l]}return b.every(Boolean)?['D',[]]:null};
+function mm(b,p,depth,a,be){const w=winner(b);if(w)return w[0]==='O'?10-depth:w[0]==='X'?depth-10:0;if(N===4&&depth>=4)return 0;let best=p==='O'?-1e9:1e9;
+  for(let i=0;i<b.length;i++)if(!b[i]){b[i]=p;const s=mm(b,p==='O'?'X':'O',depth+1,a,be);b[i]=null;if(p==='O'){best=Math.max(best,s);a=Math.max(a,s)}else{best=Math.min(best,s);be=Math.min(be,s)}if(be<=a)break}return best}
+function aiMove(){const lv=+$('lvl').value,free=B.map((v,i)=>v?null:i).filter(i=>i!==null);if(lv===0||(lv===1&&Math.random()<.3))return free[Math.random()*free.length|0];
+  let best=-1e9,mv=free[0];for(const i of free){B[i]='O';const s=mm(B,'X',1,-1e9,1e9)+Math.random()*.1;B[i]=null;if(s>best){best=s;mv=i}}return mv}
+function draw(w){$('b').style.gridTemplateColumns=`repeat(${N},1fr)`;$('b').innerHTML=B.map((v,i)=>`<div class="c ${v||''} ${w&&w[1].includes(i)?'win':''}" data-i="${i}">${v?`<span>${v==='X'?'✕':'◯'}</span>`:''}</div>`).join('');
+  $('st').textContent=over?(w[0]==='D'?'🤝 תיקו!':`🎉 ${w[0]==='X'?'✕':'◯'} ניצח!`):`תור ${turn==='X'?'✕':'◯'}${$('mode').value==='ai'&&turn==='O'?' (המחשב חושב...)':''}`;
+  $('sx').textContent=sc.X;$('so').textContent=sc.O;$('sd').textContent=sc.D}
+function play(i){if(over||B[i])return;B[i]=turn;const w=winner(B);if(w){over=true;sc[w[0]]++;try{localStorage.setItem('ttt',JSON.stringify(sc))}catch{}draw(w);return}turn=turn==='X'?'O':'X';draw();
+  if($('mode').value==='ai'&&turn==='O')setTimeout(()=>play(aiMove()),350)}
+function reset(){N=+$('size').value;LN=lines();B=Array(N*N).fill(null);over=false;turn=first;first=first==='X'?'O':'X';draw();if($('mode').value==='ai'&&turn==='O')setTimeout(()=>play(aiMove()),400)}
+$('b').onclick=e=>{const c=e.target.closest('.c');if(!c)return;if($('mode').value==='ai'&&turn==='O')return;play(+c.dataset.i)};
+$('new').onclick=reset;['mode','size'].forEach(k=>$(k).onchange=()=>{sc={X:0,O:0,D:0};first='X';reset()});
+try{sc=JSON.parse(localStorage.getItem('ttt'))||sc}catch{}
+reset();
+</script>
+</div>
+</body>
+</html>

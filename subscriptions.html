@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעקב מנויים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff8fab}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.sub-it{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:10px;border-radius:12px;background:rgba(255,255,255,.04);margin-bottom:6px}
+.sub-it .ic{font-size:1.6rem}.sub-it.cut{opacity:.45}.sub-it.cut b{text-decoration:line-through}
+.sub-it.soon{outline:1px solid var(--acc)}
+.bar{display:flex;height:22px;border-radius:8px;overflow:hidden;margin-top:8px}.bar div{height:100%}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🔁 מעקב מנויים והוראות קבע</h1>
+<p class="sub">כל המנויים והתשלומים הקבועים במקום אחד: סטרימינג, סלולר, ביטוחים, חדר כושר ועוד. רואים כמה זה עולה בחודש ובשנה, מתי החידוש הבא, ומה אפשר לבטל.</p>
+<div class="stats" id="st"></div>
+<div class="panel">
+  <form id="f" class="row">
+    <input id="n" placeholder="שם (נטפליקס, סלקום...)" required style="flex:1;min-width:140px" list="sug"><datalist id="sug"></datalist>
+    <input id="a" type="number" step="0.01" placeholder="₪" required style="width:90px">
+    <select id="per"><option value="1">בחודש</option><option value="12">בשנה</option><option value="0.25">בשבוע</option><option value="2">כל חודשיים</option></select>
+    <select id="cat"><option>🎬 בידור</option><option>📱 תקשורת</option><option>🛡️ ביטוח</option><option>💪 בריאות וכושר</option><option>💻 תוכנה ואחסון</option><option>🏠 בית</option><option>🚗 רכב</option><option>📚 לימודים</option><option>🎗️ תרומות</option><option>📦 אחר</option></select>
+    <label class="inline">חידוש <input id="d" type="date"></label>
+    <button class="pri">הוספה</button>
+  </form>
+</div>
+<div class="panel"><div class="row" style="justify-content:space-between"><h2 style="margin:0">📋 המנויים שלי</h2><select id="sort"><option value="cost">לפי עלות</option><option value="date">לפי חידוש קרוב</option><option value="cat">לפי קטגוריה</option></select></div><div id="list" style="margin-top:10px"></div></div>
+<div class="panel"><h2>📊 לפי קטגוריה</h2><div class="bar" id="bar"></div><table style="margin-top:8px"><tbody id="bycat"></tbody></table></div>
+<p class="hint">טיפ: סמנו ✂️ על מנוי שאתם שוקלים לבטל ותראו כמה תחסכו בשנה. "כמה שעות עבודה" מחושב לפי שכר נטו לשעה שתזינו.</p>
+<div class="panel row"><label class="inline">שכר נטו לשעה (₪) <input id="wage" type="number" value="50" style="width:90px"></label><button id="csv">⬇ CSV</button></div>
+<script>
+const $=id=>document.getElementById(id);const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');
+const SUG=['נטפליקס','ספוטיפיי','יס','הוט','סלקום','פרטנר','פלאפון','גולן טלקום','בזק','ביטוח רכב','ביטוח בריאות','ביטוח דירה','ביטוח חיים','חדר כושר','Google One','iCloud','Microsoft 365','ChatGPT','Disney+','אמזון פריים','ועד בית','עיתון','ארנונה','תרומה חודשית','קופת חולים (משלים)'];
+$('sug').innerHTML=SUG.map(s=>`<option value="${s}">`).join('');
+let L;try{L=JSON.parse(localStorage.getItem('subs'))}catch{}
+if(!L){const n=new Date(),o=k=>new Date(n.getFullYear(),n.getMonth(),n.getDate()+k).toISOString().slice(0,10);L=[{n:'נטפליקס',a:54.9,per:1,cat:'🎬 בידור',d:o(6)},{n:'סלקום',a:59,per:1,cat:'📱 תקשורת',d:o(12)},{n:'ביטוח רכב',a:3600,per:12,cat:'🚗 רכב',d:o(90)},{n:'חדר כושר',a:229,per:1,cat:'💪 בריאות וכושר',d:o(3)},{n:'Google One',a:7.9,per:1,cat:'💻 תוכנה ואחסון',d:o(20)},{n:'ספוטיפיי',a:23.9,per:1,cat:'🎬 בידור',d:o(15),cut:1}]}
+const save=()=>{try{localStorage.setItem('subs',JSON.stringify(L))}catch{}};
+const mon=x=>x.a/x.per;
+function next(x){if(!x.d)return null;const t=new Date();t.setHours(0,0,0,0);let d=new Date(x.d);const step=x.per>=1?x.per:0;while(d<t){if(step)d.setMonth(d.getMonth()+step);else d.setDate(d.getDate()+7)}return d}
+function render(){const act=L.filter(x=>!x.cut),M=act.reduce((s,x)=>s+mon(x),0),C=L.filter(x=>x.cut).reduce((s,x)=>s+mon(x),0),w=+$('wage').value||0;
+  $('st').innerHTML=[['מנויים פעילים',act.length],['בחודש',f(M)],['בשנה',f(M*12)],['שעות עבודה בחודש',w?(M/w).toFixed(1):'—'],['חיסכון מביטולים (שנתי)',f(C*12)]].map(([a,b])=>`<div class="stat"><small>${a}</small><b style="font-size:1.2rem">${b}</b></div>`).join('');
+  const s=$('sort').value,R=L.map((x,i)=>({...x,i,nx:next(x)})).sort((a,b)=>s==='cost'?mon(b)-mon(a):s==='date'?(a.nx||Infinity)-(b.nx||Infinity):a.cat.localeCompare(b.cat));const t=new Date();
+  $('list').innerHTML=R.map(x=>{const dd=x.nx?Math.round((x.nx-t)/864e5):null;return`<div class="sub-it ${x.cut?'cut':''} ${dd!==null&&dd<=7&&!x.cut?'soon':''}"><span class="ic">${x.cat.split(' ')[0]}</span><div><b>${x.n.replace(/</g,'&lt;')}</b><div class="muted" style="font-size:.82rem">${f(x.a)} ${x.per===1?'בחודש':x.per===12?'בשנה':x.per===2?'כל חודשיים':'בשבוע'} · ${f(mon(x)*12)} בשנה${x.nx?` · חידוש ${x.nx.toLocaleDateString('he-IL',{day:'numeric',month:'numeric'})} (${dd<=0?'היום':'בעוד '+dd+' ימים'})`:''}</div></div><button data-cut="${x.i}" title="שוקל/ת לבטל">${x.cut?'↺':'✂️'}</button><button data-x="${x.i}">✕</button></div>`}).join('')||'<p class="muted">אין מנויים</p>';
+  const by={};act.forEach(x=>by[x.cat]=(by[x.cat]||0)+mon(x));const cols=['#ff8fab','#4cc9f0','#90e0a0','#ffd166','#c49bff','#ff9f68','#7cf2c4','#9bd1ff','#f78c6b','#e0a0ff'];const E=Object.entries(by).sort((a,b)=>b[1]-a[1]);
+  $('bar').innerHTML=E.map(([c,v],i)=>`<div style="flex:${v};background:${cols[i%cols.length]}" title="${c}"></div>`).join('');$('bycat').innerHTML=E.map(([c,v],i)=>`<tr><td><span style="color:${cols[i%cols.length]}">●</span> ${c}</td><td class="num">${f(v)} / חודש</td><td class="num muted">${M?Math.round(v/M*100):0}%</td></tr>`).join('');save()}
+$('f').onsubmit=e=>{e.preventDefault();L.push({n:$('n').value,a:+$('a').value,per:+$('per').value,cat:$('cat').value,d:$('d').value});$('n').value='';$('a').value='';render()};
+$('list').onclick=e=>{const d=e.target.dataset;if(d.cut!==undefined){L[d.cut].cut=!L[d.cut].cut;render()}else if(d.x!==undefined&&confirm('למחוק?')){L.splice(+d.x,1);render()}};
+$('sort').onchange=render;$('wage').oninput=render;
+$('csv').onclick=()=>{const c='﻿שם,סכום,תדירות,קטגוריה,לחודש,לשנה,חידוש,לביטול\n'+L.map(x=>['"'+x.n+'"',x.a,x.per,x.cat,mon(x).toFixed(2),(mon(x)*12).toFixed(0),x.d||'',x.cut?'כן':''].join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));a.download='מנויים.csv';a.click()};
+render();
+</script>
+</div>
+</body>
+</html>

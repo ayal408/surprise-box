@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מתכנן שמחה</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffd166}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.it{display:grid;grid-template-columns:1fr 110px 110px 110px 34px;gap:6px;align-items:center;margin-bottom:5px}
+.it.paid input:first-child{text-decoration:line-through;opacity:.7}
+.bar{height:14px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:6px}.bar div{height:100%;background:var(--acc)}
+@media(max-width:640px){.it{grid-template-columns:1fr 90px 90px}.it .x,.it .pd{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>💍 מתכנן תקציב לשמחה</h1>
+<p class="sub">חתונה, בר מצווה, ברית, אירוסין או שבע ברכות: תקציב לפי סעיפים, מספר מוזמנים ומחיר למנה, חלוקה בין הצדדים, מעקב תשלומים לספקים וצפי מתנות.</p>
+<div class="panel row">
+  <label>סוג האירוע<select id="type"><option value="wed">💍 חתונה</option><option value="bar">📜 בר / בת מצווה</option><option value="brit">👶 ברית / שמחת בת</option><option value="vort">🥂 אירוסין / וורט</option><option value="sheva">🍷 שבע ברכות</option></select></label>
+  <label>מוזמנים<input id="guests" type="number" value="400"></label>
+  <label>אחוז הגעה צפוי (%)<input id="att" type="number" value="80"></label>
+  <label>מחיר למנה (₪)<input id="plate" type="number" value="180"></label>
+  <label>מתנה ממוצעת לאורח (₪)<input id="gift" type="number" value="250"></label>
+</div>
+<div class="stats" id="st"></div>
+<div class="panel">
+  <h2>🧾 סעיפי תקציב</h2>
+  <div class="it muted" style="font-size:.8rem"><span>סעיף</span><span>תקציב</span><span>בפועל</span><span>שולם</span><span></span></div>
+  <div id="items"></div>
+  <div class="row"><button id="add">+ סעיף</button><button id="preset">טעינת סעיפים לסוג האירוע</button></div>
+</div>
+<div class="grid2">
+  <div class="panel"><h2>🤝 חלוקה בין הצדדים</h2><label>חלק צד א׳ (%)<input type="range" id="split" min="0" max="100" value="50" style="width:100%"></label><table><tbody id="sp"></tbody></table></div>
+  <div class="panel"><h2>📋 מה נשאר לעשות</h2><div id="todo" style="line-height:1.9"></div></div>
+</div>
+<div class="row"><button id="cp">📋 העתקת סיכום</button></div>
+<script>
+const $=id=>document.getElementById(id);const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');
+const PRE={wed:[['אולם וקייטרינג',0,'plate'],['צלם וידאו וסטילס',9000],['תזמורת / די־ג׳יי',8000],['שמלת כלה ואיפור',6000],['חליפה וכובע לחתן',3500],['טבעת ותכשיטים',5000],['הזמנות והדפסות',1500],['סידורי פרחים',4000],['כלי קודש, כתובה וחופה',1200],['הסעות',2500],['שבע ברכות',8000],['דירה וריהוט (ראשוני)',25000]],
+ bar:[['אולם וקייטרינג',0,'plate'],['צלם',5000],['תזמורת / מוזיקה',5000],['תפילין וטלית',4000],['חליפה וכובע',2500],['קידוש בשבת',4000],['הזמנות',800],['מתנות לילד',1500]],
+ brit:[['קייטרינג / קידוש',0,'plate'],['מוהל (תודה)',1500],['צלם',2000],['אולם / בית כנסת',2500],['הזמנות',300]],
+ vort:[['כיבוד',0,'plate'],['מקום',2000],['צלם',2500],['מתנות לחתן ולכלה',6000],['תכשיט',4000]],
+ sheva:[['סעודה',0,'plate'],['מקום',1500],['מוזיקה',1500],['פרחים',600]]};
+const TODO={wed:['סגירת אולם ותאריך','בחירת צלם ותזמורת','הזמנות: עיצוב והדפסה','מסדר חופה ורב','בדיקות וכתובה','סידור שבע ברכות','חדר יחוד','רשימת הושבה'],bar:['קניית תפילין','לימוד הפרשה / דרשה','עלייה לתורה','הזמנות','אולם וקייטרינג'],brit:['תיאום מוהל','סנדק וכיבודים','מקום וקייטרינג','הודעה למשפחה'],vort:['תיאום מקום','כיבוד','הודעה למשפחות'],sheva:['סידור תאריכים ומארחים','פנים חדשות','מניין']};
+let S;try{S=JSON.parse(localStorage.getItem('simcha'))}catch{}
+if(!S)S={type:'wed',items:PRE.wed.map(([n,b,k])=>({n,b,a:'',p:0,k})),done:{},split:50};
+const save=()=>{try{S.guests=$('guests').value;S.att=$('att').value;S.plate=$('plate').value;S.gift=$('gift').value;localStorage.setItem('simcha',JSON.stringify(S))}catch{}};
+const heads=()=>(+$('guests').value||0)*(+$('att').value||0)/100;
+const bud=it=>it.k==='plate'?heads()*(+$('plate').value||0):+it.b||0;
+function items(){$('items').innerHTML=S.items.map((it,i)=>`<div class="it ${it.p&&it.p>=(+it.a||bud(it))?'paid':''}"><input data-i="${i}" data-k="n" value="${it.n.replace(/"/g,'&quot;')}"><input data-i="${i}" data-k="b" type="number" value="${it.k==='plate'?Math.round(bud(it)):it.b}" ${it.k==='plate'?'readonly title="מחושב לפי מספר האורחים ומחיר למנה"':''}><input data-i="${i}" data-k="a" type="number" value="${it.a}" placeholder="—"><input class="pd" data-i="${i}" data-k="p" type="number" value="${it.p||''}" placeholder="0"><button class="x" data-x="${i}" style="padding:2px 6px">✕</button></div>`).join('')}
+function calc(){const B=S.items.reduce((s,it)=>s+bud(it),0),A=S.items.reduce((s,it)=>s+(it.a===''?bud(it):+it.a),0),P=S.items.reduce((s,it)=>s+(+it.p||0),0),G=heads()*(+$('gift').value||0);
+  $('st').innerHTML=[['אורחים צפויים',Math.round(heads())],['תקציב',f(B)],['צפי בפועל',f(A)],['שולם עד כה',f(P)],['נותר לשלם',f(A-P)],['צפי מתנות',f(G)],['פער (עלות פחות מתנות)',f(A-G)]].map(([a,b])=>`<div class="stat"><small>${a}</small><b style="font-size:1.1rem">${b}</b></div>`).join('')+`<div class="stat" style="grid-column:1/-1"><small>שולם ${A?Math.round(P/A*100):0}%</small><div class="bar"><div style="width:${A?Math.min(100,P/A*100):0}%"></div></div></div>`;
+  const s=+$('split').value/100;$('sp').innerHTML=[['צד א׳',A*s],['צד ב׳',A*(1-s)]].map(([n,v])=>`<tr><td>${n} (${Math.round(n==='צד א׳'?s*100:(1-s)*100)}%)</td><td class="num">${f(v)}</td></tr>`).join('');
+  $('todo').innerHTML=(TODO[S.type]||[]).map((t,i)=>`<label class="inline"><input type="checkbox" data-td="${i}" ${S.done[S.type+i]?'checked':''}> ${t}</label>`).join('<br>');save()}
+document.addEventListener('input',e=>{const d=e.target.dataset;if(d.i!==undefined){const it=S.items[d.i];it[d.k]=d.k==='n'?e.target.value:e.target.value===''&&d.k==='a'?'':+e.target.value;calc()}else if(['guests','att','plate','gift','split'].includes(e.target.id)){S.split=+$('split').value;items();calc()}});
+document.addEventListener('change',e=>{const t=e.target.dataset.td;if(t!==undefined){S.done[S.type+t]=e.target.checked;save()}});
+document.addEventListener('click',e=>{const x=e.target.dataset.x;if(x!==undefined){S.items.splice(+x,1);items();calc()}});
+$('add').onclick=()=>{S.items.push({n:'סעיף חדש',b:0,a:'',p:0});items();calc()};
+$('type').onchange=()=>{S.type=$('type').value;calc()};
+$('preset').onclick=()=>{if(S.items.length&&!confirm('להחליף את הסעיפים בסעיפים המוכנים לסוג האירוע?'))return;S.type=$('type').value;S.items=PRE[S.type].map(([n,b,k])=>({n,b,a:'',p:0,k}));items();calc()};
+$('cp').onclick=()=>{const A=S.items.reduce((s,it)=>s+(it.a===''?bud(it):+it.a),0);navigator.clipboard.writeText(`תקציב ${$('type').selectedOptions[0].text}\n${S.items.map(it=>`• ${it.n}: ${f(it.a===''?bud(it):+it.a)}${it.p?' (שולם '+f(it.p)+')':''}`).join('\n')}\n\nסה״כ: ${f(A)}`);$('cp').textContent='✓ הועתק';setTimeout(()=>$('cp').textContent='📋 העתקת סיכום',1400)};
+['guests','att','plate','gift'].forEach(k=>{if(S[k]!==undefined)$(k).value=S[k]});$('split').value=S.split??50;$('type').value=S.type;
+items();calc();
+</script>
+</div>
+</body>
+</html>

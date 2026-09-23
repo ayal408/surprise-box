@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מס על שכירות</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffd166}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.best td{background:rgba(144,224,160,.14)}.big{font-size:1.3rem;font-weight:800;color:var(--acc);text-align:center;margin:10px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🏘️ מס על הכנסה משכירות דירה</h1>
+<p class="sub">משווים בין שלושת המסלולים להכנסה משכירות למגורים: פטור, 10%, ומס רגיל. הכלי מחשב את המס בכל מסלול וממליץ על הזול ביותר.</p>
+<div class="grid2">
+  <div class="panel">
+    <label>שכר דירה חודשי מכל הדירות יחד (₪)<input id="rent" type="number" value="6500"></label>
+    <div class="row" style="margin-top:8px"><label style="flex:1">חודשי השכרה בשנה<input id="mon" type="number" value="12" min="1" max="12"></label><label style="flex:1">תקרת הפטור לחודש (₪)<input id="cap" type="number" value="5654"></label></div>
+    <h2 style="margin-top:14px">למסלול הרגיל</h2>
+    <div class="row"><label style="flex:1">עלות הדירה (למבנה, ללא קרקע)<input id="cost" type="number" value="900000"></label><label style="flex:1">הוצאות בשנה (תיקונים, ביטוח, ריבית משכנתא)<input id="exp" type="number" value="9000"></label></div>
+    <div class="row" style="margin-top:8px"><label style="flex:1">הכנסה חייבת אחרת בשנה (משכורת/עסק)<input id="other" type="number" value="180000"></label><label style="flex:1">נקודות זיכוי<input id="pts" type="number" value="2.25" step="0.25"></label></div>
+  </div>
+  <div class="panel">
+    <div class="big" id="rec"></div>
+    <table><thead><tr><th>מסלול</th><th class="num">מס שנתי</th><th class="num">נטו שנתי</th></tr></thead><tbody id="tb"></tbody></table>
+    <div id="det" class="hint" style="margin-top:10px;line-height:1.8"></div>
+  </div>
+</div>
+<p class="hint">כללים עיקריים: <b>פטור</b> עד תקרה חודשית (הוזנה כברירת מחדל התקרה המעודכנת שידועה לנו, ויש לוודא אותה). בין התקרה לפעמיים התקרה יש פטור חלקי, ומעל זה אין פטור. <b>10%</b> על כל ההכנסה, בלי קיזוז הוצאות ופחת, והתשלום עד 30 יום מסוף השנה. <b>מס רגיל</b> לפי מדרגות על ההכנסה נטו (אחרי הוצאות ופחת של 2% על המבנה). לרוב יש לדווח לרשות המסים. זה לא ייעוץ מס.</p>
+<script>
+const $=id=>document.getElementById(id);const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');
+const BR=[[84120,.10],[120720,.14],[193800,.20],[269280,.31],[560280,.35],[721560,.47],[Infinity,.50]];
+function tax(y){let p=0,t=0;for(const[top,r]of BR){t+=Math.max(0,Math.min(y,top)-p)*r;p=top}return t}
+function calc(){const r=+$('rent').value||0,m=+$('mon').value||12,cap=+$('cap').value||0,gross=r*m,other=+$('other').value||0,pts=(+$('pts').value||0)*2904;
+  // exempt track
+  let exempt=r<=cap?r:r<2*cap?2*cap-r:0;const taxableEx=(r-exempt)*m;const tEx=Math.max(0,tax(other+taxableEx)-pts)-Math.max(0,tax(other)-pts);
+  const t10=gross*.10;
+  const dep=(+$('cost').value||0)*.02,net=Math.max(0,gross-(+$('exp').value||0)-dep);const tReg=Math.max(0,tax(other+net)-pts)-Math.max(0,tax(other)-pts);
+  const T=[['פטור (עם פטור חלקי)',tEx],['מסלול 10%',t10],['מסלול רגיל (מדרגות)',tReg]],best=Math.min(...T.map(x=>x[1]));
+  $('tb').innerHTML=T.map(([n,t])=>`<tr class="${t===best?'best':''}"><td>${t===best?'✅ ':''}${n}</td><td class="num">${f(t)}</td><td class="num">${f(gross-t)}</td></tr>`).join('');
+  $('rec').textContent=`המסלול המשתלם: ${T.find(x=>x[1]===best)[0]}`;
+  $('det').innerHTML=`הכנסה שנתית משכירות: <b>${f(gross)}</b><br>פטור חודשי: ${f(exempt)} ${r>cap&&r<2*cap?'(פטור חלקי: פעמיים התקרה פחות שכר הדירה)':r>=2*cap?'(אין פטור, שכר הדירה גבוה מפעמיים התקרה)':'(כל ההכנסה פטורה)'}<br>במסלול הרגיל: פחת ${f(dep)} בשנה, הכנסה חייבת ${f(net)}`}
+document.querySelectorAll('input').forEach(i=>i.oninput=calc);calc();
+</script>
+</div>
+</body>
+</html>

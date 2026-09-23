@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ממיר מטבעות</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#58d68d}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.big{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end}
+.big input{font-size:1.8rem;font-weight:700;width:100%;direction:ltr;text-align:center}
+.big select{width:100%;margin-top:6px}
+canvas{width:100%;height:220px;display:block}
+.qk{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>💱 ממיר מטבעות</h1>
+<p class="sub">המרה בין שקל, דולר, אירו ועוד 30 מטבעות לפי שערים עדכניים של הבנק המרכזי האירופי, עם גרף של 30 הימים האחרונים. אפשר להוסיף עמלת המרה כדי לראות כמה באמת תקבלו.</p>
+<div class="panel">
+  <div class="big">
+    <div><input id="a" type="number" value="100"><select id="fa"></select></div>
+    <button id="sw" style="font-size:1.3rem;margin-bottom:6px">⇄</button>
+    <div><input id="b" readonly><select id="fb"></select></div>
+  </div>
+  <div class="row" style="margin-top:10px;justify-content:center"><label class="inline">עמלת המרה / מרווח (%) <input id="fee" type="number" value="0" step="0.25" style="width:80px"></label><span class="muted" id="rate"></span></div>
+</div>
+<div class="panel"><h2 id="ct">30 ימים אחרונים</h2><canvas id="cv"></canvas></div>
+<div class="panel"><h2>⚡ מול השקל</h2><div class="qk" id="qk"></div></div>
+<p class="hint" id="src"></p>
+<script>
+const $=id=>document.getElementById(id);
+const NAMES={ILS:'🇮🇱 שקל',USD:'🇺🇸 דולר אמריקאי',EUR:'🇪🇺 אירו',GBP:'🇬🇧 לירה שטרלינג',CHF:'🇨🇭 פרנק שווייצרי',JPY:'🇯🇵 ין יפני',CAD:'🇨🇦 דולר קנדי',AUD:'🇦🇺 דולר אוסטרלי',CNY:'🇨🇳 יואן',INR:'🇮🇳 רופי',TRY:'🇹🇷 לירה טורקית',PLN:'🇵🇱 זלוטי',HUF:'🇭🇺 פורינט',CZK:'🇨🇿 קורונה צ׳כית',SEK:'🇸🇪 קורונה שוודית',NOK:'🇳🇴 קורונה נורווגית',DKK:'🇩🇰 קורונה דנית',RON:'🇷🇴 לאו רומני',BGN:'🇧🇬 לב בולגרי',THB:'🇹🇭 באט תאילנדי',ZAR:'🇿🇦 ראנד',MXN:'🇲🇽 פזו מקסיקני',BRL:'🇧🇷 ריאל ברזילאי',HKD:'🇭🇰 דולר הונג קונג',SGD:'🇸🇬 דולר סינגפורי',NZD:'🇳🇿 דולר ניו זילנדי',KRW:'🇰🇷 וון',IDR:'🇮🇩 רופיה',PHP:'🇵🇭 פזו פיליפיני',MYR:'🇲🇾 רינגיט',ISK:'🇮🇸 קרונה איסלנדית'};
+// fallback rates per 1 EUR (approximate) for offline use
+let R={EUR:1,ILS:3.44,USD:1.14,GBP:.85,CHF:.94,JPY:162,CAD:1.5,AUD:1.65,CNY:7.9,INR:92,TRY:38,PLN:4.3,HUF:395,CZK:25,SEK:11.5,NOK:11.7,DKK:7.46,RON:4.97,BGN:1.956,THB:39,ZAR:20,MXN:21,BRL:6,HKD:8.6,SGD:1.47,NZD:1.8,KRW:1500,IDR:17800,PHP:63,MYR:5,ISK:152},live=false,date='';
+const opts=Object.keys(NAMES).map(k=>`<option value="${k}">${NAMES[k]} (${k})</option>`).join('');$('fa').innerHTML=opts;$('fb').innerHTML=opts;$('fa').value='USD';$('fb').value='ILS';
+const fx=(from,to)=>R[to]/R[from];
+const fmt=(v,c)=>v.toLocaleString('he-IL',{maximumFractionDigits:c==='JPY'||c==='KRW'||c==='IDR'?0:v<1?4:2});
+function calc(){const a=+$('a').value||0,f=$('fa').value,t=$('fb').value,r=fx(f,t),fee=(+$('fee').value||0)/100;$('b').value=fmt(a*r*(1-fee),t);
+  $('rate').textContent=`1 ${f} = ${fmt(r,t)} ${t}${fee?` · אחרי עמלה: ${fmt(r*(1-fee),t)}`:''}`;
+  $('qk').innerHTML=['USD','EUR','GBP','CHF','JPY','CAD','TRY','THB'].map(c=>`<div class="stat"><small>${NAMES[c]}</small><b style="font-size:1.1rem">₪${fmt(fx(c,'ILS'),'ILS')}</b></div>`).join('');
+  $('src').textContent=live?`שערים של הבנק המרכזי האירופי ליום ${date} (דרך frankfurter.dev). השער היציג של בנק ישראל עשוי להיות שונה מעט.`:'⚠️ אין חיבור לשירות השערים, ולכן מוצגים שערים משוערים שאינם עדכניים.';
+  try{localStorage.setItem('fx',JSON.stringify([$('fa').value,$('fb').value,$('a').value,$('fee').value]))}catch{}}
+async function load(){try{const r=await fetch('https://api.frankfurter.dev/v1/latest?base=EUR');const j=await r.json();R={EUR:1,...j.rates};date=j.date;live=true}catch{}calc();hist()}
+async function hist(){const f=$('fa').value,t=$('fb').value,cv=$('cv'),x=cv.getContext('2d'),d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;cv.width=W*d;cv.height=H*d;x.scale(d,d);$('ct').textContent=`${f} ← ${t}, 30 ימים אחרונים`;
+  if(f===t)return;try{const s=new Date(Date.now()-31*864e5).toISOString().slice(0,10);const j=await(await fetch(`https://api.frankfurter.dev/v1/${s}..?base=${f}&symbols=${t}`)).json();
+    const P=Object.entries(j.rates).map(([k,v])=>[k,v[t]]),vs=P.map(p=>p[1]),mn=Math.min(...vs),mx=Math.max(...vs),X=i=>50+i*(W-60)/(P.length-1),Y=v=>H-24-(v-mn)/(mx-mn||1)*(H-40);
+    x.font='11px Segoe UI';x.fillStyle='#a9a3c9';x.strokeStyle='rgba(255,255,255,.08)';x.textAlign='right';[mn,(mn+mx)/2,mx].forEach(v=>{x.beginPath();x.moveTo(50,Y(v));x.lineTo(W,Y(v));x.stroke();x.fillText(v.toFixed(3),46,Y(v)+4)});
+    x.strokeStyle='#58d68d';x.lineWidth=3;x.beginPath();P.forEach(([,v],i)=>i?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v)));x.stroke();x.textAlign='center';[0,P.length-1].forEach(i=>x.fillText(P[i][0].slice(5).split('-').reverse().join('/'),X(i),H-6));
+    const ch=(vs.at(-1)/vs[0]-1)*100;$('ct').textContent+=` · ${ch>=0?'▲':'▼'} ${Math.abs(ch).toFixed(2)}%`}catch{x.fillStyle='#a9a3c9';x.font='14px Segoe UI';x.textAlign='center';x.fillText('אין חיבור, לא ניתן להציג גרף',W/2,H/2)}}
+$('a').oninput=calc;$('fee').oninput=calc;['fa','fb'].forEach(k=>$(k).onchange=()=>{calc();hist()});
+$('sw').onclick=()=>{const t=$('fa').value;$('fa').value=$('fb').value;$('fb').value=t;calc();hist()};
+try{const s=JSON.parse(localStorage.getItem('fx'));if(s){$('fa').value=s[0];$('fb').value=s[1];$('a').value=s[2];$('fee').value=s[3]}}catch{}
+calc();load();
+</script>
+</div>
+</body>
+</html>

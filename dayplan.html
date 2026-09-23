@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מתכנן יומי</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#90e0a0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1100px!important}
+.cols{display:grid;grid-template-columns:320px 1fr;gap:16px}
+.slot{display:grid;grid-template-columns:54px 1fr;gap:8px;min-height:40px;border-top:1px solid var(--line);align-items:stretch}
+.slot .h{color:var(--muted);font-size:.85rem;padding-top:4px;direction:ltr;text-align:right}
+.slot .z{border-radius:8px;padding:2px;min-height:36px}
+.slot .z.over{background:rgba(144,224,160,.15)}
+.slot.now .h{color:var(--acc);font-weight:800}
+.slot.now{border-top:2px solid var(--acc)}
+.task{background:rgba(255,255,255,.06);border-radius:10px;padding:7px 10px;margin-bottom:5px;display:flex;gap:8px;align-items:center;cursor:grab;border-inline-start:4px solid var(--c,#90e0a0)}
+.task.done span{text-decoration:line-through;opacity:.5}
+.task span{flex:1}.task button{padding:0 6px;font-size:.8rem}
+.top3 input{width:100%;margin-bottom:6px;font-weight:700}
+@media(max-width:800px){.cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>☀️ מתכנן יומי</h1>
+<p class="sub">מתכננים את היום בשעות: גוררים משימות מהרשימה אל לוח הזמנים, בוחרים את שלוש החשובות של היום, ורואים כמה זמן נשאר. כל יום נשמר בנפרד.</p>
+<div class="panel row" style="justify-content:space-between"><button id="prev">→ אתמול</button><h2 id="day" style="margin:0"></h2><button id="next">מחר ←</button></div>
+<div class="cols">
+  <div>
+    <div class="panel top3"><h2>⭐ שלושת הדברים החשובים היום</h2><input data-t="0" placeholder="1."><input data-t="1" placeholder="2."><input data-t="2" placeholder="3."></div>
+    <div class="panel"><h2>📥 משימות</h2><form class="row" id="f"><input id="n" placeholder="משימה" style="flex:1" required><select id="dur"><option value="1">30′</option><option value="2" selected>שעה</option><option value="3">1.5 ש׳</option><option value="4">2 ש׳</option></select><button class="pri">+</button></form>
+      <div id="pool" class="z" style="margin-top:8px;min-height:60px"></div><p class="hint">גוררים משימה לשעה בלוח. בטלפון: לוחצים על ⏰ ובוחרים שעה.</p></div>
+    <div class="panel"><h2>📝 הערות ליום</h2><textarea id="notes" rows="4" style="width:100%"></textarea></div>
+    <div class="stats" id="st"></div>
+  </div>
+  <div class="panel"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2 style="margin:0">🕐 לוח זמנים</h2><label class="inline">מ־<select id="from"></select> עד <select id="to"></select></label></div><div id="grid"></div></div>
+</div>
+<div class="row"><button id="cp">📋 העתקת תוכנית היום</button><button id="carry">↪ העברת משימות פתוחות למחר</button></div>
+<script>
+const $=id=>document.getElementById(id);const COL=['#90e0a0','#4cc9f0','#ffd166','#ff8fab','#c49bff','#ff9f68'];
+let D=new Date();D.setHours(0,0,0,0);let all;try{all=JSON.parse(localStorage.getItem('dayplan'))||{}}catch{all={}}
+const key=()=>D.toISOString().slice(0,10);const day=()=>all[key()]=all[key()]||{t:[],top:['','',''],notes:''};
+const save=()=>{try{localStorage.setItem('dayplan',JSON.stringify(all))}catch{}};
+for(let h=5;h<=23;h++){$('from').innerHTML+=`<option ${h===7?'selected':''}>${h}</option>`;$('to').innerHTML+=`<option ${h===22?'selected':''}>${h}</option>`}
+const lbl=s=>{const h=Math.floor(s/2),m=s%2?'30':'00';return`${String(h).padStart(2,'0')}:${m}`};
+function taskHTML(t,i){return`<div class="task ${t.d?'done':''}" draggable="true" data-i="${i}" style="--c:${COL[i%COL.length]}"><input type="checkbox" data-ck="${i}" ${t.d?'checked':''}><span>${t.n.replace(/</g,'&lt;')} <small class="muted">${t.len*30}′</small></span>${t.s==null?`<button data-at="${i}" title="שיבוץ לשעה">⏰</button>`:`<button data-un="${i}" title="החזרה לרשימה">↩</button>`}<button data-x="${i}">✕</button></div>`}
+function render(){const d=day(),now=new Date(),isToday=now.toDateString()===D.toDateString(),nowS=now.getHours()*2+(now.getMinutes()>=30?1:0);
+  $('day').textContent=(isToday?'היום, ':'')+D.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'});
+  document.querySelectorAll('[data-t]').forEach(i=>i.value=d.top[i.dataset.t]||'');$('notes').value=d.notes||'';
+  $('pool').innerHTML=d.t.map((t,i)=>t.s==null?taskHTML(t,i):'').join('')||'<small class="muted">אין משימות שמחכות לשיבוץ</small>';
+  const a=+$('from').value*2,b=+$('to').value*2;let h='';for(let s=a;s<=b;s++){const here=d.t.map((t,i)=>[t,i]).filter(([t])=>t.s===s);
+    h+=`<div class="slot ${isToday&&s===nowS?'now':''}"><span class="h">${lbl(s)}</span><div class="z" data-s="${s}">${here.map(([t,i])=>taskHTML(t,i)).join('')}</div></div>`}$('grid').innerHTML=h;
+  const sch=d.t.filter(t=>t.s!=null),busy=sch.reduce((x,t)=>x+t.len,0)/2,free=(b-a+1)/2-busy;
+  $('st').innerHTML=[['משימות',d.t.length],['בוצעו',d.t.filter(t=>t.d).length],['שעות משובצות',busy],['זמן פנוי',Math.max(0,free)+' ש׳']].map(([x,y])=>`<div class="stat"><small>${x}</small><b>${y}</b></div>`).join('');save()}
+document.addEventListener('dragstart',e=>{const t=e.target.closest('.task');if(t)e.dataTransfer.setData('text',t.dataset.i)});
+document.addEventListener('dragover',e=>{const z=e.target.closest('.z');if(z){e.preventDefault();z.classList.add('over')}});
+document.addEventListener('dragleave',e=>{const z=e.target.closest('.z');z&&z.classList.remove('over')});
+document.addEventListener('drop',e=>{const z=e.target.closest('.z');if(!z)return;e.preventDefault();const t=day().t[e.dataTransfer.getData('text')];if(t){t.s=z.dataset.s!==undefined?+z.dataset.s:null;render()}});
+document.addEventListener('click',e=>{const d=e.target.dataset,T=day().t;if(d.ck!==undefined){T[d.ck].d=e.target.checked;render()}else if(d.x!==undefined){T.splice(+d.x,1);render()}else if(d.un!==undefined){T[d.un].s=null;render()}
+  else if(d.at!==undefined){const v=prompt('באיזו שעה? (למשל 14:30)');const m=v&&/^(\d{1,2})(?::(\d{2}))?$/.exec(v.trim());if(m){T[d.at].s=+m[1]*2+(+m[2]>=30?1:0);render()}}});
+$('f').onsubmit=e=>{e.preventDefault();day().t.push({n:$('n').value,len:+$('dur').value,s:null,d:false});$('n').value='';render()};
+document.querySelectorAll('[data-t]').forEach(i=>i.oninput=()=>{day().top[i.dataset.t]=i.value;save()});$('notes').oninput=()=>{day().notes=$('notes').value;save()};
+$('prev').onclick=()=>{D.setDate(D.getDate()-1);render()};$('next').onclick=()=>{D.setDate(D.getDate()+1);render()};$('from').onchange=render;$('to').onchange=render;
+$('carry').onclick=()=>{const open=day().t.filter(t=>!t.d);if(!open.length)return;const n=new Date(D);n.setDate(n.getDate()+1);const k=n.toISOString().slice(0,10);all[k]=all[k]||{t:[],top:['','',''],notes:''};open.forEach(t=>all[k].t.push({...t,s:null}));day().t=day().t.filter(t=>t.d);D=n;render()};
+$('cp').onclick=()=>{const d=day();const t=`📅 ${$('day').textContent}\n\n⭐ ${d.top.filter(Boolean).join(' · ')||'—'}\n\n`+d.t.filter(x=>x.s!=null).sort((a,b)=>a.s-b.s).map(x=>`${lbl(x.s)} ${x.d?'✔':'•'} ${x.n}`).join('\n')+(d.t.some(x=>x.s==null)?'\n\nבלי שעה:\n'+d.t.filter(x=>x.s==null).map(x=>'• '+x.n).join('\n'):'');navigator.clipboard.writeText(t);$('cp').textContent='✓ הועתק';setTimeout(()=>$('cp').textContent='📋 העתקת תוכנית היום',1400)};
+if(!Object.keys(all).length){const d=day();d.t=[{n:'הליכה',len:1,s:14,d:false},{n:'עבודה מרוכזת',len:4,s:18,d:false},{n:'קניות',len:2,s:null,d:false},{n:'להתקשר לרופא',len:1,s:null,d:false}];d.top=['לסיים את הדוח','להתקשר לאמא',''];}
+render();setInterval(()=>{if(new Date().toDateString()===D.toDateString())render()},60000);
+</script>
+</div>
+</body>
+</html>

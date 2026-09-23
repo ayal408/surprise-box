@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>וורדל עברי</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#58d68d}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:520px!important}
+.board{display:grid;grid-template-rows:repeat(6,1fr);gap:6px;width:min(100%,330px);margin:0 auto}
+.rw{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.t{aspect-ratio:1;border:2px solid var(--line);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.9rem;font-weight:800;transition:transform .25s}
+.t.f{border-color:#a9a3c9}.t.g{background:#3aa55c;border-color:#3aa55c}.t.y{background:#c9a227;border-color:#c9a227}.t.x{background:#3b3558;border-color:#3b3558}
+.t.pop{animation:pop .12s}@keyframes pop{50%{transform:scale(1.12)}}
+.shake{animation:sh .35s}@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.kb{display:flex;flex-direction:column;gap:6px;margin-top:12px;user-select:none}
+.kr{display:flex;gap:4px;justify-content:center}
+.k{flex:1;max-width:44px;height:52px;border-radius:8px;background:#4a4270;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;cursor:pointer}
+.k.w{max-width:76px;font-size:.85rem}.k.g{background:#3aa55c}.k.y{background:#c9a227}.k.x{background:#2a2545;color:#6d6790}
+.msg{text-align:center;min-height:1.6em;font-weight:700;font-size:1.1rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🟩 וורדל עברי</h1>
+<p class="sub">מנחשים מילה בת 5 אותיות בשש הזדמנויות. ירוק: האות במקום הנכון. צהוב: האות במילה אבל במקום אחר. אפור: האות לא במילה. יש מילה יומית אחת לכולם, ומצב תרגול בלי הגבלה.</p>
+<div class="panel row" style="justify-content:space-between"><div class="row"><button class="md on" data-m="daily">📅 מילה יומית</button><button class="md" data-m="free">♾️ תרגול</button></div><span class="muted" id="stats"></span></div>
+<div class="msg" id="msg"></div>
+<div class="board" id="board"></div>
+<div class="kb" id="kb"></div>
+<div class="row" style="justify-content:center;margin-top:10px"><button id="share" hidden>📤 שיתוף תוצאה</button><button id="again" hidden>🔄 מילה חדשה</button></div>
+<script>
+const $=id=>document.getElementById(id);
+const W='מחברת מכונה משפחה תלמיד מורים שולחן ירושה כתובת גלידה מדינה ממשלה עיתון טלפון מחשבה מספרה ספרים חברים חתונה ילדים שמחות בריאה מתנות מלחמה שלווה תקווה ארוחה עבודה קבוצה מסעדה רכבות תחנות שכונה בניין מעלית מדרגה כניסה יציאה פסנתר גיטרה שירים ציפור ארנבת נמלים דבורה כלבים חתולה סוסים אריות פילים שמיים עננים גשמים שלגים שבועה ערבים לילות חלבון בצלים לימון אבטיח ענבים תמרים זיתים עוגות עוגיה פיצות סלטים מרקים חולצה שמלות תיקים מקלדת מסכים תוכנה אתרים סיסמה הודעה שיחות תמונה סרטים ספריה פרחים יערות נהרות אגמים חופים סירות אוניה חשבון קבלות שטרות בנקים מיסים חובות הכנסה הוצאה תקציב פנסיה ביטוח שבתות סוכות פורים חנוכה תפילה ברכות מצוות ישיבה רבנים מזוזה'.split(' ');
+const FIN={'ך':'כ','ם':'מ','ן':'נ','ף':'פ','ץ':'צ'},TOF={'כ':'ך','מ':'ם','נ':'ן','פ':'ף','צ':'צ'};TOF['צ']='ץ';
+const norm=s=>[...s].map(c=>FIN[c]||c).join('');
+const disp=(arr)=>arr.map((c,i)=>i===4&&TOF[c]?TOF[c]:c);
+const dayIdx=()=>Math.floor((Date.now()+2*36e5)/864e5)-20000;
+let mode='daily',ans,rows,cur,done;
+function pickWord(){return mode==='daily'?W[((dayIdx()*7919)%W.length+W.length)%W.length]:W[Math.random()*W.length|0]}
+function load(){ans=norm(pickWord());rows=[];cur=[];done=false;$('msg').textContent='';$('share').hidden=true;$('again').hidden=mode==='daily';
+  if(mode==='daily'){try{const s=JSON.parse(localStorage.getItem('wordle-day'));if(s&&s.d===dayIdx()){rows=s.rows;done=s.done;if(done)end(s.win,true)}}catch{}}draw()}
+function score(g){const r=Array(5).fill('x'),a=[...ans],gg=[...g];gg.forEach((c,i)=>{if(c===a[i]){r[i]='g';a[i]=null}});gg.forEach((c,i)=>{if(r[i]!=='g'){const j=a.indexOf(c);if(j>=0){r[i]='y';a[j]=null}}});return r}
+function draw(){let h='';for(let i=0;i<6;i++){const g=rows[i],c=!g&&i===rows.length?cur:null;h+='<div class="rw" '+(i===rows.length?'id="currow"':'')+'>';for(let j=0;j<5;j++){if(g){const s=score(g);h+=`<div class="t ${s[j]}">${disp([...g])[j]}</div>`}else{const ch=c&&c[j];h+=`<div class="t ${ch?'f':''}">${ch?disp(c.concat(Array(5-c.length).fill('')))[j]||ch:''}</div>`}}h+='</div>'}$('board').innerHTML=h;kb();stats()}
+const KR=[['ק','ר','א','ט','ו','ן','ם','פ'],['ש','ד','ג','כ','ע','י','ח','ל','ך','ף'],['⏎','ז','ס','ב','ה','נ','מ','צ','ת','ץ','⌫']];
+function kb(){const st={};rows.forEach(g=>{const s=score(g);[...g].forEach((c,i)=>{const p=st[c];if(s[i]==='g'||(s[i]==='y'&&p!=='g')||(!p))st[c]=s[i]})});
+  $('kb').innerHTML=KR.map(r=>`<div class="kr">${r.map(k=>{const n=FIN[k]||k;return`<div class="k ${k.length>1||k==='⏎'||k==='⌫'?'w':''} ${st[n]||''}" data-k="${k}">${k==='⏎'?'אישור':k}</div>`}).join('')}</div>`).join('')}
+function msg(t,ms=1600){$('msg').textContent=t;if(ms)setTimeout(()=>{if($('msg').textContent===t&&!done)$('msg').textContent=''},ms)}
+function key(k){if(done)return;if(k==='⌫'||k==='Backspace'){cur.pop();draw();return}
+  if(k==='⏎'||k==='Enter'){if(cur.length<5){msg('חסרות אותיות');const r=$('currow');r&&r.classList.add('shake');return}
+    const g=cur.join('');rows.push(g);cur=[];const win=g===ans;if(win||rows.length===6){done=true;end(win)}draw();save();return}
+  const n=FIN[k]||k;if(/^[א-ת]$/.test(n)&&cur.length<5){cur.push(n);draw();const t=$('currow').children[cur.length-1];t.classList.add('pop')}}
+function end(win,silent){$('msg').textContent=win?['🤯 גאון!','🔥 מדהים!','👏 מצוין!','😎 יפה מאוד!','🙂 טוב!','😅 בשנייה האחרונה!'][rows.length-1]:`המילה הייתה: ${disp([...ans]).join('')}`;$('share').hidden=false;
+  if(!silent&&mode==='daily'){try{const s=JSON.parse(localStorage.getItem('wordle-st'))||{p:0,w:0,streak:0,best:0,last:-1};s.p++;if(win){s.w++;s.streak=s.last===dayIdx()-1?s.streak+1:1;s.best=Math.max(s.best,s.streak);s.last=dayIdx()}else s.streak=0;localStorage.setItem('wordle-st',JSON.stringify(s))}catch{}}}
+function save(){if(mode!=='daily')return;try{localStorage.setItem('wordle-day',JSON.stringify({d:dayIdx(),rows,done,win:rows.at(-1)===ans}))}catch{}}
+function stats(){try{const s=JSON.parse(localStorage.getItem('wordle-st'));$('stats').textContent=s?`שוחקו ${s.p} · ניצחונות ${Math.round(s.w/s.p*100)}% · רצף ${s.streak} 🔥`:''}catch{}}
+$('kb').onclick=e=>{const k=e.target.closest('.k');if(k)key(k.dataset.k)};
+addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const EN="qwertyuiopasdfghjkl;zxcvbnm,.";const HE="/'קראטוןםפשדגכעיחלךףזסבהנמצתץ";let k=e.key;const i=EN.indexOf(k.toLowerCase());if(i>=0)k=HE[i];if(k==='Enter'||k==='Backspace'||/^[א-ת]$/.test(k)){e.preventDefault();key(k)}});
+document.querySelectorAll('.md').forEach(b=>b.onclick=()=>{mode=b.dataset.m;document.querySelectorAll('.md').forEach(x=>x.classList.toggle('on',x===b));load()});
+$('again').onclick=load;
+$('share').onclick=()=>{const t=`וורדל עברי ${mode==='daily'?'#'+dayIdx():''} ${rows.at(-1)===ans?rows.length:'X'}/6\n\n`+rows.map(g=>score(g).map(s=>s==='g'?'🟩':s==='y'?'🟨':'⬛').reverse().join('')).join('\n');navigator.clipboard.writeText(t);msg('✓ הועתק, אפשר להדביק בוואטסאפ')};
+load();
+</script>
+</div>
+</body>
+</html>
