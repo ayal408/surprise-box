@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מי חייב לי</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff8fab}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.p{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px;border-radius:12px;background:rgba(255,255,255,.04);margin-bottom:6px;cursor:pointer}
+.p.sel{outline:2px solid var(--acc)}.p .av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#140f2b}
+.pos{color:#90e0a0}.neg{color:#ff8fab}
+.tx{display:grid;grid-template-columns:90px 1fr auto 30px;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);align-items:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🤝 מי חייב לי (ולמי אני חייב)</h1>
+<p class="sub">פנקס הלוואות אישי: כמה הלווית ולמי, כמה החזירו, ומה היתרה מול כל אחד. עם תזכורת מנומסת בוואטסאפ ותאריך יעד להחזר.</p>
+<div class="stats" id="st"></div>
+<div class="grid2">
+  <div class="panel"><h2>👥 אנשים</h2><div id="ppl"></div><form class="row" id="fp" style="margin-top:8px"><input id="pn" placeholder="שם חדש" style="flex:1" required><input id="ph" placeholder="טלפון (לתזכורת)" style="width:130px;direction:ltr"><button>+</button></form></div>
+  <div class="panel">
+    <h2 id="who">בחרו אדם</h2>
+    <form class="row" id="ft"><select id="k"><option value="1">💸 הלוויתי לו/ה</option><option value="-1">↩️ החזיר/ה לי</option><option value="-2">🙋 לוויתי ממנו/ה</option><option value="2">✅ החזרתי לו/ה</option></select><input id="a" type="number" placeholder="₪" style="width:100px" required><input id="n" placeholder="על מה" style="flex:1"><input type="date" id="due" title="תאריך יעד להחזר"><button class="pri">רישום</button></form>
+    <div id="txs" style="margin-top:8px"></div>
+    <div class="row" style="margin-top:10px"><button id="rem">📤 תזכורת בוואטסאפ</button><button id="settle">🤝 סגירת חשבון</button></div>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);const f=v=>'₪'+Math.round(Math.abs(v)).toLocaleString('he-IL');const COL=['#ff8fab','#4cc9f0','#90e0a0','#ffd166','#c49bff','#ff9f68'];
+let S;try{S=JSON.parse(localStorage.getItem('owed'))}catch{}
+if(!S)S={p:[{id:1,n:'יוסי',ph:''},{id:2,n:'רחל',ph:''}],t:[{p:1,a:500,k:1,n:'חתונה של אחיו',d:'2026-08-01'},{p:1,a:200,k:-1,n:'החזר חלקי',d:'2026-08-20'},{p:2,a:150,k:-2,n:'מסעדה',d:'2026-09-10'}]};let sel=S.p[0]?.id;
+const save=()=>{try{localStorage.setItem('owed',JSON.stringify(S))}catch{}};
+// balance >0 : they owe me
+const bal=id=>S.t.filter(t=>t.p===id).reduce((s,t)=>s+(t.k===1||t.k===2?t.a:-t.a),0);
+function render(){const all=S.p.map(p=>bal(p.id)),me=all.filter(b=>b>0).reduce((a,b)=>a+b,0),i=-all.filter(b=>b<0).reduce((a,b)=>a+b,0);
+  $('st').innerHTML=[['חייבים לי',`<span class="pos">${f(me)}</span>`],['אני חייב/ת',`<span class="neg">${f(i)}</span>`],['מאזן',`<span class="${me-i>=0?'pos':'neg'}">${me-i>=0?'+':'−'}${f(me-i)}</span>`]].map(([a,b])=>`<div class="stat"><small>${a}</small><b>${b}</b></div>`).join('');
+  $('ppl').innerHTML=S.p.map((p,i)=>{const b=bal(p.id);return`<div class="p ${p.id===sel?'sel':''}" data-id="${p.id}"><span class="av" style="background:${COL[i%6]}">${p.n[0]||'?'}</span><div><b>${p.n.replace(/</g,'&lt;')}</b><div class="muted" style="font-size:.8rem">${b>0?'חייב/ת לי':b<0?'אני חייב/ת':'מאוזן'}</div></div><b class="${b>0?'pos':b<0?'neg':'muted'}">${b?f(b):'✓'}</b></div>`}).join('')||'<p class="muted">הוסיפו אדם</p>';
+  const p=S.p.find(x=>x.id===sel);$('who').textContent=p?`${p.n}: ${bal(p.id)>0?'חייב/ת לך '+f(bal(p.id)):bal(p.id)<0?'את/ה חייב/ת '+f(bal(p.id)):'אין חוב פתוח'}`:'בחרו אדם';
+  const L={1:'💸 הלוויתי',[-1]:'↩️ החזיר/ה לי',[-2]:'🙋 לוויתי',2:'✅ החזרתי'};const now=new Date().toISOString().slice(0,10);
+  $('txs').innerHTML=p?S.t.map((t,i)=>({...t,i})).filter(t=>t.p===sel).reverse().map(t=>`<div class="tx"><span class="muted" style="font-size:.8rem">${t.d.split('-').reverse().join('/')}</span><span>${L[t.k]}${t.n?' · '+t.n.replace(/</g,'&lt;'):''}${t.due?` <span class="tag" style="${t.due<now&&bal(sel)>0?'color:#ff8fab':''}">עד ${t.due.split('-').reverse().join('/')}</span>`:''}</span><b class="num">${f(t.a)}</b><button data-x="${t.i}" style="padding:1px 6px">✕</button></div>`).join('')||'<p class="muted">אין תנועות</p>':'';save()}
+$('ppl').onclick=e=>{const c=e.target.closest('.p');if(c){sel=+c.dataset.id;render()}};
+$('fp').onsubmit=e=>{e.preventDefault();const id=Date.now();S.p.push({id,n:$('pn').value,ph:$('ph').value});sel=id;$('pn').value='';$('ph').value='';render()};
+$('ft').onsubmit=e=>{e.preventDefault();if(!sel)return;S.t.push({p:sel,a:+$('a').value,k:+$('k').value,n:$('n').value,d:new Date().toISOString().slice(0,10),due:$('due').value});$('a').value='';$('n').value='';$('due').value='';render()};
+$('txs').onclick=e=>{const x=e.target.dataset.x;if(x!==undefined){S.t.splice(+x,1);render()}};
+$('rem').onclick=()=>{const p=S.p.find(x=>x.id===sel);if(!p)return;const b=bal(p.id);if(b<=0){alert('אין חוב פתוח שלו/ה כלפיך');return}const t=`היי ${p.n} 🙂 רק תזכורת קטנה לגבי ה־${f(b)} שנשארו פתוחים. אין לחץ, מתי שנוח לך. תודה!`;const ph=(p.ph||'').replace(/\D/g,'').replace(/^0/,'972');open('https://wa.me/'+(ph||'')+'?text='+encodeURIComponent(t),'_blank')};
+$('settle').onclick=()=>{const b=bal(sel);if(!b||!confirm('לרשום החזר מלא וסגירת החשבון?'))return;S.t.push({p:sel,a:Math.abs(b),k:b>0?-1:2,n:'סגירת חשבון',d:new Date().toISOString().slice(0,10)});render()};
+render();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

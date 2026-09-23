@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעבדת רקורסיה</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff9f68}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1250px!important}
+.hanoi{position:relative;height:280px;background:rgba(0,0,0,.25);border-radius:14px;display:grid;grid-template-columns:repeat(3,1fr);align-items:end;padding:10px 10px 20px;direction:ltr}
+.peg{position:relative;height:100%;display:flex;flex-direction:column-reverse;align-items:center;justify-content:flex-start}
+.peg::before{content:"";position:absolute;bottom:0;width:10px;height:90%;background:#5a5480;border-radius:5px}
+.peg::after{content:"";position:absolute;bottom:-8px;width:90%;height:10px;background:#5a5480;border-radius:5px}
+.disk{height:22px;border-radius:11px;margin-top:3px;z-index:1;transition:all .2s}
+#tree{width:100%;overflow:auto;background:rgba(0,0,0,.25);border-radius:14px;direction:ltr}
+.stack{font-family:Consolas,monospace;font-size:.85rem;direction:ltr;text-align:left;display:flex;flex-direction:column-reverse;gap:3px;max-height:260px;overflow:auto}
+.stack div{background:rgba(255,159,104,.15);border-inline-start:3px solid var(--acc);padding:3px 8px;border-radius:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🌀 מעבדת רקורסיה</h1>
+<p class="sub">פונקציה שקוראת לעצמה, מוצגת בתמונה: מגדלי הנוי עם אנימציה, עץ הקריאות של פיבונאצ׳י עם ובלי זיכרון (memoization), ומחסנית הקריאות בזמן אמת.</p>
+<div class="panel row" id="tabs"><button class="on" data-t="hanoi">🗼 מגדלי הנוי</button><button data-t="fib">🌿 עץ פיבונאצ׳י</button></div>
+<div id="p-hanoi">
+  <div class="panel row"><label class="inline">דיסקיות <input type="range" id="hn" min="2" max="8" value="4" style="width:110px"></label><b id="hnv">4</b><button class="pri" id="hgo">▶ פתרון</button><button id="hst">⏭ מהלך</button><button id="hrs">↺</button><label class="inline">מהירות <input type="range" id="hsp" min="30" max="800" value="400" style="width:90px"></label><span class="muted" id="hmv"></span></div>
+  <div class="grid2" style="grid-template-columns:1fr 300px"><div class="panel"><div class="hanoi" id="hanoi"></div></div><div class="panel"><h2>📚 מחסנית הקריאות</h2><div class="stack" id="hstack"></div><p class="hint" style="margin-top:8px">כדי להעביר n דיסקיות: מעבירים n−1 לעמוד העזר, מעבירים את הגדולה, ומחזירים את n−1 מעליה. מספר המהלכים הוא 2ⁿ−1: עם 64 דיסקיות, במהלך לשנייה, זה ייקח 585 מיליארד שנה.</p></div></div>
+</div>
+<div id="p-fib" hidden>
+  <div class="panel row"><label class="inline">fib(n), n = <input type="range" id="fn" min="2" max="8" value="5" style="width:110px"></label><b id="fnv">5</b><label class="inline"><input type="checkbox" id="memo"> עם זיכרון (memoization)</label><button class="pri" id="fgo">▶ הרצה</button><span class="muted" id="fst"></span></div>
+  <div class="panel"><div id="tree"></div><p class="hint" style="margin-top:8px">בלי זיכרון, אותו חישוב חוזר שוב ושוב (הצמתים באותו צבע), ומספר הקריאות גדל פי 1.6 בערך עם כל n. עם זיכרון, כל ערך מחושב פעם אחת בלבד, והזמן הופך לליניארי.</p></div>
+  <div class="panel"><table><thead><tr><th>n</th><th class="num">קריאות בלי זיכרון</th><th class="num">עם זיכרון</th></tr></thead><tbody id="cmp"></tbody></table></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));$('p-hanoi').hidden=b.dataset.t!=='hanoi';$('p-fib').hidden=b.dataset.t!=='fib'});
+// Hanoi
+let pegs,moves,mi,run=false;const COL=['#ff8fab','#ffb703','#ffd166','#90e0a0','#4cc9f0','#9b9bff','#c49bff','#ff9f68'];
+function hinit(){const n=+$('hn').value;$('hnv').textContent=n;pegs=[[...Array(n)].map((_,i)=>n-i),[],[]];moves=[];const rec=(k,a,b,c,d)=>{if(!k)return;rec(k-1,a,c,b,d+1);moves.push({a,c,k,stack:[...Array(d+1)].map((_,j)=>j)});rec(k-1,b,a,c,d+1)};
+  // collect with call stack snapshots
+  moves=[];const st=[];const r2=(k,a,b,c)=>{if(!k)return;st.push(`hanoi(${k}, ${'ABC'[a]}→${'ABC'[c]})`);r2(k-1,a,c,b);moves.push({a,c,k,stack:[...st]});r2(k-1,b,a,c);st.pop()};r2(n,0,1,2);mi=0;run=false;$('hgo').textContent='▶ פתרון';hdraw()}
+function hdraw(){const n=+$('hn').value;$('hanoi').innerHTML=pegs.map((p,i)=>`<div class="peg">${p.map(d=>`<div class="disk" style="width:${20+d/n*75}%;background:${COL[(d-1)%8]}"></div>`).join('')}<b style="position:absolute;bottom:-26px;color:var(--muted)">${'ABC'[i]}</b></div>`).join('');
+  $('hmv').textContent=`מהלך ${mi} מתוך ${moves.length} (2^${n}−1)`;$('hstack').innerHTML=(moves[mi-1]?.stack||[]).map(s=>`<div>${s}</div>`).join('')}
+function hstep(){if(mi>=moves.length)return false;const m=moves[mi++];pegs[m.c].push(pegs[m.a].pop());hdraw();return true}
+$('hst').onclick=hstep;$('hrs').onclick=hinit;$('hn').oninput=hinit;
+$('hgo').onclick=async()=>{if(run){run=false;$('hgo').textContent='▶ פתרון';return}if(mi>=moves.length)hinit();run=true;$('hgo').textContent='⏸';while(run&&hstep())await sleep(830-+$('hsp').value);run=false;$('hgo').textContent='▶ פתרון'};
+// Fibonacci tree
+function fibTree(n,memo){let calls=0;const M=new Map();const build=(k,d)=>{calls++;const node={k,d,ch:[],cached:false};if(memo&&M.has(k)){node.cached=true;node.v=M.get(k);return node}
+  if(k<2)node.v=k;else{node.ch=[build(k-1,d+1),build(k-2,d+1)];node.v=node.ch[0].v+node.ch[1].v}if(memo)M.set(k,node.v);return node};const root=build(n,0);return{root,calls}}
+function countCalls(n,memo){return fibTree(n,memo).calls}
+async function fdraw(){const n=+$('fn').value;$('fnv').textContent=n;const{root,calls}=fibTree(n,$('memo').checked);let x=0;const L=[];const lay=nd=>{nd.ch.forEach(lay);if(!nd.ch.length)nd.x=x++;else nd.x=nd.ch.reduce((a,c)=>a+c.x,0)/nd.ch.length;L.push(nd)};lay(root);
+  const W=Math.max(600,x*54+40),D=Math.max(...L.map(l=>l.d)),H=(D+1)*70+30,X=v=>20+v*54+20,Y=d=>30+d*70;const HUE=['#ff8fab','#ffb703','#ffd166','#90e0a0','#4cc9f0','#9b9bff','#c49bff','#ff9f68','#7cf2c4'];
+  const order=[];const pre=nd=>{order.push(nd);nd.ch.forEach(pre)};pre(root);let svg=`<svg width="${W}" height="${H}">`;
+  L.forEach(nd=>nd.ch.forEach(c=>svg+=`<line x1="${X(nd.x)}" y1="${Y(nd.d)}" x2="${X(c.x)}" y2="${Y(c.d)}" stroke="#4a4270" stroke-width="2"/>`));
+  order.forEach((nd,i)=>svg+=`<g class="fn" style="opacity:0" data-i="${i}"><circle cx="${X(nd.x)}" cy="${Y(nd.d)}" r="20" fill="${nd.cached?'#231d4a':HUE[nd.k%9]}" stroke="${nd.cached?'#90e0a0':'none'}" stroke-width="3" stroke-dasharray="${nd.cached?'4 3':''}"/><text x="${X(nd.x)}" y="${Y(nd.d)+5}" text-anchor="middle" font-size="12" font-weight="800" fill="${nd.cached?'#90e0a0':'#140f2b'}">f(${nd.k})</text></g>`);
+  $('tree').innerHTML=svg+'</svg>';$('fst').textContent=`${calls} קריאות · תוצאה: fib(${n}) = ${root.v}`;const gs=$('tree').querySelectorAll('.fn');for(const g of gs){g.style.opacity=1;await sleep(Math.max(15,500/gs.length*6))}}
+$('fgo').onclick=fdraw;$('fn').oninput=()=>{$('fnv').textContent=$('fn').value};$('memo').onchange=fdraw;
+$('cmp').innerHTML=[5,10,15,20,25,30,40].map(n=>{const plain=2*[...Array(n+1)].reduce((a,_,i)=>{a.push(i<2?1:a[i-1]+a[i-2]);return a},[])[n]-1;return`<tr><td>${n}</td><td class="num">${plain.toLocaleString()}</td><td class="num">${2*n-1}</td></tr>`}).join('');
+hinit();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>טבלת גיבוב</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffd166}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1200px!important}
+.tbl{display:grid;gap:6px;direction:ltr}
+.slot{display:grid;grid-template-columns:44px 1fr;gap:6px;align-items:center}
+.slot .ix{font-family:Consolas,monospace;color:var(--muted);text-align:right}
+.chain{display:flex;gap:4px;flex-wrap:wrap;min-height:36px;background:rgba(0,0,0,.2);border-radius:8px;padding:4px}
+.k{background:var(--acc);color:#140f2b;border-radius:6px;padding:4px 10px;font-weight:700;animation:pop .35s}.k.hl{background:#ff8fab}.k.c2{background:#ff9f68}
+@keyframes pop{from{transform:scale(0)}}
+.calc{font-family:Consolas,monospace;direction:ltr;text-align:left;font-size:.9rem;line-height:1.7;background:rgba(0,0,0,.25);border-radius:10px;padding:10px;min-height:90px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>#️⃣ איך עובדת טבלת גיבוב (Hash Table)</h1>
+<p class="sub">המבנה שמאחורי מילונים, אובייקטים ומסדי נתונים: מכניסים מפתחות ורואים את פונקציית הגיבוב שולחת כל אחד לתא, איך נוצרות התנגשויות, ומתי הטבלה מוכפלת בגודלה.</p>
+<div class="panel row"><input id="key" placeholder="מפתח (שם, מילה, מספר)" style="flex:1;min-width:150px"><button class="pri" id="put">➕ הכנסה</button><button id="get">🔍 חיפוש</button><button id="del">🗑 מחיקה</button><button id="many">🎲 10 שמות</button><button id="clr">🧹</button>
+  <select id="hf"><option value="djb2">djb2 (טובה)</option><option value="sum">סכום אותיות (גרועה)</option><option value="len">אורך המילה (גרועה מאוד)</option></select><select id="strat"><option value="chain">שרשור (Chaining)</option><option value="probe">בדיקה ליניארית (Probing)</option></select><label class="inline"><input type="checkbox" id="grow" checked> הגדלה אוטומטית</label></div>
+<div class="grid2" style="grid-template-columns:1fr 360px">
+  <div class="panel"><div class="tbl" id="tbl"></div></div>
+  <div class="panel"><h2>🧮 החישוב</h2><div class="calc" id="calc">הכניסו מפתח כדי לראות את החישוב</div><div class="stats" id="st" style="margin-top:10px"></div><p class="hint" style="margin-top:10px;line-height:1.7">פונקציית גיבוב טובה מפזרת את המפתחות באופן שווה, ואז חיפוש לוקח O(1) בממוצע. פונקציה גרועה מרכזת הרבה מפתחות באותו תא (התנגשויות), והחיפוש נהיה איטי כמו ברשימה, O(n). כשהטבלה מלאה יותר מ־75% היא מוכפלת וכל המפתחות מגובבים מחדש.</p></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);let M=8,T=[],keys=[],hl=null,rehash=0;const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const H={djb2:s=>{let h=5381;for(const c of s)h=((h<<5)+h+c.codePointAt(0))>>>0;return h},sum:s=>[...s].reduce((a,c)=>a+c.codePointAt(0),0),len:s=>[...s].length};
+function explain(k){const f=$('hf').value,h=H[f](k);return{h,i:h%M,txt:f==='djb2'?`h = 5381\nלכל תו: h = h×33 + קוד התו\nhash("${k}") = ${h}\n${h} mod ${M} = ${h%M}`:f==='sum'?`סכום קודי התווים של "${k}":\n${[...k].map(c=>c.codePointAt(0)).join(' + ')} = ${h}\n${h} mod ${M} = ${h%M}`:`אורך "${k}" = ${h}\n${h} mod ${M} = ${h%M}`}}
+function build(){T=[...Array(M)].map(()=>[]);const pk=keys;keys=[];pk.forEach(k=>place(k))}
+function place(k){const{i}=explain(k);if($('strat').value==='chain'){T[i].push(k)}else{let j=i,probes=0;while(T[j].length&&probes<M){j=(j+1)%M;probes++}if(probes>=M)return false;T[j].push(k)}keys.push(k);return true}
+function locate(k){const{i}=explain(k);if($('strat').value==='chain'){const p=T[i].indexOf(k);return p>=0?{slot:i,steps:p+1}:{slot:-1,steps:T[i].length}}let j=i,s=0;while(s<M){s++;if(T[j][0]===k)return{slot:j,steps:s};if(!T[j].length)break;j=(j+1)%M}return{slot:-1,steps:s}}
+function draw(){const load=keys.length/M;const longest=Math.max(0,...T.map(c=>c.length));const used=T.filter(c=>c.length).length;
+  $('tbl').innerHTML=T.map((c,i)=>`<div class="slot"><span class="ix">${i}</span><div class="chain">${c.map((k,j)=>`<span class="k ${k===hl?'hl':''} ${j?'c2':''}">${k.replace(/</g,'&lt;')}</span>`).join('')}</div></div>`).join('');
+  const coll=keys.filter(k=>{const{i}=explain(k);return $('strat').value==='chain'?T[i].length>1:T[i][0]!==k}).length;
+  $('st').innerHTML=[['מפתחות',keys.length],['גודל טבלה',M],['עומס',Math.round(load*100)+'%'],['התנגשויות',coll],['שרשרת ארוכה',longest],['הכפלות',rehash]].map(([a,b])=>`<div class="stat"><small>${a}</small><b>${b}</b></div>`).join('')}
+async function put(k){if(!k||keys.includes(k)){if(k)$('calc').textContent=`"${k}" כבר בטבלה`;return}const e=explain(k);$('calc').textContent=e.txt;hl=k;
+  if(!place(k)){$('calc').textContent+='\n⚠ הטבלה מלאה'}if($('grow').checked&&keys.length/M>.75){draw();await sleep(500);M*=2;rehash++;build();$('calc').textContent+=`\n\n📈 העומס עבר 75%: מכפילים ל־${M} תאים ומגבבים מחדש את כל ${keys.length} המפתחות`}draw()}
+$('put').onclick=()=>{put($('key').value.trim());$('key').value='';$('key').focus()};
+$('key').onkeydown=e=>{if(e.key==='Enter')$('put').click()};
+$('get').onclick=()=>{const k=$('key').value.trim();if(!k)return;const e=explain(k),r=locate(k);hl=r.slot>=0?k:null;$('calc').textContent=e.txt+`\n\n${r.slot>=0?`✅ נמצא בתא ${r.slot} אחרי ${r.steps} בדיקות`:`❌ לא נמצא (${r.steps} בדיקות)`}`;draw()};
+$('del').onclick=()=>{const k=$('key').value.trim();if(!keys.includes(k))return;keys=keys.filter(x=>x!==k);build();hl=null;$('calc').textContent=`"${k}" נמחק`;draw()};
+$('many').onclick=async()=>{const N=['דנה','יוסי','מיכל','אבי','רותי','משה','שרה','דוד','נועה','איתי','תמר','עומר','ליה','גיל','הדס','רון','שני','עידו','מאיה','אורי'].sort(()=>Math.random()-.5).slice(0,10);for(const k of N){await put(k);await sleep(350)}};
+$('clr').onclick=()=>{M=8;keys=[];rehash=0;hl=null;build();draw();$('calc').textContent='הטבלה נוקתה'};
+['hf','strat'].forEach(k=>$(k).onchange=()=>{build();draw()});
+build();['תפוח','בננה','ענבים'].forEach(k=>place(k));draw();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

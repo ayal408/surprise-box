@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>לוח ניקיון</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#7cf2c4}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.t{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.04);margin-bottom:5px;border-inline-start:5px solid var(--s)}
+.t .ck{width:30px;height:30px;border-radius:50%;border:2px solid var(--s);background:none;cursor:pointer;font-size:1rem;color:var(--s);padding:0}
+.t .ck:hover{background:var(--s);color:#140f2b}
+.t select{padding:3px 6px;font-size:.8rem}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🧽 לוח ניקיון לבית</h1>
+<p class="sub">כל מטלות הניקיון החוזרות: יומיות, שבועיות, חודשיות ועונתיות. רואים מה הגיע הזמן לעשות, מסמנים "בוצע", ומחלקים בין בני הבית בצורה הוגנת.</p>
+<div class="stats" id="st"></div>
+<div class="panel row"><div class="filters" id="fl"></div><span style="flex:1"></span><label class="inline">בני הבית <input id="ppl" style="width:220px" placeholder="אבא, אמא, יוסי"></label><button id="fair">⚖️ חלוקה הוגנת</button></div>
+<div class="panel"><div id="list"></div></div>
+<div class="panel"><form class="row" id="f"><input id="n" placeholder="מטלה חדשה" required style="flex:1"><select id="room"></select><select id="fr"><option value="1">כל יום</option><option value="3">כל 3 ימים</option><option value="7" selected>כל שבוע</option><option value="14">כל שבועיים</option><option value="30">כל חודש</option><option value="90">כל 3 חודשים</option><option value="180">פעמיים בשנה</option></select><button class="pri">+</button></form></div>
+<script>
+const $=id=>document.getElementById(id);const DAY=864e5;
+const ROOMS=['🍳 מטבח','🛁 אמבטיה','🛋️ סלון','🛏️ חדרי שינה','🧺 כביסה','🌿 חוץ ומרפסת','🏠 כללי'];
+$('room').innerHTML=ROOMS.map(r=>`<option>${r}</option>`).join('');
+let S;try{S=JSON.parse(localStorage.getItem('cleaning'))}catch{}
+if(!S){const d=k=>new Date(Date.now()-k*DAY).toISOString().slice(0,10);S={ppl:'אבא, אמא, ילדים',f:'all',t:[['שטיפת כלים / מדיח','🍳 מטבח',1,0],['ניגוב שיש וכיריים','🍳 מטבח',1,1],['ניקוי מקרר','🍳 מטבח',30,40],['ניקוי תנור','🍳 מטבח',90,20],['ניקוי אסלה וכיור','🛁 אמבטיה',7,8],['שטיפת מקלחת','🛁 אמבטיה',7,3],['החלפת מגבות','🛁 אמבטיה',7,7],['שאיבת אבק','🛋️ סלון',7,5],['שטיפת רצפה','🏠 כללי',7,9],['ניקוי אבק מרהיטים','🛋️ סלון',14,10],['החלפת מצעים','🛏️ חדרי שינה',14,15],['סידור ארונות','🛏️ חדרי שינה',90,60],['כביסה','🧺 כביסה',3,2],['ניקוי חלונות','🏠 כללי',30,35],['ניקוי מזגנים (פילטרים)','🏠 כללי',90,100],['השקיית עציצים','🌿 חוץ ומרפסת',3,1],['פינוי זבל ומחזור','🏠 כללי',1,0]].map(([n,r,fr,ago],i)=>({id:i+1,n,r,fr,last:d(ago),w:''}))}}
+const save=()=>{try{localStorage.setItem('cleaning',JSON.stringify(S))}catch{}};
+const due=t=>{const d=Math.floor((Date.now()-new Date(t.last))/DAY);return t.fr-d};
+const st=t=>{const x=due(t);return x<0?['#ff4d6d',`באיחור של ${-x} ימים`]:x===0?['#ffb703','היום']:x<=2?['#ffd166',`בעוד ${x} ימים`]:['#58d68d',`בעוד ${x} ימים`]};
+function render(){$('ppl').value=S.ppl;const ppl=S.ppl.split(',').map(s=>s.trim()).filter(Boolean);
+  const late=S.t.filter(t=>due(t)<0).length,today=S.t.filter(t=>due(t)===0).length;$('st').innerHTML=[['מטלות',S.t.length],['באיחור',late],['להיום',today],['הכל בסדר',S.t.length-late-today]].map(([a,b],i)=>`<div class="stat"><small>${a}</small><b style="color:${['var(--acc)','#ff4d6d','#ffb703','#58d68d'][i]}">${b}</b></div>`).join('');
+  $('fl').innerHTML=[['all','הכל'],['due','לעשות עכשיו'],...ROOMS.map(r=>[r,r])].map(([k,n])=>`<button data-f="${k}" class="${S.f===k?'on':''}" style="padding:5px 10px;font-size:.85rem">${n}</button>`).join('');
+  const L=S.t.filter(t=>S.f==='all'||(S.f==='due'?due(t)<=0:t.r===S.f)).sort((a,b)=>due(a)-due(b));
+  $('list').innerHTML=L.map(t=>{const[c,s]=st(t);return`<div class="t" style="--s:${c}"><button class="ck" data-done="${t.id}" title="בוצע">✓</button><div><b>${t.n.replace(/</g,'&lt;')}</b><div class="muted" style="font-size:.8rem">${t.r} · כל ${t.fr===1?'יום':t.fr+' ימים'} · ${s}</div></div>${ppl.length?`<select data-w="${t.id}"><option value="">מי?</option>${ppl.map(p=>`<option ${t.w===p?'selected':''}>${p}</option>`).join('')}</select>`:'<span></span>'}<button data-x="${t.id}" style="padding:1px 6px">✕</button></div>`}).join('')||'<p class="muted" style="text-align:center">✨ אין מה לעשות כרגע</p>';save()}
+document.addEventListener('click',e=>{const d=e.target.dataset;if(d.f){S.f=d.f;render()}else if(d.done){const t=S.t.find(x=>x.id==d.done);t.last=new Date().toISOString().slice(0,10);render()}else if(d.x&&confirm('למחוק את המטלה?')){S.t=S.t.filter(x=>x.id!=d.x);render()}});
+document.addEventListener('change',e=>{const w=e.target.dataset.w;if(w){S.t.find(x=>x.id==w).w=e.target.value;save()}});
+$('ppl').onchange=()=>{S.ppl=$('ppl').value;render()};
+$('fair').onclick=()=>{const ppl=S.ppl.split(',').map(s=>s.trim()).filter(Boolean);if(!ppl.length)return;const load=Object.fromEntries(ppl.map(p=>[p,0]));[...S.t].sort((a,b)=>1/b.fr-1/a.fr).forEach(t=>{const p=ppl.reduce((a,b)=>load[a]<=load[b]?a:b);t.w=p;load[p]+=1/t.fr});render()};
+$('f').onsubmit=e=>{e.preventDefault();S.t.push({id:Date.now(),n:$('n').value,r:$('room').value,fr:+$('fr').value,last:new Date().toISOString().slice(0,10),w:''});$('n').value='';render()};
+render();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

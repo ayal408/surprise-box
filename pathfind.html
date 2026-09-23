@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מציאת מסלול</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#58d68d}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1250px!important}
+.stage{display:grid;gap:1px;background:rgba(255,255,255,.06);border-radius:10px;overflow:hidden;touch-action:none;user-select:none;direction:ltr}
+.c{aspect-ratio:1;background:#1a1538}
+.c.w{background:#5a5480}.c.h{background:#3a2a18}.c.s{background:#58d68d}.c.e{background:#ff4d6d}
+.c.v{background:#2b4a7a;animation:vis .3s}.c.f{background:#3a78c4}.c.p{background:#ffd166;animation:pth .3s}
+@keyframes vis{from{transform:scale(.3);border-radius:50%}}@keyframes pth{50%{transform:scale(1.25)}}
+.tools button{padding:6px 10px;font-size:.88rem}
+.leg{display:flex;flex-wrap:wrap;gap:10px;font-size:.82rem;color:var(--muted)}.leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-inline-end:4px;vertical-align:middle}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🧭 מעבדת מציאת מסלול</h1>
+<p class="sub">רואים איך אלגוריתמים מוצאים דרך במבוך: BFS, DFS, דייקסטרה, A* ו־Greedy. מציירים קירות וקרקע כבדה, מגרילים מבוך, ומריצים מרוץ בין האלגוריתמים.</p>
+<div class="panel row tools">
+  <select id="alg"><option value="astar">A* (הכי חכם)</option><option value="dijkstra">דייקסטרה</option><option value="bfs">BFS (רוחב)</option><option value="dfs">DFS (עומק)</option><option value="greedy">Greedy best-first</option></select>
+  <button class="pri" id="run">▶ הרצה</button><button id="race">🏁 מרוץ של כל האלגוריתמים</button>
+  <span style="flex:1"></span>
+  <span class="muted">ציור:</span><button class="br on" data-b="w">🧱 קיר</button><button class="br" data-b="h">🟫 בוץ (עלות 5)</button><button class="br" data-b="s">🟢 התחלה</button><button class="br" data-b="e">🔴 סוף</button>
+  <button id="maze">🌀 מבוך</button><button id="rnd">🎲 מכשולים</button><button id="clr">🧹 ניקוי</button>
+  <label class="inline">מהירות <input type="range" id="sp" min="1" max="60" value="25" style="width:90px"></label>
+</div>
+<div class="grid2" style="grid-template-columns:1fr 300px">
+  <div class="panel"><div class="stage" id="g"></div><div class="leg" style="margin-top:8px"><span><i style="background:#58d68d"></i>התחלה</span><span><i style="background:#ff4d6d"></i>סוף</span><span><i style="background:#5a5480"></i>קיר</span><span><i style="background:#3a2a18"></i>בוץ</span><span><i style="background:#2b4a7a"></i>נבדק</span><span><i style="background:#3a78c4"></i>בתור</span><span><i style="background:#ffd166"></i>המסלול</span></div></div>
+  <div class="panel"><h2 id="an"></h2><p id="ad" class="hint" style="line-height:1.7"></p><div class="stats" id="st" style="margin-top:10px"></div><table style="margin-top:10px"><tbody id="rt"></tbody></table></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);let R=21,C=45,G=[],S=[10,5],E=[10,39],brush='w',busy=false,down=false;
+const INFO={astar:['A*','משלב את המרחק שכבר עבר עם הערכה (מרחק מנהטן) של כמה נשאר. מוצא את המסלול הקצר ביותר, ובודק הרבה פחות משבצות מדייקסטרה.','✔ מסלול קצר ביותר · ✔ מתחשב בעלות'],
+ dijkstra:['דייקסטרה','מתפשט בעיגולים לפי העלות שהצטברה, בלי לדעת איפה היעד. מבטיח את המסלול הזול ביותר גם כשיש קרקע כבדה.','✔ מסלול קצר ביותר · ✔ מתחשב בעלות'],
+ bfs:['BFS: חיפוש לרוחב','בודק שכבה אחרי שכבה בעזרת תור. מוצא את המסלול עם הכי מעט צעדים, אבל מתעלם מהעלות של הבוץ.','✔ הכי מעט צעדים · ✘ מתעלם מעלות'],
+ dfs:['DFS: חיפוש לעומק','הולך עד הסוף בכיוון אחד בעזרת מחסנית, ורק אז חוזר אחורה. מהיר לפעמים, אבל המסלול בדרך כלל ארוך ומפותל.','✘ לא מבטיח מסלול קצר'],
+ greedy:['Greedy best-first','תמיד הולך למשבצת שנראית הכי קרובה ליעד. מהיר מאוד, אבל יכול להיתקע מאחורי קירות ולמצוא מסלול לא אופטימלי.','✘ לא מבטיח מסלול קצר · ⚡ מהיר']};
+function init(){G=[...Array(R*C)].map(()=>0);draw()}
+const id=(r,c)=>r*C+c,rc=i=>[i/C|0,i%C];
+function draw(){const g=$('g');g.style.gridTemplateColumns=`repeat(${C},1fr)`;if(g.children.length!==R*C){g.innerHTML=[...Array(R*C)].map((_,i)=>`<div class="c" data-i="${i}"></div>`).join('')}
+  [...g.children].forEach((d,i)=>d.className='c'+(G[i]===1?' w':G[i]===5?' h':''));g.children[id(...S)].className='c s';g.children[id(...E)].className='c e'}
+function clearPath(){[...$('g').children].forEach((d,i)=>{if(!(i===id(...S)||i===id(...E)))d.className='c'+(G[i]===1?' w':G[i]===5?' h':'')})}
+function nb(i){const[r,c]=rc(i),o=[];[[0,1],[1,0],[0,-1],[-1,0]].forEach(([dr,dc])=>{const nr=r+dr,nc=c+dc;if(nr>=0&&nc>=0&&nr<R&&nc<C&&G[id(nr,nc)]!==1)o.push(id(nr,nc))});return o}
+const hman=i=>{const[a,b]=rc(i);return Math.abs(a-E[0])+Math.abs(b-E[1])};
+function solve(alg){const s=id(...S),e=id(...E),prev=new Map([[s,-1]]),cost=new Map([[s,0]]),order=[],frontier=[];let open=[[alg==='astar'?hman(s):alg==='greedy'?hman(s):0,s]];const seen=new Set();
+  while(open.length){let cur;if(alg==='bfs')cur=open.shift()[1];else if(alg==='dfs')cur=open.pop()[1];else{let bi=0;for(let k=1;k<open.length;k++)if(open[k][0]<open[bi][0])bi=k;cur=open.splice(bi,1)[0][1]}
+    if(seen.has(cur))continue;seen.add(cur);order.push(cur);if(cur===e)break;
+    for(const n of nb(cur)){const w=G[n]===5?5:1,nc=cost.get(cur)+(alg==='bfs'||alg==='dfs'?1:w);if(seen.has(n))continue;
+      if(alg==='bfs'||alg==='dfs'){if(!prev.has(n)){prev.set(n,cur);cost.set(n,nc);open.push([0,n]);frontier.push(n)}}
+      else if(!cost.has(n)||nc<cost.get(n)){cost.set(n,nc);prev.set(n,cur);open.push([alg==='astar'?nc+hman(n):alg==='greedy'?hman(n):nc,n]);frontier.push(n)}}}
+  const path=[];if(prev.has(e)){let x=e;while(x!==-1){path.unshift(x);x=prev.get(x)}}const pc=path.slice(1).reduce((s,i)=>s+(G[i]===5?5:1),0);return{order,path,cost:pc,frontier}}
+function info(){const[a,b,c]=INFO[$('alg').value];$('an').textContent=a;$('ad').innerHTML=b+'<br><b>'+c+'</b>'}
+async function animate(res){const cells=$('g').children,sp=+$('sp').value,s=id(...S),e=id(...E);for(let k=0;k<res.order.length;k+=Math.ceil(sp/8)){for(let j=k;j<Math.min(res.order.length,k+Math.ceil(sp/8));j++){const i=res.order[j];if(i!==s&&i!==e)cells[i].className='c v'}await new Promise(r=>setTimeout(r,Math.max(0,60-sp)))}
+  for(const i of res.path){if(i!==s&&i!==e)cells[i].className='c p';await new Promise(r=>setTimeout(r,18))}}
+function stats(res){$('st').innerHTML=[['משבצות שנבדקו',res.order.length],['אורך המסלול',res.path.length?res.path.length-1:'אין'],['עלות',res.path.length?res.cost:'—']].map(([a,b])=>`<div class="stat"><small>${a}</small><b>${b}</b></div>`).join('')}
+$('run').onclick=async()=>{if(busy)return;busy=true;clearPath();const res=solve($('alg').value);stats(res);await animate(res);busy=false};
+$('race').onclick=()=>{if(busy)return;clearPath();const rows=Object.keys(INFO).map(a=>{const r=solve(a);return[a,r]});const best=Math.min(...rows.filter(x=>x[1].path.length).map(x=>x[1].cost));
+  $('rt').innerHTML='<tr><th>אלגוריתם</th><th class="num">נבדקו</th><th class="num">עלות</th></tr>'+rows.sort((a,b)=>a[1].order.length-b[1].order.length).map(([a,r])=>`<tr><td>${INFO[a][0]}</td><td class="num">${r.order.length}</td><td class="num" style="${r.cost===best?'color:#90e0a0;font-weight:800':''}">${r.path.length?r.cost:'—'}</td></tr>`).join('')};
+$('alg').onchange=info;
+document.querySelectorAll('.br').forEach(b=>b.onclick=()=>{brush=b.dataset.b;document.querySelectorAll('.br').forEach(x=>x.classList.toggle('on',x===b))});
+function paint(e){const d=document.elementFromPoint(e.clientX,e.clientY);if(!d||!d.dataset||d.dataset.i===undefined)return;const i=+d.dataset.i,p=rc(i);if(i===id(...S)||i===id(...E))return;
+  if(brush==='s'){S=p;draw();return}if(brush==='e'){E=p;draw();return}G[i]=down==='erase'?0:brush==='w'?1:5;draw()}
+$('g').addEventListener('pointerdown',e=>{if(busy)return;const i=+e.target.dataset.i;down=(G[i]&&(brush==='w'&&G[i]===1||brush==='h'&&G[i]===5))?'erase':true;paint(e)});
+addEventListener('pointermove',e=>{if(down&&!busy&&(brush==='w'||brush==='h'))paint(e)});addEventListener('pointerup',()=>down=false);
+$('clr').onclick=()=>{if(!busy)init()};
+$('rnd').onclick=()=>{if(busy)return;G=G.map((_,i)=>Math.random()<.25?1:Math.random()<.08?5:0);G[id(...S)]=G[id(...E)]=0;draw()};
+$('maze').onclick=()=>{if(busy)return;G=G.map(()=>1);const st=[[1,1]];G[id(1,1)]=0;while(st.length){const[r,c]=st.at(-1),n=[[0,2],[2,0],[0,-2],[-2,0]].map(([a,b])=>[r+a,c+b,r+a/2,c+b/2]).filter(([a,b])=>a>0&&b>0&&a<R-1&&b<C-1&&G[id(a,b)]===1);
+  if(!n.length){st.pop();continue}const[a,b,ma,mb]=n[Math.random()*n.length|0];G[id(a,b)]=0;G[id(ma,mb)]=0;st.push([a,b])}S=[1,1];E=[R-2,C-2];G[id(...S)]=G[id(...E)]=0;draw()};
+if(innerWidth<700){R=21;C=21;S=[10,2];E=[10,18]}
+info();init();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

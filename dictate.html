@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הקלטה ותמלול</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#f78c6b}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.mic{width:120px;height:120px;border-radius:50%;font-size:3rem;margin:10px auto;display:flex;align-items:center;justify-content:center;background:var(--card);border:3px solid var(--acc);cursor:pointer}
+.mic.on{background:#ff4d6d;border-color:#ff4d6d;animation:pulse 1.2s infinite}@keyframes pulse{50%{box-shadow:0 0 0 18px rgba(255,77,109,.2)}}
+#txt{width:100%;min-height:220px;font-size:1.15rem;line-height:1.8}
+.interim{color:var(--muted);min-height:1.5em;font-style:italic}
+.note{padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.04);margin-bottom:6px;cursor:pointer}
+.note small{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🎙️ הקלטה ותמלול</h1>
+<p class="sub">מדברים והטקסט נכתב. אומרים "נקודה", "פסיק" או "שורה חדשה" והסימן נכנס. הפתקים נשמרים ברשימה, ואפשר להעתיק, להוריד או לשלוח. עובד בכרום ובאדג׳.</p>
+<div class="grid2">
+  <div class="panel" style="text-align:center">
+    <button class="mic" id="mic">🎤</button>
+    <div id="state" class="muted">לחצו כדי להתחיל להקליט</div>
+    <div class="row" style="justify-content:center;margin-top:8px"><select id="lang"><option value="he-IL">עברית</option><option value="en-US">English</option><option value="ar-IL">العربية</option><option value="ru-RU">Русский</option></select><label class="inline"><input type="checkbox" id="cmds" checked> פקודות קוליות</label></div>
+    <p class="hint" style="margin-top:10px">פקודות: "נקודה", "פסיק", "סימן שאלה", "סימן קריאה", "שורה חדשה", "פסקה חדשה", "מחק מילה".</p>
+  </div>
+  <div class="panel">
+    <div class="interim" id="interim"></div>
+    <textarea id="txt" placeholder="הטקסט יופיע כאן..."></textarea>
+    <div class="row" style="margin-top:6px"><button class="pri" id="save">💾 שמירה כפתק</button><button id="cp">📋 העתקה</button><button id="wa">📤 וואטסאפ</button><button id="dl">⬇ .txt</button><button id="clr">🗑</button><span class="muted" id="wc" style="margin-inline-start:auto"></span></div>
+  </div>
+</div>
+<div class="panel"><h2>🗒️ פתקים שמורים</h2><div id="notes"></div></div>
+<script>
+const $=id=>document.getElementById(id),T=$('txt');const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,on=false;
+let N;try{N=JSON.parse(localStorage.getItem('dictate'))||[]}catch{N=[]}
+const CM=[[/\s*(נקודה)\s*$/,'. '],[/\s*(פסיק)\s*$/,', '],[/\s*(סימן שאלה)\s*$/,'? '],[/\s*(סימן קריאה)\s*$/,'! '],[/\s*(פסקה חדשה)\s*$/,'\n\n'],[/\s*(שורה חדשה)\s*$/,'\n']];
+function process(t){if(!$('cmds').checked)return t;t=t.replace(/\s*נקודה\s*/g,'. ').replace(/\s*פסיק\s*/g,', ').replace(/\s*סימן שאלה\s*/g,'? ').replace(/\s*סימן קריאה\s*/g,'! ').replace(/\s*פסקה חדשה\s*/g,'\n\n').replace(/\s*שורה חדשה\s*/g,'\n');return t}
+function add(t){if($('cmds').checked&&/^\s*מחק מילה\s*$/.test(t)){T.value=T.value.replace(/\s*\S+\s*$/,' ');stats();return}const p=process(t.trim());const sep=T.value&&!/[\s\n]$/.test(T.value)?' ':'';T.value+=sep+p;stats();T.scrollTop=T.scrollHeight}
+function stats(){$('wc').textContent=(T.value.match(/\S+/g)||[]).length+' מילים';try{localStorage.setItem('dictate-cur',T.value)}catch{}}
+function start(){if(!SR){$('state').textContent='❌ הדפדפן לא תומך בזיהוי דיבור. נסו בכרום או באדג׳.';return}rec=new SR();rec.lang=$('lang').value;rec.continuous=true;rec.interimResults=true;
+  rec.onresult=e=>{let im='';for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];if(r.isFinal)add(r[0].transcript);else im+=r[0].transcript}$('interim').textContent=im};
+  rec.onerror=e=>{$('state').textContent=e.error==='not-allowed'?'❌ אין הרשאה למיקרופון':'שגיאה: '+e.error};rec.onend=()=>{if(on){try{rec.start()}catch{}}else ui()};rec.start();on=true;ui()}
+function stop(){on=false;rec&&rec.stop();$('interim').textContent='';ui()}
+function ui(){$('mic').classList.toggle('on',on);$('mic').textContent=on?'⏹':'🎤';$('state').textContent=on?'🔴 מקליט… מדברים חופשי':'לחצו כדי להתחיל להקליט'}
+function notes(){$('notes').innerHTML=N.map((n,i)=>`<div class="note" data-i="${i}"><small>${new Date(n.d).toLocaleString('he-IL',{dateStyle:'short',timeStyle:'short'})}</small> <button data-x="${i}" style="padding:0 6px;font-size:.75rem;float:left">✕</button><div>${n.t.replace(/</g,'&lt;').slice(0,200).replace(/\n/g,'<br>')}${n.t.length>200?'…':''}</div></div>`).join('')||'<p class="muted">אין עדיין פתקים</p>';try{localStorage.setItem('dictate',JSON.stringify(N))}catch{}}
+$('mic').onclick=()=>on?stop():start();$('lang').onchange=()=>{if(on){stop();setTimeout(start,300)}};
+$('save').onclick=()=>{if(!T.value.trim())return;N.unshift({t:T.value.trim(),d:Date.now()});T.value='';stats();notes()};
+$('notes').onclick=e=>{const x=e.target.dataset.x;if(x!==undefined){N.splice(+x,1);notes();return}const n=e.target.closest('.note');if(n){T.value=N[n.dataset.i].t;stats()}};
+$('cp').onclick=()=>{navigator.clipboard.writeText(T.value);$('cp').textContent='✓';setTimeout(()=>$('cp').textContent='📋 העתקה',1200)};
+$('wa').onclick=()=>open('https://wa.me/?text='+encodeURIComponent(T.value),'_blank');
+$('dl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+T.value],{type:'text/plain;charset=utf-8'}));a.download='תמלול.txt';a.click()};
+$('clr').onclick=()=>{if(!T.value||confirm('לנקות את הטקסט?')){T.value='';stats()}};T.oninput=stats;
+try{T.value=localStorage.getItem('dictate-cur')||''}catch{}stats();notes();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>חידון מדינות</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#4cc9f0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:720px!important}
+.flag{font-size:7rem;text-align:center;line-height:1.2}
+.qq{font-size:1.6rem;font-weight:800;text-align:center;margin:8px 0}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opts button{font-size:1.2rem;padding:14px}
+.opts button.ok{background:#3aa55c;border-color:#3aa55c}.opts button.bad{background:#d62839;border-color:#d62839}
+.bar{height:8px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden}.bar div{height:100%;background:var(--acc);transition:width 1s linear}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}.card span{font-size:2.4rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🌍 חידון מדינות, דגלים ובירות</h1>
+<p class="sub">מזהים דגלים, בירות ויבשות של 80 מדינות. בוחרים יבשת ורמה, ומשחקים נגד השעון או ללא הגבלה. יש גם מצב לימוד עם כרטיסיות.</p>
+<div class="panel row" style="justify-content:center">
+  <select id="mode"><option value="flag">🏳️ איזו מדינה לפי הדגל?</option><option value="cap">🏛️ מה הבירה?</option><option value="rcap">🗺️ של איזו מדינה הבירה?</option><option value="cont">🌐 באיזו יבשת?</option><option value="learn">📚 לימוד</option></select>
+  <select id="cont"><option value="">כל העולם</option><option>אירופה</option><option>אסיה</option><option>אפריקה</option><option>אמריקה</option><option>אוקיאניה</option></select>
+  <label class="inline"><input type="checkbox" id="timer"> ⏱ 10 שניות לשאלה</label>
+  <button class="pri" id="start">▶ התחלה</button>
+</div>
+<div class="stats"><div class="stat"><small>ניקוד</small><b id="sc">0</b></div><div class="stat"><small>נכונות</small><b id="ok">0/0</b></div><div class="stat"><small>רצף</small><b id="st">0</b></div><div class="stat"><small>שיא</small><b id="best">0</b></div></div>
+<div class="panel" id="game"><div class="bar"><div id="tb" style="width:100%"></div></div><div class="flag" id="fl"></div><div class="qq" id="qq"></div><div class="opts" id="opts"></div></div>
+<div class="panel" id="learn" hidden><div class="cards" id="cards"></div></div>
+<script>
+const $=id=>document.getElementById(id);
+const D=`🇮🇱|ישראל|ירושלים|אסיה;🇺🇸|ארצות הברית|וושינגטון|אמריקה;🇬🇧|בריטניה|לונדון|אירופה;🇫🇷|צרפת|פריז|אירופה;🇩🇪|גרמניה|ברלין|אירופה;🇮🇹|איטליה|רומא|אירופה;🇪🇸|ספרד|מדריד|אירופה;🇵🇹|פורטוגל|ליסבון|אירופה;🇳🇱|הולנד|אמסטרדם|אירופה;🇧🇪|בלגיה|בריסל|אירופה;🇨🇭|שווייץ|ברן|אירופה;🇦🇹|אוסטריה|וינה|אירופה;🇬🇷|יוון|אתונה|אירופה;🇨🇾|קפריסין|ניקוסיה|אירופה;🇵🇱|פולין|ורשה|אירופה;🇨🇿|צ׳כיה|פראג|אירופה;🇭🇺|הונגריה|בודפשט|אירופה;🇷🇴|רומניה|בוקרשט|אירופה;🇧🇬|בולגריה|סופיה|אירופה;🇺🇦|אוקראינה|קייב|אירופה;🇷🇺|רוסיה|מוסקבה|אירופה;🇸🇪|שוודיה|שטוקהולם|אירופה;🇳🇴|נורווגיה|אוסלו|אירופה;🇩🇰|דנמרק|קופנהגן|אירופה;🇫🇮|פינלנד|הלסינקי|אירופה;🇮🇪|אירלנד|דבלין|אירופה;🇮🇸|איסלנד|רייקיאוויק|אירופה;🇭🇷|קרואטיה|זאגרב|אירופה;🇷🇸|סרביה|בלגרד|אירופה;🇬🇪|גאורגיה|טביליסי|אסיה;🇹🇷|טורקיה|אנקרה|אסיה;🇯🇴|ירדן|עמאן|אסיה;🇪🇬|מצרים|קהיר|אפריקה;🇱🇧|לבנון|ביירות|אסיה;🇸🇦|ערב הסעודית|ריאד|אסיה;🇦🇪|איחוד האמירויות|אבו דאבי|אסיה;🇧🇭|בחריין|מנאמה|אסיה;🇲🇦|מרוקו|רבאט|אפריקה;🇮🇳|הודו|ניו דלהי|אסיה;🇨🇳|סין|בייג׳ינג|אסיה;🇯🇵|יפן|טוקיו|אסיה;🇰🇷|דרום קוריאה|סיאול|אסיה;🇹🇭|תאילנד|בנגקוק|אסיה;🇻🇳|וייטנאם|האנוי|אסיה;🇵🇭|הפיליפינים|מנילה|אסיה;🇮🇩|אינדונזיה|ג׳קרטה|אסיה;🇸🇬|סינגפור|סינגפור|אסיה;🇲🇾|מלזיה|קואלה לומפור|אסיה;🇳🇵|נפאל|קטמנדו|אסיה;🇵🇰|פקיסטן|איסלמבאד|אסיה;🇮🇷|איראן|טהרן|אסיה;🇰🇿|קזחסטן|אסטנה|אסיה;🇺🇿|אוזבקיסטן|טשקנט|אסיה;🇦🇿|אזרבייג׳ן|באקו|אסיה;🇨🇦|קנדה|אוטווה|אמריקה;🇲🇽|מקסיקו|מקסיקו סיטי|אמריקה;🇧🇷|ברזיל|ברזיליה|אמריקה;🇦🇷|ארגנטינה|בואנוס איירס|אמריקה;🇨🇱|צ׳ילה|סנטיאגו|אמריקה;🇵🇪|פרו|לימה|אמריקה;🇨🇴|קולומביה|בוגוטה|אמריקה;🇻🇪|ונצואלה|קראקס|אמריקה;🇨🇺|קובה|הוואנה|אמריקה;🇺🇾|אורוגוואי|מונטווידאו|אמריקה;🇵🇦|פנמה|פנמה סיטי|אמריקה;🇨🇷|קוסטה ריקה|סן חוסה|אמריקה;🇿🇦|דרום אפריקה|פרטוריה|אפריקה;🇳🇬|ניגריה|אבוג׳ה|אפריקה;🇰🇪|קניה|ניירובי|אפריקה;🇪🇹|אתיופיה|אדיס אבבה|אפריקה;🇬🇭|גאנה|אקרה|אפריקה;🇹🇳|תוניסיה|תוניס|אפריקה;🇹🇿|טנזניה|דודומה|אפריקה;🇺🇬|אוגנדה|קמפלה|אפריקה;🇷🇼|רואנדה|קיגאלי|אפריקה;🇸🇳|סנגל|דקאר|אפריקה;🇦🇺|אוסטרליה|קנברה|אוקיאניה;🇳🇿|ניו זילנד|ולינגטון|אוקיאניה;🇫🇯|פיג׳י|סובה|אוקיאניה;🇵🇬|פפואה גינאה החדשה|פורט מורסבי|אוקיאניה`.split(';').map(s=>{const[f,n,c,k]=s.split('|');return{f,n,c,k}});
+let pool=[],cur=null,sc=0,ok=0,tot=0,str=0,tmr=null,left=0,lock=false;
+try{$('best').textContent=localStorage.getItem('geo-best')||0}catch{}
+const sh=a=>[...a].sort(()=>Math.random()-.5);
+function list(){return D.filter(x=>!$('cont').value||x.k===$('cont').value)}
+function next(){lock=false;const L=list();if(!pool.length)pool=sh(L);cur=pool.pop();const m=$('mode').value;let q,ans,field;
+  if(m==='flag'){q='איזו מדינה זו?';ans=cur.n;field='n';$('fl').textContent=cur.f}else if(m==='cap'){q=`מה הבירה של ${cur.n}?`;ans=cur.c;field='c';$('fl').textContent=cur.f}else if(m==='rcap'){q=`${cur.c} היא הבירה של…`;ans=cur.n;field='n';$('fl').textContent='🏛️'}else{q=`באיזו יבשת נמצאת ${cur.n}?`;ans=cur.k;field='k';$('fl').textContent=cur.f}
+  const others=field==='k'?['אירופה','אסיה','אפריקה','אמריקה','אוקיאניה'].filter(x=>x!==ans):sh(D.filter(x=>x[field]!==ans&&(!$('cont').value||x.k===cur.k)).map(x=>x[field]));
+  const opts=sh([ans,...[...new Set(others)].slice(0,3)]);$('qq').textContent=q;$('opts').innerHTML=opts.map(o=>`<button data-o="${o}">${o}</button>`).join('');$('opts').dataset.ans=ans;
+  clearInterval(tmr);$('tb').style.transition='none';$('tb').style.width='100%';if($('timer').checked){left=10;requestAnimationFrame(()=>{$('tb').style.transition='width 10s linear';$('tb').style.width='0%'});tmr=setTimeout(()=>answer(null),10000)}}
+function answer(o){if(lock)return;lock=true;clearTimeout(tmr);const ans=$('opts').dataset.ans;tot++;
+  [...$('opts').children].forEach(b=>{if(b.dataset.o===ans)b.classList.add('ok');else if(b.dataset.o===o)b.classList.add('bad')});
+  if(o===ans){ok++;str++;sc+=10+Math.min(str,10)*2}else str=0;$('sc').textContent=sc;$('ok').textContent=`${ok}/${tot}`;$('st').textContent=str;
+  try{if(sc>+(localStorage.getItem('geo-best')||0)){localStorage.setItem('geo-best',sc);$('best').textContent=sc}}catch{}setTimeout(next,o===ans?700:1500)}
+$('opts').onclick=e=>{const o=e.target.dataset.o;if(o)answer(o)};
+function start(){const m=$('mode').value;$('learn').hidden=m!=='learn';$('game').hidden=m==='learn';if(m==='learn'){$('cards').innerHTML=list().map(x=>`<div class="card"><span>${x.f}</span><div><b>${x.n}</b></div><small class="muted">${x.c} · ${x.k}</small></div>`).join('');return}sc=ok=tot=str=0;pool=[];['sc','st'].forEach(k=>$(k).textContent=0);$('ok').textContent='0/0';next()}
+$('start').onclick=start;$('mode').onchange=start;$('cont').onchange=start;
+start();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

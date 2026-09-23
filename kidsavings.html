@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>חיסכון לכל ילד</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#58d68d}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.kid{display:grid;grid-template-columns:1fr 140px 110px 34px;gap:6px;margin-bottom:6px}canvas{width:100%;height:240px;display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>👧 חיסכון לכל ילד</h1>
+<p class="sub">כמה יהיה לכל ילד בגיל 18 או 21: ההפקדה של ביטוח לאומי, ההפקדה הנוספת של ההורים, ומה שאתם חוסכים בנוסף. עם יעד לבר מצווה, לחתונה או לדירה.</p>
+<div class="grid2">
+  <div class="panel">
+    <h2>👶 הילדים</h2>
+    <div class="kid muted" style="font-size:.8rem"><span>שם</span><span>תאריך לידה</span><span>חיסכון נוסף בחודש</span><span></span></div>
+    <div id="kids"></div><button id="add">+ ילד/ה</button>
+  </div>
+  <div class="panel">
+    <h2>⚙️ הנחות</h2>
+    <div class="row"><label style="flex:1">הפקדת ביטוח לאומי בחודש<input id="gov" type="number" value="57"></label><label style="flex:1">הפקדה נוספת של ההורים מהקצבה<input id="par" type="number" value="57"></label></div>
+    <div class="row" style="margin-top:6px"><label style="flex:1">תשואה שנתית (%)<input id="r" type="number" value="5" step="0.5"></label><label style="flex:1">יעד בגיל<select id="age"><option>13</option><option selected>18</option><option>21</option></select></label></div>
+    <label class="inline" style="margin-top:6px"><input type="checkbox" id="bonus" checked> מענק של כ־500 ₪ בגיל 3, 7, 13 ו־18 (כשבחרתם בתוכנית)</label>
+  </div>
+</div>
+<div class="panel"><table><thead><tr><th>ילד/ה</th><th class="num">גיל היום</th><th class="num">נצבר היום (משוער)</th><th class="num" id="hage"></th><th class="num">מתוכם הפקדות</th></tr></thead><tbody id="t"></tbody></table></div>
+<div class="panel"><h2>📈 צמיחת החיסכון</h2><canvas id="cv"></canvas></div>
+<p class="hint">התוכנית "חיסכון לכל ילד" של ביטוח לאומי מפקידה סכום חודשי לכל ילד עד גיל 18, ואפשר להכפיל אותו מקצבת הילדים. הסכומים מתעדכנים מדי שנה, ולכן כדאי לעדכן אותם כאן. החישוב משוער, לפני מס ודמי ניהול.</p>
+<script>
+const $=id=>document.getElementById(id);const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');const v=id=>+$(id).value||0;
+const COL=['#58d68d','#4cc9f0','#ffd166','#ff8fab','#c49bff','#ff9f68','#7cf2c4','#9bd1ff'];
+let K;try{K=JSON.parse(localStorage.getItem('kidsav'))}catch{}if(!K){const y=new Date().getFullYear();K=[{n:'נועה',b:`${y-9}-03-12`,x:100},{n:'איתי',b:`${y-5}-08-01`,x:50},{n:'שירה',b:`${y-1}-11-20`,x:0}]}
+const save=()=>{try{localStorage.setItem('kidsav',JSON.stringify(K))}catch{}};
+function sim(k){const b=new Date(k.b),T=+$('age').value,r=v('r')/100/12,m0=v('gov')+v('par');let bal=0,dep=0,now=0;const pts=[];const nowMs=Date.now();
+  for(let m=0;m<=T*12;m++){const d=new Date(b.getFullYear(),b.getMonth()+m,1);bal*=1+r;const add=(m<18*12?m0:0)+k.x;bal+=add;dep+=add;if($('bonus').checked&&[36,84,156,216].includes(m)&&m<=18*12){bal+=500;dep+=500}if(d<=nowMs)now=bal;if(m%12===0)pts.push(bal)}return{final:bal,dep,now,pts}}
+function ui(){$('kids').innerHTML=K.map((k,i)=>`<div class="kid"><input data-i="${i}" data-k="n" value="${k.n}"><input data-i="${i}" data-k="b" type="date" value="${k.b}"><input data-i="${i}" data-k="x" type="number" value="${k.x}"><button data-x="${i}" style="padding:2px 6px">✕</button></div>`).join('')}
+function calc(){$('hage').textContent='בגיל '+$('age').value;let tot=0;const R=K.map(k=>{const s=sim(k);tot+=s.final;return[k,s]});
+  $('t').innerHTML=R.map(([k,s],i)=>{const a=((Date.now()-new Date(k.b))/(365.25*864e5));return`<tr><td><span style="color:${COL[i%8]}">●</span> ${k.n}</td><td class="num">${Math.max(0,a).toFixed(1)}</td><td class="num">${f(s.now)}</td><td class="num"><b>${f(s.final)}</b></td><td class="num muted">${f(s.dep)}</td></tr>`}).join('')+`<tr><td><b>סה״כ</b></td><td></td><td></td><td class="num"><b>${f(tot)}</b></td><td></td></tr>`;
+  const cv=$('cv'),d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;cv.width=W*d;cv.height=H*d;const x=cv.getContext('2d');x.scale(d,d);const mx=Math.max(1,...R.flatMap(([,s])=>s.pts)),n=+$('age').value;
+  const X=i=>50+(W-60)*i/n,Y=val=>H-24-val/mx*(H-40);x.font='11px Segoe UI';x.fillStyle='#a9a3c9';x.textAlign='right';x.strokeStyle='rgba(255,255,255,.08)';for(let i=0;i<=3;i++){const val=mx*i/3;x.beginPath();x.moveTo(46,Y(val));x.lineTo(W,Y(val));x.stroke();x.fillText(Math.round(val/1000)+'K',42,Y(val)+4)}
+  x.textAlign='center';for(let a=0;a<=n;a+=3)x.fillText('גיל '+a,X(a),H-6);R.forEach(([,s],i)=>{x.strokeStyle=COL[i%8];x.lineWidth=3;x.beginPath();s.pts.forEach((val,j)=>j?x.lineTo(X(j),Y(val)):x.moveTo(X(j),Y(val)));x.stroke()});save()}
+document.addEventListener('input',e=>{const d=e.target.dataset;if(d.i!==undefined)K[d.i][d.k]=d.k==='x'?+e.target.value:e.target.value;calc()});document.addEventListener('change',calc);
+$('kids').onclick=e=>{const x=e.target.dataset.x;if(x!==undefined){K.splice(+x,1);ui();calc()}};$('add').onclick=()=>{K.push({n:'ילד/ה',b:new Date().toISOString().slice(0,10),x:0});ui();calc()};
+addEventListener('resize',calc);ui();calc();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

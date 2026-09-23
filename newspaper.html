@@ -102,5 +102,6 @@ function make(){const n=$('name').value.trim()||'אורח/ת מסתורי/ת',c=
 try{const s=JSON.parse(localStorage.getItem('np'));if(s){$('name').value=s[0];$('city').value=s[1]}}catch{}
 $('go').onclick=make;make();
 </script>
+<script src="dl.js" defer></script>
 </body>
 </html>

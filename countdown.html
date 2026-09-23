@@ -66,5 +66,6 @@ $('list').onclick=e=>{const x=e.target.dataset.x;if(x!==undefined){evs.splice(+x
 $('f').onsubmit=e=>{e.preventDefault();const at=new Date($('d').value+'T'+($('t').value||'00:00'));evs.push({n:$('n').value,at:at.toISOString()});save();evs.sort((a,b)=>new Date(a.at)-new Date(b.at));sel=evs.findIndex(v=>v.n===$('n').value);$('n').value='';render()};
 render();setInterval(tick,1000);setInterval(render,60000);
 </script>
+<script src="dl.js" defer></script>
 </body>
 </html>

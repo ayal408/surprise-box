@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>עץ משפחה</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#90e0a0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1300px!important}
+.stage{overflow:auto;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.2);min-height:420px;position:relative}
+svg{display:block}
+.node{cursor:pointer}
+.node:hover rect{fill:#2e2660}
+.ed{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+@media print{body{background:#fff}.panel:not(.pr),.back,h1,.sub{display:none!important}.stage{border:0;overflow:visible}.node rect{fill:#fff}.node text{fill:#000}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🌳 עץ משפחה</h1>
+<p class="sub">בונים את עץ המשפחה: מוסיפים אנשים, מחברים הורים, בני זוג וילדים, ורואים את כל הדורות. כולל תאריכים עבריים, הדפסה ושמירה כתמונה.</p>
+<div class="panel">
+  <h2 id="edt">➕ אדם חדש</h2>
+  <div class="ed">
+    <label>שם פרטי<input id="fn"></label><label>שם משפחה<input id="ln"></label>
+    <label>מין<select id="sx"><option value="m">זכר</option><option value="f">נקבה</option></select></label>
+    <label>תאריך לידה<input type="date" id="bd"></label><label>תאריך פטירה<input type="date" id="dd"></label>
+    <label>אבא<select id="fa"></select></label><label>אמא<select id="mo"></select></label><label>בן/בת זוג<select id="sp"></select></label>
+  </div>
+  <div class="row" style="margin-top:8px"><button class="pri" id="save">שמירה</button><button id="new">אדם חדש</button><button id="del">🗑 מחיקה</button><span class="muted" id="hint" style="font-size:.85rem">לחיצה על אדם בעץ פותחת אותו לעריכה</span></div>
+</div>
+<div class="panel pr stage" id="stage"></div>
+<div class="panel row"><button onclick="print()">🖨️ הדפסה</button><button id="png">🖼️ שמירה כתמונה</button><button id="exp">⬇ גיבוי</button><button id="imp">⬆ שחזור</button><input type="file" id="file" accept=".json" hidden><span class="muted" id="cnt"></span></div>
+<script>
+const $=id=>document.getElementById(id);
+const HF=new Intl.DateTimeFormat('he-u-ca-hebrew',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});
+const heb=s=>{try{const[y,m,d]=s.split('-').map(Number);return HF.format(new Date(Date.UTC(y,m-1,d)))}catch{return''}};
+let P;try{P=JSON.parse(localStorage.getItem('ftree'))}catch{}
+if(!P)P=[{id:1,fn:'אברהם',ln:'כהן',sx:'m',bd:'1935-04-10',dd:'2010-01-05',sp:2},{id:2,fn:'שרה',ln:'כהן',sx:'f',bd:'1938-09-01',sp:1},{id:3,fn:'יצחק',ln:'כהן',sx:'m',bd:'1962-03-15',fa:1,mo:2,sp:4},{id:4,fn:'רבקה',ln:'כהן',sx:'f',bd:'1965-07-20',sp:3},{id:5,fn:'יעקב',ln:'כהן',sx:'m',bd:'1990-11-02',fa:3,mo:4},{id:6,fn:'דינה',ln:'כהן',sx:'f',bd:'1993-02-14',fa:3,mo:4}];
+let cur=null;const save=()=>{try{localStorage.setItem('ftree',JSON.stringify(P))}catch{}};
+const by=id=>P.find(p=>p.id==id);const name=p=>p?`${p.fn} ${p.ln||''}`.trim():'';
+function opts(){const o=sx=>'<option value="">—</option>'+P.filter(p=>!sx||p.sx===sx).filter(p=>!cur||p.id!==cur).map(p=>`<option value="${p.id}">${name(p)}</option>`).join('');$('fa').innerHTML=o('m');$('mo').innerHTML=o('f');$('sp').innerHTML=o('')}
+function edit(id){cur=id;opts();const p=by(id)||{};['fn','ln','bd','dd'].forEach(k=>$(k).value=p[k]||'');$('sx').value=p.sx||'m';$('fa').value=p.fa||'';$('mo').value=p.mo||'';$('sp').value=p.sp||'';$('edt').textContent=id?'✏️ עריכה: '+name(p):'➕ אדם חדש';draw()}
+function gen(p,seen=new Set()){if(!p||seen.has(p.id))return 0;seen.add(p.id);return Math.max(p.fa?gen(by(p.fa),seen)+1:0,p.mo?gen(by(p.mo),seen)+1:0)}
+function draw(){const G={};P.forEach(p=>{let g=gen(p);const s=by(p.sp);if(s)g=Math.max(g,gen(s));(G[g]=G[g]||[]).push(p)});
+  const W=170,H=74,gx=26,gy=70,rows=Object.keys(G).map(Number).sort((a,b)=>a-b);const pos={};let maxW=0;
+  rows.forEach(g=>{const arr=G[g];const ordered=[];arr.sort((a,b)=>{const ka=(a.fa||a.mo||0)*1000+(a.bd||'').slice(0,4)*1,kb=(b.fa||b.mo||0)*1000+(b.bd||'').slice(0,4)*1;return ka-kb});
+    arr.forEach(p=>{if(ordered.includes(p))return;ordered.push(p);const s=by(p.sp);if(s&&arr.includes(s)&&!ordered.includes(s))ordered.push(s)});maxW=Math.max(maxW,ordered.length*(W+gx))
+    ordered.forEach((p,i)=>pos[p.id]={x:i*(W+gx)+20,y:g*(H+gy)+20})});
+  rows.forEach(g=>{const arr=G[g],w=arr.length*(W+gx),off=(maxW-w)/2;arr.forEach(p=>pos[p.id].x+=off)});
+  const SW=maxW+40,SH=rows.length*(H+gy)+20;let s=`<svg xmlns="http://www.w3.org/2000/svg" width="${SW}" height="${SH}" direction="rtl">`;
+  P.forEach(p=>{const q=by(p.sp);if(q&&pos[q.id]&&p.id<q.id&&pos[p.id].y===pos[q.id].y){const a=pos[p.id],b=pos[q.id];s+=`<line x1="${Math.min(a.x,b.x)+W}" y1="${a.y+H/2}" x2="${Math.max(a.x,b.x)}" y2="${b.y+H/2}" stroke="#ff8fab" stroke-width="2" stroke-dasharray="4 3"/>`}});
+  P.forEach(p=>{const pa=[by(p.fa),by(p.mo)].filter(Boolean);if(!pa.length)return;const c=pos[p.id];const px=pa.reduce((a,q)=>a+pos[q.id].x+W/2,0)/pa.length,py=Math.max(...pa.map(q=>pos[q.id].y))+H;const my=(py+c.y)/2;
+    s+=`<path d="M${px} ${py} V${my} H${c.x+W/2} V${c.y}" fill="none" stroke="#90e0a0" stroke-width="2"/>`});
+  P.forEach(p=>{const{x,y}=pos[p.id],c=p.sx==='f'?'#ff8fab':'#4cc9f0';const yrs=(p.bd?p.bd.slice(0,4):'?')+(p.dd?' – '+p.dd.slice(0,4):'');
+    const T=`text-anchor="middle" font-family="Segoe UI, Arial"`;
+    s+=`<g class="node ${cur===p.id?'sel':''}" data-id="${p.id}"><rect x="${x}" y="${y}" width="${W}" height="${H}" rx="12" fill="#231d4a" stroke="${c}" stroke-width="${cur===p.id?4:2}"/><text x="${x+W/2}" y="${y+26}" font-size="16" font-weight="700" fill="#f3efff" ${T}>${name(p).replace(/</g,'&lt;')}${p.dd?' ז״ל':''}</text><text x="${x+W/2}" y="${y+46}" font-size="12" fill="#a9a3c9" ${T}>${yrs}</text><text x="${x+W/2}" y="${y+63}" font-size="11" fill="#a9a3c9" ${T}>${p.bd?heb(p.bd):''}</text></g>`});
+  $('stage').innerHTML=s+'</svg>';$('cnt').textContent=`${P.length} אנשים · ${rows.length} דורות`;save()}
+$('stage').onclick=e=>{const g=e.target.closest('.node');if(g)edit(+g.dataset.id)};
+$('save').onclick=()=>{if(!$('fn').value.trim()){$('fn').focus();return}let p=by(cur);if(!p){p={id:Date.now()};P.push(p)}const oldSp=p.sp;
+  Object.assign(p,{fn:$('fn').value.trim(),ln:$('ln').value.trim(),sx:$('sx').value,bd:$('bd').value,dd:$('dd').value,fa:+$('fa').value||undefined,mo:+$('mo').value||undefined,sp:+$('sp').value||undefined});
+  if(oldSp&&oldSp!==p.sp){const o=by(oldSp);if(o&&o.sp===p.id)o.sp=undefined}if(p.sp){const s=by(p.sp);if(s)s.sp=p.id}edit(p.id)};
+$('new').onclick=()=>edit(null);
+$('del').onclick=()=>{if(!cur||!confirm('למחוק את '+name(by(cur))+'?'))return;P=P.filter(p=>p.id!==cur);P.forEach(p=>{['fa','mo','sp'].forEach(k=>{if(p[k]===cur)p[k]=undefined})});edit(null)};
+$('png').onclick=()=>{const svg=$('stage').querySelector('svg'),xml=new XMLSerializer().serializeToString(svg);const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=svg.width.baseVal.value*2;c.height=svg.height.baseVal.value*2;const x=c.getContext('2d');x.fillStyle='#1d1840';x.fillRect(0,0,c.width,c.height);x.scale(2,2);x.drawImage(img,0,0);const a=document.createElement('a');a.download='עץ-משפחה.png';a.href=c.toDataURL();a.click()};
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(xml)};
+$('exp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(P)],{type:'application/json'}));a.download='עץ-משפחה.json';a.click()};
+$('imp').onclick=()=>$('file').click();$('file').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());if(Array.isArray(d)){P=d;edit(null)}}catch{alert('קובץ לא תקין')}};
+edit(null);
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

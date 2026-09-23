@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>קופת יעד</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffd166}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.goals{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.g{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.jar{position:relative;width:120px;height:150px;border:4px solid rgba(255,255,255,.5);border-top:0;border-radius:0 0 30px 30px;overflow:hidden;margin-top:14px}
+.jar::before{content:"";position:absolute;top:-14px;left:-10px;right:-10px;height:14px;border:4px solid rgba(255,255,255,.5);border-radius:8px}
+.jar .fill{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(#ffe45c,#ffb703);transition:height .8s cubic-bezier(.2,.8,.2,1)}
+.jar .fill::before{content:"";position:absolute;top:-6px;left:0;right:0;height:12px;background:radial-gradient(circle at 10px 6px,#ffe45c 6px,transparent 7px) 0 0/20px 12px}
+.jar .pc{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.4rem;color:#140f2b;text-shadow:0 0 6px #fff8}
+.g .row{justify-content:center}
+.g input{width:90px;padding:5px 8px}
+.done{animation:party 1s}@keyframes party{50%{transform:scale(1.05) rotate(-2deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🏺 קופת יעד</h1>
+<p class="sub">חוסכים למשהו מסוים: טיול, מכונת כביסה, מחשב או מתנה. מגדירים יעד ותאריך, מפקידים, ורואים את הצנצנת מתמלאת ומתי תגיעו ליעד.</p>
+<div class="panel"><form class="row" id="f"><input id="ic" value="✈️" style="width:56px;text-align:center"><input id="n" placeholder="למה חוסכים?" required style="flex:1"><input id="t" type="number" placeholder="יעד ₪" required style="width:110px"><label class="inline">עד <input id="d" type="date"></label><button class="pri">+ קופה חדשה</button></form></div>
+<div class="goals" id="goals"></div>
+<script>
+const $=id=>document.getElementById(id);const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');
+let G;try{G=JSON.parse(localStorage.getItem('goaljar'))}catch{}
+if(!G){const y=new Date().getFullYear();G=[{id:1,ic:'✈️',n:'טיול משפחתי',t:15000,d:`${y+1}-07-01`,dep:[{a:2000,d:`${y}-06-01`},{a:1500,d:`${y}-08-01`}]},{id:2,ic:'💻',n:'מחשב חדש',t:5000,d:'',dep:[{a:3200,d:`${y}-09-01`}]}]}
+const save=()=>{try{localStorage.setItem('goaljar',JSON.stringify(G))}catch{}};
+function render(){$('goals').innerHTML=G.map(g=>{const s=g.dep.reduce((a,x)=>a+x.a,0),p=Math.min(1,s/g.t),left=Math.max(0,g.t-s);
+  let plan='';if(g.d&&left>0){const m=Math.max(1,Math.ceil((new Date(g.d)-Date.now())/(30.4*864e5)));plan=`כדי להגיע עד ${new Date(g.d).toLocaleDateString('he-IL',{month:'short',year:'numeric'})}: <b>${f(left/m)}</b> בחודש`}
+  else if(left>0&&g.dep.length>1){const first=new Date(g.dep[0].d),months=Math.max(1,(Date.now()-first)/(30.4*864e5)),rate=s/months;plan=rate?`בקצב הנוכחי: עוד ~${Math.ceil(left/rate)} חודשים`:''}
+  return`<div class="g ${p>=1?'done':''}"><div style="font-size:1.8rem">${g.ic}</div><b>${g.n.replace(/</g,'&lt;')}</b><div class="jar"><div class="fill" style="height:${p*100}%"></div><div class="pc">${Math.round(p*100)}%</div></div>
+  <div><b style="color:var(--acc)">${f(s)}</b> מתוך ${f(g.t)}</div><div class="muted" style="font-size:.85rem">${p>=1?'🎉 הגעתם ליעד!':plan}</div>
+  <div class="row"><input type="number" data-a="${g.id}" placeholder="₪"><button data-dep="${g.id}">+ הפקדה</button><button data-wd="${g.id}" title="משיכה">−</button></div><button data-x="${g.id}" style="padding:2px 8px;font-size:.78rem">🗑 מחיקה</button></div>`}).join('')||'<p class="muted">צרו קופה ראשונה למעלה</p>';save()}
+$('f').onsubmit=e=>{e.preventDefault();G.push({id:Date.now(),ic:$('ic').value||'🎯',n:$('n').value,t:+$('t').value,d:$('d').value,dep:[]});$('n').value='';$('t').value='';render()};
+$('goals').onclick=e=>{const d=e.target.dataset;const id=d.dep||d.wd||d.x;if(!id)return;const g=G.find(x=>x.id==id);
+  if(d.x){if(confirm('למחוק את הקופה?')){G=G.filter(x=>x!==g);render()}return}const inp=document.querySelector(`[data-a="${id}"]`),a=+inp.value;if(!a){inp.focus();return}
+  g.dep.push({a:d.wd?-a:a,d:new Date().toISOString().slice(0,10)});const was=g.dep.reduce((s,x)=>s+x.a,0)-a;render();if(!d.wd&&was<g.t&&was+a>=g.t){try{const c=new AudioContext();[523,659,784,1046].forEach((fr,i)=>{const o=c.createOscillator(),gg=c.createGain();o.frequency.value=fr;gg.gain.setValueAtTime(.15,c.currentTime+i*.12);gg.gain.exponentialRampToValueAtTime(.001,c.currentTime+i*.12+.3);o.connect(gg).connect(c.destination);o.start(c.currentTime+i*.12);o.stop(c.currentTime+i*.12+.3)})}catch{}}};
+render();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

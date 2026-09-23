@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעבדת השברים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffb703}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.fr{display:flex;flex-direction:column;align-items:center;gap:4px}
+.fr input{width:70px;text-align:center;font-size:1.4rem;font-weight:800}
+.fr hr{width:70px;border:0;border-top:3px solid var(--ink);margin:0}
+.eq{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;font-size:1.8rem;font-weight:800}
+.op{display:flex;gap:4px}.op button{font-size:1.3rem;width:46px}
+canvas{display:block}
+.steps{line-height:2;font-size:1.1rem}
+.big{font-size:2rem;font-weight:800;color:var(--acc)}
+.q{font-size:2rem;font-weight:800;text-align:center;direction:ltr}
+.ans{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.ans button{font-size:1.4rem;min-width:90px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🍕 מעבדת השברים</h1>
+<p class="sub">שברים שאפשר לראות: פיצות ומלבנים שמראים כמה זה ½ או ¾, השוואה, חיבור, חיסור, כפל וחילוק עם כל השלבים, ותרגול עם ניקוד.</p>
+<div class="panel">
+  <div class="eq">
+    <div class="fr"><input id="a1" type="number" value="1"><hr><input id="b1" type="number" value="2"></div>
+    <div class="op" id="ops"><button data-o="+" class="on">+</button><button data-o="-">−</button><button data-o="*">×</button><button data-o="/">÷</button><button data-o="cmp">⚖</button></div>
+    <div class="fr"><input id="a2" type="number" value="1"><hr><input id="b2" type="number" value="3"></div>
+    <span>=</span><div class="big" id="res"></div>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel"><h2>👀 איך זה נראה</h2><div class="row" style="justify-content:center;gap:18px"><canvas id="c1" width="160" height="160"></canvas><canvas id="c2" width="160" height="160"></canvas><canvas id="c3" width="160" height="160"></canvas></div><canvas id="bars" width="600" height="130" style="width:100%;margin-top:10px"></canvas></div>
+  <div class="panel"><h2>🪜 שלב אחרי שלב</h2><div class="steps" id="steps"></div></div>
+</div>
+<div class="panel"><h2>🎯 תרגול</h2><div class="row" style="justify-content:center"><select id="lvl"><option value="0">קל: השוואה</option><option value="1" selected>חיבור וחיסור</option><option value="2">כפל וחילוק</option></select><span>ניקוד: <b id="sc">0</b> · רצף: <b id="str">0</b> 🔥</span></div><div class="q" id="q"></div><div class="ans" id="ans"></div><p id="fb" style="text-align:center;font-weight:700;min-height:1.4em"></p></div>
+<script>
+const $=id=>document.getElementById(id);let op='+';
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b)[a,b]=[b,a%b];return a||1},lcm=(a,b)=>Math.abs(a*b)/gcd(a,b);
+const simp=(n,d)=>{if(d<0){n=-n;d=-d}const g=gcd(n,d);return[n/g,d/g]};const S=([n,d])=>d===1?`${n}`:`${n}/${d}`;
+const mixed=([n,d])=>Math.abs(n)>d&&d!==1?` (${n<0?'-':''}${Math.floor(Math.abs(n)/d)} ו־${Math.abs(n)%d}/${d})`:'';
+function pie(cv,n,d,col){const x=cv.getContext('2d'),W=cv.width,r=W/2-8;x.clearRect(0,0,W,W);if(d<=0)return;const whole=Math.floor(Math.max(0,n)/d),rem=Math.max(0,n)%d;const k=Math.min(d,60);
+  x.fillStyle='rgba(255,255,255,.07)';x.beginPath();x.arc(W/2,W/2,r,0,7);x.fill();const fillSlices=whole>0?d:rem;
+  for(let i=0;i<k;i++){const a0=-Math.PI/2+i*2*Math.PI/d,a1=a0+2*Math.PI/d;if(i<fillSlices){x.fillStyle=col;x.beginPath();x.moveTo(W/2,W/2);x.arc(W/2,W/2,r,a0,a1);x.closePath();x.fill()}x.strokeStyle='#0f0c24';x.lineWidth=2;x.beginPath();x.moveTo(W/2,W/2);x.lineTo(W/2+r*Math.cos(a0),W/2+r*Math.sin(a0));x.stroke()}
+  x.strokeStyle='#fff';x.lineWidth=3;x.beginPath();x.arc(W/2,W/2,r,0,7);x.stroke();x.fillStyle='#fff';x.font='bold 20px Segoe UI';x.textAlign='center';x.fillText(whole>0&&rem?`${whole}+${rem}/${d}`:S([n,d]),W/2,W-2)}
+function bars(F){const cv=$('bars'),x=cv.getContext('2d'),W=cv.width;x.clearRect(0,0,W,130);const cols=['#ffb703','#4cc9f0','#90e0a0'];F.forEach(([n,d],i)=>{if(!d)return;const y=8+i*40,w=W-20,v=Math.max(0,Math.min(2,n/d));x.fillStyle='rgba(255,255,255,.07)';x.fillRect(10,y,w,28);x.fillStyle=cols[i];x.fillRect(W-10-w*v/2*1,y,w*v/2,28);x.strokeStyle='#0f0c24';for(let k=1;k<d*2&&k<80;k++){x.beginPath();x.moveTo(W-10-w*k/(2*d),y);x.lineTo(W-10-w*k/(2*d),y+28);x.stroke()}x.strokeStyle='#fff';x.beginPath();x.moveTo(W/2,y-2);x.lineTo(W/2,y+30);x.stroke()})}
+function calc(){const a=+$('a1').value,b=+$('b1').value,c=+$('a2').value,d=+$('b2').value;if(!b||!d){$('res').textContent='—';$('steps').textContent='המכנה לא יכול להיות 0';return}
+  let r,st=[];const L=lcm(b,d);
+  if(op==='+'||op==='-'){const s=op==='+'?1:-1;st.push(`מכנה משותף: המכפלה המשותפת הקטנה של ${b} ו־${d} היא <b>${L}</b>`);st.push(`${a}/${b} = ${a*L/b}/${L} · ${c}/${d} = ${c*L/d}/${L}`);const n=a*L/b+s*c*L/d;st.push(`${a*L/b} ${op==='+'?'+':'−'} ${c*L/d} = ${n}, כלומר ${n}/${L}`);r=simp(n,L)}
+  else if(op==='*'){st.push(`מונה כפול מונה, מכנה כפול מכנה: (${a}×${c})/(${b}×${d}) = ${a*c}/${b*d}`);r=simp(a*c,b*d)}
+  else if(op==='/'){if(!c){$('res').textContent='—';$('steps').textContent='אי אפשר לחלק באפס';return}st.push(`חילוק = כפל בהופכי: ${a}/${b} × ${d}/${c}`);st.push(`= ${a*d}/${b*c}`);r=simp(a*d,b*c)}
+  else{const x1=a*L/b,x2=c*L/d;st.push(`מביאים למכנה משותף ${L}: ${x1}/${L} מול ${x2}/${L}`);$('res').textContent=x1>x2?'> השמאלי גדול':x1<x2?'< הימני גדול':'= שווים';st.push(x1===x2?'השברים שווים!':`${x1>x2?a+'/'+b:c+'/'+d} גדול יותר`);$('steps').innerHTML=st.map((s,i)=>`${i+1}. ${s}`).join('<br>');pie($('c1'),a,b,'#ffb703');pie($('c2'),c,d,'#4cc9f0');$('c3').getContext('2d').clearRect(0,0,160,160);bars([[a,b],[c,d]]);return}
+  if(r){const g=gcd(r[0]*1,r[1]);st.push(`צמצום: <b>${S(r)}</b>${mixed(r)} · בעשרוני ${(r[0]/r[1]).toFixed(4).replace(/\.?0+$/,'')}`);$('res').textContent=S(r)}
+  $('steps').innerHTML=st.map((s,i)=>`${i+1}. ${s}`).join('<br>');pie($('c1'),a,b,'#ffb703');pie($('c2'),c,d,'#4cc9f0');pie($('c3'),r[0],r[1],'#90e0a0');bars([[a,b],[c,d],r])}
+document.querySelectorAll('#ops button').forEach(b=>b.onclick=()=>{op=b.dataset.o;document.querySelectorAll('#ops button').forEach(x=>x.classList.toggle('on',x===b));calc()});
+['a1','b1','a2','b2'].forEach(k=>$(k).oninput=calc);
+let sc=0,str=0,qa=null;const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function q(){const L=+$('lvl').value;const d1=rnd(2,L?8:6),d2=rnd(2,L?8:6),n1=rnd(1,d1-1),n2=rnd(1,d2-1);let text,ans,opts;
+  if(L===0){text=`${n1}/${d1}  ?  ${n2}/${d2}`;const v=n1/d1-n2/d2;ans=v>0?'>':v<0?'<':'=';opts=['>','=','<']}
+  else{const o=L===1?(Math.random()<.5?'+':'-'):(Math.random()<.5?'×':'÷');let r;if(o==='+')r=simp(n1*d2+n2*d1,d1*d2);else if(o==='-')r=simp(n1*d2-n2*d1,d1*d2);else if(o==='×')r=simp(n1*n2,d1*d2);else r=simp(n1*d2,d1*n2);
+    text=`${n1}/${d1} ${o} ${n2}/${d2}`;ans=S(r);const s=new Set([ans]);while(s.size<4){const t=simp(r[0]+rnd(-3,3),Math.max(1,r[1]+rnd(-2,2)));s.add(S(t))}opts=[...s].sort(()=>Math.random()-.5)}
+  qa=ans;$('q').textContent=text;$('ans').innerHTML=opts.map(o=>`<button data-a="${o}">${o}</button>`).join('');$('fb').textContent=''}
+$('ans').onclick=e=>{const a=e.target.dataset.a;if(!a)return;if(a===qa){sc+=10;str++;$('fb').textContent=['👏 נכון!','🎉 מעולה!','🔥 אלוף!','⭐ בדיוק!'][str%4];$('fb').style.color='#90e0a0';setTimeout(q,900)}else{str=0;$('fb').textContent='❌ לא בדיוק, נסו שוב';$('fb').style.color='#ff8fab'}$('sc').textContent=sc;$('str').textContent=str};
+$('lvl').onchange=q;calc();q();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

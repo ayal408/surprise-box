@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחולל ברכות</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ffd166}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.cats{display:flex;flex-wrap:wrap;gap:6px}
+#txt{width:100%;min-height:150px;font-size:1.1rem;line-height:1.8}
+canvas{width:100%;max-width:540px;display:block;margin:10px auto 0;border-radius:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🎉 מחולל ברכות</h1>
+<p class="sub">ברכה מוכנה לכל אירוע: יום הולדת, חתונה, בר מצווה, לידה, חגים והחלמה. בוחרים סגנון, מוסיפים שמות, ושולחים בוואטסאפ או מורידים ככרטיס מעוצב.</p>
+<div class="panel cats" id="cats"></div>
+<div class="grid2">
+  <div class="panel">
+    <div class="row"><label style="flex:1">למי?<input id="to" value="דני"></label><label style="flex:1">מאת<input id="from" value="משפחת כהן"></label></div>
+    <div class="row" style="margin-top:6px"><label style="flex:1">גיל / פרט נוסף<input id="age" placeholder="למשל 40"></label><label style="flex:1">סגנון<select id="sty"><option value="0">חם ומרגש</option><option value="1">מצחיק וקליל</option><option value="2">קצר</option></select></label></div>
+    <label style="margin-top:8px">הברכה<textarea id="txt"></textarea></label>
+    <div class="row" style="margin-top:8px"><button class="pri" id="again">🎲 ברכה אחרת</button><button id="wa">📤 וואטסאפ</button><button id="cp">📋 העתקה</button></div>
+  </div>
+  <div class="panel"><h2>🖼️ כרטיס</h2><div class="row"><button class="th on" data-t="0">🎈 צבעוני</button><button class="th" data-t="1">✨ זהב</button><button class="th" data-t="2">🌸 פרחוני</button><button class="th" data-t="3">🌙 לילה</button></div><canvas id="cv" width="1080" height="1080"></canvas><button id="dl" style="margin-top:8px">⬇ הורדת הכרטיס</button></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const C={
+ bday:['🎂 יום הולדת',[['מזל טוב {to} ליום הולדתך{age}! שתהיה שנה מלאה בבריאות, אהבה, שמחה והצלחה בכל מה שתעשה. מאחלים לך שכל החלומות יתגשמו ושתמיד תהיה מוקף באנשים שאוהבים אותך.','{to} היקר/ה, עד 120! שכל שנה תהיה טובה מקודמתה, מלאה ברגעים מאושרים ובחיוכים. אוהבים אותך המון.'],['{to}, מזל טוב! עוד שנה עברה ואתה עדיין הכי צעיר בנשמה (לפחות ככה אומרים 😉). שיהיו הרבה עוגות, מעט נרות ושנה מדהימה!','יום הולדת שמח {to}! מדענים גילו שמי שחוגג יותר ימי הולדת חי יותר זמן. אז תמשיך לחגוג! 🥳'],['מזל טוב {to}! עד 120 🎉','יום הולדת שמח {to}, שנה נפלאה! 🎂']]],
+ wed:['💍 חתונה',[['מזל טוב לחתן ולכלה! שתזכו לבנות בית נאמן בישראל, מלא אהבה, אחווה, שלום ורעות. שתמיד תמצאו אחד בשני את הכוח, השמחה והחבר הכי טוב.','{to}, מזל טוב מכל הלב! שהיום הזה יהיה רק ההתחלה של חיים משותפים מאושרים, עם הרבה שמחות, בריאות ונחת.'],['מזל טוב! מהיום יש לכם מישהו שיזכיר לכם איפה השארתם את המפתחות, לכל החיים. שתהיו מאושרים! 💑','{to}, ברוכים הבאים לעולם של "אז מה אוכלים הערב?". מזל טוב ובהצלחה! 😄'],['מזל טוב! בית נאמן בישראל 💍','מזל טוב לזוג המאושר! 🥂']]],
+ bar:['📜 בר / בת מצווה',[['מזל טוב {to} להגיעך לגיל מצוות! שתזכה לגדול לתורה, לחופה ולמעשים טובים, ושתמיד תהיה גאווה להוריך ולמשפחה.','{to} היקר/ה, מזל טוב! היום אתה נכנס לעול מצוות. שתלך בדרך הישר, ושתצליח בכל אשר תפנה.'],['מזל טוב {to}! מהיום אתה אחראי על המעשים שלך… אבל את החדר עדיין אמא מסדרת 😉','{to}, מזל טוב! 13 זה המספר החדש של "גדול". שתהיה לך שנה של הצלחות!'],['מזל טוב {to} לבר המצווה! 📜','מזל טוב, שתגדל לתורה ולמעשים טובים! 🎉']]],
+ baby:['👶 לידה',[['מזל טוב להולדת התינוק/ת! שתזכו לגדלו לתורה, לחופה ולמעשים טובים, ושהבית יתמלא בשמחה ונחת.','מזל טוב! ברוך/ה הבא/ה לעולם. שיהיה/תהיה בריא/ה וחזק/ה, ושתרוו ממנו/ה רק נחת.'],['מזל טוב! מהיום שינה זו נחלת העבר, אבל החיוכים שווים הכל 👶😴','ברוכים הבאים לתקופה הכי מתוקה ועייפה בחיים. מזל טוב!'],['מזל טוב להולדת הבן/הבת! 👶','מזל טוב, הרבה נחת! 🍼']]],
+ chag:['🍯 חגים',[['שנה טובה ומתוקה {to}! שתהיה שנה של בריאות, שמחה, פרנסה טובה והגשמת חלומות. כתיבה וחתימה טובה.','חג שמח {to}! שיהיה חג מלא אור, שמחה ומשפחה, ושנזכה לחגוג יחד עוד שנים רבות.'],['חג שמח {to}! שיהיה חג בלי פקקים, בלי דיאטות ועם הרבה אוכל של אמא 😋','שנה טובה! שתהיה מתוקה כמו הדבש, ובלי הדבורים 🍯🐝'],['שנה טובה ומתוקה! 🍎🍯','חג שמח! 🎉']]],
+ heal:['💐 החלמה',[['{to} היקר/ה, מאחלים לך רפואה שלמה והחלמה מהירה. שתחזור/י במהרה לכוחות מלאים ולכל מה שאת/ה אוהב/ת.','רפואה שלמה {to}! אנחנו חושבים עליך ומחכים לראות אותך בריא/ה ושמח/ה.'],['{to}, תבריא מהר! בלעדיך אין מי שיצחק מהבדיחות הגרועות שלנו 😉','רפואה שלמה! ותזכור: המנוחה היא חלק מהטיפול, אז יש לך אישור רשמי לעצלות 🛋️'],['רפואה שלמה והחלמה מהירה! 💐','תבריא/י במהרה! 🙏']]],
+ thanks:['🙏 תודה',[['{to}, רצינו להגיד תודה מכל הלב על כל מה שעשית. זה ממש לא מובן מאליו, והערכנו כל רגע.','תודה רבה {to}! העזרה שלך הייתה משמעותית מאוד עבורנו.'],['{to}, תודה! אתה/את אלוף/ה, ומגיע לך פסל בכיכר העיר 🏆','אין מילים להגיד תודה, אז הנה אימוג׳י: 🙏❤️🙌'],['תודה רבה {to}! 🙏','תודה מכל הלב! ❤️']]]};
+let cat='bday',idx=0,th=0;
+$('cats').innerHTML=Object.entries(C).map(([k,[n]])=>`<button data-c="${k}" class="${k===cat?'on':''}">${n}</button>`).join('');
+function gen(){const L=C[cat][1][+$('sty').value],t=L[idx%L.length];const age=$('age').value.trim();$('txt').value=t.replace(/\{to\}/g,$('to').value||'').replace(/\{age\}/g,age?(/^\d+$/.test(age)?` ה־${age}`:' '+age):'')+'\n\n'+($('from').value?'באהבה, '+$('from').value:'');card()}
+function wrap(x,t,w){const out=[];t.split('\n').forEach(p=>{let l='';p.split(' ').forEach(wd=>{const s=l?l+' '+wd:wd;if(x.measureText(s).width>w&&l){out.push(l);l=wd}else l=s});out.push(l)});return out}
+function card(){const x=$('cv').getContext('2d'),W=1080;const T=[['#ff9a9e','#fad0c4','#a18cd1','#3d1d6b'],['#1a1a1a','#3a2e14','#ffd166','#fff4d6'],['#fde2e4','#fad2e1','#e2ece9','#6b2e4a'],['#0b1033','#2a1f66','#9bd1ff','#f3efff']][th];
+  const g=x.createLinearGradient(0,0,W,W);g.addColorStop(0,T[0]);g.addColorStop(1,T[1]);x.fillStyle=g;x.fillRect(0,0,W,W);
+  for(let i=0;i<40;i++){x.globalAlpha=.25;x.fillStyle=T[2];x.beginPath();x.arc((i*263)%W,(i*397)%W,6+(i*7)%22,0,7);x.fill()}x.globalAlpha=1;
+  x.strokeStyle=T[2];x.lineWidth=6;x.strokeRect(40,40,W-80,W-80);
+  x.fillStyle=T[3];x.textAlign='center';x.direction='rtl';x.font='120px serif';x.fillText(C[cat][0].split(' ')[0],W/2,230);
+  let fs=46;x.font=`600 ${fs}px Segoe UI, Arial`;let lines=wrap(x,$('txt').value,W-200);while(lines.length*fs*1.5>560&&fs>26){fs-=2;x.font=`600 ${fs}px Segoe UI, Arial`;lines=wrap(x,$('txt').value,W-200)}
+  const y0=W/2-lines.length*fs*1.5/2+120;lines.forEach((l,i)=>x.fillText(l,W/2,y0+i*fs*1.5))}
+$('cats').onclick=e=>{const c=e.target.dataset.c;if(!c)return;cat=c;idx=0;document.querySelectorAll('#cats button').forEach(b=>b.classList.toggle('on',b===e.target));gen()};
+document.querySelectorAll('.th').forEach(b=>b.onclick=()=>{th=+b.dataset.t;document.querySelectorAll('.th').forEach(x=>x.classList.toggle('on',x===b));card()});
+['to','from','age','sty'].forEach(k=>$(k).oninput=gen);$('txt').oninput=card;
+$('again').onclick=()=>{idx++;gen()};
+$('wa').onclick=()=>open('https://wa.me/?text='+encodeURIComponent($('txt').value),'_blank');
+$('cp').onclick=()=>{navigator.clipboard.writeText($('txt').value);$('cp').textContent='✓ הועתק';setTimeout(()=>$('cp').textContent='📋 העתקה',1400)};
+$('dl').onclick=()=>{const a=document.createElement('a');a.download='ברכה.png';a.href=$('cv').toDataURL();a.click()};
+gen();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעבדת ביטים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#90e0a0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1200px!important}
+.bits{display:flex;gap:4px;flex-wrap:wrap;direction:ltr;justify-content:center}
+.bit{width:40px;height:52px;border-radius:8px;border:2px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-family:Consolas,monospace;font-weight:800;font-size:1.3rem;user-select:none;transition:background .15s}
+.bit.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.bit small{font-size:.55rem;font-weight:400;opacity:.7}
+.bit.sign{border-color:#ff8fab}.bit.exp{border-color:#ffd166}.bit.man{border-color:#4cc9f0}
+.bit.sep{margin-left:10px}
+.vals{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px}
+.vals input{width:100%;font-family:Consolas,monospace;direction:ltr;text-align:center;font-size:1.1rem}
+.op{font-family:Consolas,monospace;direction:ltr;text-align:left;line-height:1.6;font-size:1.05rem;white-space:pre}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>💡 מעבדת ביטים ובינארי</h1>
+<p class="sub">איך המחשב שומר מספרים: לוחצים על ביטים ומדליקים ומכבים אותם, רואים את הערך בעשרוני, בהקסה ובתווים, משלים ל־2 למספרים שליליים, פעולות AND/OR/XOR/SHIFT, ואיך נראה מספר עשרוני (float) בזיכרון.</p>
+<div class="panel">
+  <div class="row" style="justify-content:space-between"><h2 style="margin:0">🔢 מספר שלם</h2><div class="row"><select id="w"><option value="8" selected>8 ביט (בייט)</option><option value="16">16 ביט</option><option value="32">32 ביט</option></select><label class="inline"><input type="checkbox" id="signed"> עם סימן (משלים ל־2)</label><button id="inv">~ היפוך</button><button id="shl">&lt;&lt; שמאלה</button><button id="shr">&gt;&gt; ימינה</button><button id="zero">0</button></div></div>
+  <div class="bits" id="bits" style="margin-top:12px"></div>
+  <div class="vals"><label>עשרוני<input id="dec"></label><label>הקסדצימלי<input id="hex"></label><label>אוקטלי<input id="oct"></label><label>תו (ASCII)<input id="chr" maxlength="1"></label></div>
+  <p class="hint" id="sx" style="margin-top:8px"></p>
+</div>
+<div class="grid2">
+  <div class="panel"><h2>⚙️ פעולות בין שני מספרים</h2><div class="row"><input id="a" type="number" value="12" style="width:90px"><select id="bop"><option>AND</option><option>OR</option><option>XOR</option></select><input id="b" type="number" value="10" style="width:90px"></div><div class="op" id="opr" style="margin-top:10px"></div><p class="hint" id="oph"></p></div>
+  <div class="panel"><h2>🌊 מספר עשרוני בזיכרון (float 32)</h2><input id="fl" value="0.1" style="width:160px;direction:ltr;font-family:Consolas,monospace"><div class="bits" id="fbits" style="margin-top:10px"></div><div id="fexp" class="hint" style="margin-top:8px;line-height:1.8"></div></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);let W=8,V=0n;
+const mask=()=>(1n<<BigInt(W))-1n;const signed=()=>$('signed').checked;
+const toSigned=v=>signed()&&(v>>BigInt(W-1))&1n?v-(1n<<BigInt(W)):v;
+function render(){V&=mask();const b=$('bits');b.innerHTML=[...Array(W)].map((_,k)=>{const i=W-1-k,on=(V>>BigInt(i))&1n;return`<div class="bit ${on?'on':''} ${i%8===7&&i!==W-1?'':''}" data-i="${i}" style="${i%8===7&&k?'margin-left:12px':''}">${on}<small>${signed()&&i===W-1?'±':'2^'+i}</small></div>`}).join('');
+  const sv=toSigned(V);[['dec',sv.toString()],['hex','0x'+V.toString(16).toUpperCase().padStart(W/4,'0')],['oct','0o'+V.toString(8)],['chr',V>=32n&&V<127n?String.fromCharCode(Number(V)):'']].forEach(([k,v])=>{if(document.activeElement!==$(k))$(k).value=v});
+  $('sx').textContent=signed()?`טווח: ${-(1n<<BigInt(W-1))} עד ${(1n<<BigInt(W-1))-1n}. ${sv<0n?`מספר שלילי: הופכים את כל הביטים ומוסיפים 1 כדי לקבל את ${-sv}.`:''}`:`טווח: 0 עד ${mask()}. ${V===mask()?'כל הביטים דלוקים. עוד 1 וזה יתאפס (overflow)!':''}`}
+$('bits').onclick=e=>{const d=e.target.closest('.bit');if(d){V^=1n<<BigInt(d.dataset.i);render()}};
+$('w').onchange=()=>{W=+$('w').value;render()};$('signed').onchange=render;
+$('inv').onclick=()=>{V=~V&mask();render()};$('shl').onclick=()=>{V=(V<<1n)&mask();render()};$('shr').onclick=()=>{V=V>>1n;render()};$('zero').onclick=()=>{V=0n;render()};
+$('dec').oninput=e=>{try{let v=BigInt(e.target.value||0);if(v<0n)v=(1n<<BigInt(W))+v;V=v;render()}catch{}};
+$('hex').oninput=e=>{try{V=BigInt('0x'+(e.target.value.replace(/^0x/i,'')||'0'));render()}catch{}};
+$('oct').oninput=e=>{try{V=BigInt('0o'+(e.target.value.replace(/^0o/i,'')||'0'));render()}catch{}};
+$('chr').oninput=e=>{if(e.target.value)V=BigInt(e.target.value.charCodeAt(0));render()};
+function op(){const a=(+$('a').value|0)&255,b=(+$('b').value|0)&255,o=$('bop').value,r=o==='AND'?a&b:o==='OR'?a|b:a^b,B=x=>x.toString(2).padStart(8,'0');
+  $('opr').textContent=`  ${B(a)}  (${a})\n${o==='AND'?'&':o==='OR'?'|':'^'} ${B(b)}  (${b})\n  ────────\n  ${B(r)}  (${r})`;
+  $('oph').textContent={AND:'AND: 1 רק כששני הביטים 1. משמש לבדיקה אם ביט מסוים דלוק (מסכה).',OR:'OR: 1 אם לפחות אחד מהביטים 1. משמש להדלקת ביטים, למשל הרשאות.',XOR:'XOR: 1 כשהביטים שונים. XOR פעמיים עם אותו מספר מחזיר את המקור, ולכן משמש בהצפנה פשוטה.'}[o]}
+['a','b','bop'].forEach(k=>$(k).oninput=op);
+function fl(){const v=parseFloat($('fl').value);const buf=new DataView(new ArrayBuffer(4));buf.setFloat32(0,isNaN(v)?0:v);const u=buf.getUint32(0),bits=[...Array(32)].map((_,k)=>(u>>>(31-k))&1);
+  $('fbits').innerHTML=bits.map((x,k)=>`<div class="bit ${x?'on':''} ${k===0?'sign':k<9?'exp':'man'}" style="width:22px;height:34px;font-size:.9rem;${k===1||k===9?'margin-left:8px':''}">${x}</div>`).join('');
+  const s=bits[0],e=(u>>>23)&255,m=u&0x7fffff,stored=buf.getFloat32(0);
+  $('fexp').innerHTML=`<span style="color:#ff8fab">סימן</span>: ${s?'שלילי':'חיובי'} · <span style="color:#ffd166">מעריך</span>: ${e} − 127 = ${e-127} · <span style="color:#4cc9f0">מנטיסה</span>: 1.${m.toString(2).padStart(23,'0').replace(/0+$/,'')||'0'}<br>הערך שנשמר בפועל: <b style="direction:ltr;display:inline-block">${stored.toPrecision(17)}</b>${!isNaN(v)&&stored!==v?'<br>⚠️ המספר לא נשמר בדיוק! זו הסיבה ש־0.1+0.2 ≠ 0.3 במחשב.':''}`}
+$('fl').oninput=fl;V=42n;render();op();fl();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

@@ -84,5 +84,6 @@ let sx,sy,st;cv.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY;st=
 cv.addEventListener('pointerup',e=>{const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)<15&&Math.abs(dy)<15){running?act('rot'):start();return}if(Math.abs(dx)>Math.abs(dy))act(dx<0?'L':'R');else if(dy>0)act(dy>120?'drop':'D')});
 render();
 </script>
+<script src="dl.js" defer></script>
 </body>
 </html>

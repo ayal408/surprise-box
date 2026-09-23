@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעקב הוצאות יומי</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff9f68}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.amt{font-size:2.4rem;font-weight:800;text-align:center;width:100%;direction:ltr}
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.cats button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px;font-size:.8rem}
+.cats button span{font-size:1.5rem}
+.row2{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.bud{height:10px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:3px}.bud div{height:100%}
+canvas{width:100%;height:180px;display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>💳 מעקב הוצאות יומי</h1>
+<p class="sub">רושמים הוצאה בשתי לחיצות: סכום וקטגוריה. רואים כמה הוצאתם היום, השבוע והחודש, מול תקציב לכל קטגוריה. נוח במיוחד בטלפון.</p>
+<div class="grid2">
+  <div class="panel">
+    <input id="a" class="amt" type="number" inputmode="decimal" placeholder="₪ 0">
+    <input id="note" placeholder="הערה (לא חובה)" style="width:100%;margin-top:6px">
+    <div class="cats" id="cats"></div>
+    <p class="hint" style="margin-top:6px">מקלידים סכום ולוחצים על קטגוריה, וההוצאה נשמרת.</p>
+  </div>
+  <div class="panel">
+    <div class="stats" id="st"></div>
+    <div class="row" style="margin-top:10px;justify-content:space-between"><button id="pm">→</button><b id="mt"></b><button id="nm">←</button></div>
+    <canvas id="cv" style="margin-top:6px"></canvas>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel"><h2>🎯 תקציב לפי קטגוריה</h2><div id="bud"></div></div>
+  <div class="panel"><h2>🧾 הוצאות אחרונות</h2><div id="list" style="max-height:380px;overflow:auto"></div><div class="row" style="margin-top:8px"><button id="csv">⬇ CSV</button></div></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');
+const CATS=[['🛒','סופר',2500],['🍔','אוכל בחוץ',600],['⛽','דלק ותחבורה',800],['🏠','בית',700],['👕','ביגוד',400],['💊','בריאות',300],['🎁','מתנות',300],['🎈','ילדים',600],['📚','לימודים',300],['🎬','בילויים',400],['💡','חשבונות',900],['📦','אחר',400]];
+let E,B;try{E=JSON.parse(localStorage.getItem('spend'))||[];B=JSON.parse(localStorage.getItem('spend-bud'))||{}}catch{E=[];B={}}
+CATS.forEach(c=>{if(B[c[1]]==null)B[c[1]]=c[2]});
+let vm=new Date();vm.setDate(1);const save=()=>{try{localStorage.setItem('spend',JSON.stringify(E));localStorage.setItem('spend-bud',JSON.stringify(B))}catch{}};
+$('cats').innerHTML=CATS.map(([i,n])=>`<button data-c="${n}"><span>${i}</span>${n}</button>`).join('');
+const ym=d=>d.slice(0,7),today=()=>new Date().toISOString().slice(0,10),icon=n=>(CATS.find(c=>c[1]===n)||['📦'])[0];
+function render(){const m=vm.toISOString().slice(0,7),M=E.filter(e=>ym(e.d)===m),t=today(),wk=new Date();wk.setDate(wk.getDate()-6);const W=E.filter(e=>e.d>=wk.toISOString().slice(0,10));
+  const sum=a=>a.reduce((s,e)=>s+e.a,0);const totB=Object.values(B).reduce((a,b)=>a+(+b||0),0);
+  $('st').innerHTML=[['היום',f(sum(E.filter(e=>e.d===t)))],['7 ימים',f(sum(W))],['החודש',f(sum(M))],['נשאר בתקציב',f(totB-sum(M))]].map(([a,b])=>`<div class="stat"><small>${a}</small><b style="font-size:1.15rem">${b}</b></div>`).join('');
+  $('mt').textContent=vm.toLocaleDateString('he-IL',{month:'long',year:'numeric'});
+  $('bud').innerHTML=CATS.map(([i,n])=>{const s=sum(M.filter(e=>e.c===n)),b=+B[n]||0,p=b?s/b:0;return`<div class="row2"><span>${i}</span><div>${n}<div class="bud"><div style="width:${Math.min(100,p*100)}%;background:${p>1?'#ff4d6d':p>.8?'#ffb703':'#58d68d'}"></div></div></div><span class="num" style="${p>1?'color:#ff8fab':''}">${f(s)}</span><input data-b="${n}" type="number" value="${b}" style="width:80px;padding:3px 6px" title="תקציב חודשי"></div>`}).join('');
+  $('list').innerHTML=[...E].map((e,i)=>({...e,i})).reverse().slice(0,60).map(e=>`<div class="row2"><span>${icon(e.c)}</span><div>${e.c}${e.n?` <small class="muted">· ${e.n.replace(/</g,'&lt;')}</small>`:''}<div class="muted" style="font-size:.75rem">${e.d.split('-').reverse().join('/')}</div></div><b class="num">${f(e.a)}</b><button data-x="${e.i}" style="padding:1px 6px">✕</button></div>`).join('')||'<p class="muted">עוד אין הוצאות</p>';
+  const cv=$('cv'),d=devicePixelRatio||1,Wd=cv.clientWidth,H=cv.clientHeight;cv.width=Wd*d;cv.height=H*d;const x=cv.getContext('2d');x.scale(d,d);const days=new Date(vm.getFullYear(),vm.getMonth()+1,0).getDate(),per=[...Array(days)].map((_,k)=>sum(M.filter(e=>+e.d.slice(8)===k+1))),mx=Math.max(1,...per),bw=(Wd-20)/days;
+  per.forEach((v,k)=>{x.fillStyle=v>mx*.7?'#ff8fab':'#ff9f68';const h=v/mx*(H-24);x.fillRect(Wd-10-(k+1)*bw+1,H-18-h,bw-2,h)});x.fillStyle='#a9a3c9';x.font='10px Segoe UI';x.textAlign='center';[1,10,20,days].forEach(k=>x.fillText(k,Wd-10-(k-.5)*bw,H-4));save()}
+$('cats').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;const a=+$('a').value;if(!a){$('a').focus();$('a').style.outline='2px solid #ff4d6d';setTimeout(()=>$('a').style.outline='',800);return}E.push({d:today(),a,c:b.dataset.c,n:$('note').value});$('a').value='';$('note').value='';vm=new Date();vm.setDate(1);render();b.animate([{transform:'scale(1.15)'},{transform:'scale(1)'}],250)};
+$('bud').oninput=e=>{const k=e.target.dataset.b;if(k){B[k]=+e.target.value;save()}};$('bud').onchange=render;
+$('list').onclick=e=>{const x=e.target.dataset.x;if(x!==undefined){E.splice(+x,1);render()}};
+$('pm').onclick=()=>{vm=new Date(vm.getFullYear(),vm.getMonth()-1,1);render()};$('nm').onclick=()=>{vm=new Date(vm.getFullYear(),vm.getMonth()+1,1);render()};
+$('csv').onclick=()=>{const c='﻿תאריך,סכום,קטגוריה,הערה\n'+E.map(e=>[e.d,e.a,e.c,'"'+(e.n||'').replace(/"/g,'""')+'"'].join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));a.download='הוצאות.csv';a.click()};
+addEventListener('resize',render);render();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

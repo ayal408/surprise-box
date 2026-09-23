@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>אלגוריתמים על גרפים</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#4cc9f0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1250px!important}
+svg{width:100%;height:auto;display:block;background:rgba(0,0,0,.25);border-radius:14px;touch-action:none;direction:ltr}
+.steps{font-family:Consolas,"Segoe UI",monospace;font-size:.85rem;max-height:320px;overflow:auto;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🕸️ אלגוריתמים על גרפים</h1>
+<p class="sub">רשת של ערים וכבישים: רואים את BFS, DFS, דייקסטרה (הדרך הקצרה ביותר) ו־Prim (עץ פורש מינימלי, כמו לחבר את כל הערים בכמה שפחות כבל) עובדים צעד אחרי צעד.</p>
+<div class="panel row">
+  <select id="alg"><option value="dijkstra">דייקסטרה: מסלול קצר ביותר</option><option value="bfs">BFS: לפי שכבות</option><option value="dfs">DFS: לעומק</option><option value="prim">Prim: עץ פורש מינימלי</option></select>
+  <label class="inline">מ־<select id="from"></select></label><label class="inline">אל <select id="to"></select></label>
+  <button class="pri" id="run">▶ הרצה</button><button id="step">⏭ צעד</button><button id="reset">↺</button><button id="rnd">🎲 רשת חדשה</button>
+  <label class="inline">מהירות <input type="range" id="sp" min="100" max="1500" value="700" style="width:90px;direction:ltr"></label>
+</div>
+<div class="grid2" style="grid-template-columns:1fr 320px">
+  <div class="panel"><svg id="g" viewBox="0 0 900 560"></svg><p class="hint" style="margin-top:6px">אפשר לגרור ערים. המספר על כל כביש הוא המרחק.</p></div>
+  <div class="panel"><h2 id="an"></h2><p class="hint" id="ad" style="line-height:1.7"></p><div class="stats" id="st" style="margin-top:8px"></div><h2 style="margin-top:10px">🪜 צעדים</h2><div class="steps" id="log"></div></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);const NAMES=['ירושלים','תל אביב','חיפה','באר שבע','אילת','טבריה','אשדוד','נתניה','צפת','עפולה','אשקלון','מודיעין','חדרה','נצרת','דימונה'];
+let N=[],Ed=[],steps=[],si=0,timer=null,state={};
+const INFO={dijkstra:['דייקסטרה','בכל צעד בוחרים את העיר הלא־סופית שהכי קרובה להתחלה, ומעדכנים את השכנות שלה אם נמצאה דרך קצרה יותר. בסוף יש לנו את המרחק הקצר ביותר לכל עיר.'],
+ bfs:['BFS','סורק לפי שכבות: קודם כל השכנות, אחר כך השכנות של השכנות. מוצא את המסלול עם הכי מעט כבישים (בלי להתחשב באורך).'],
+ dfs:['DFS','הולך כמה שיותר עמוק במסלול אחד, ורק כשנתקע חוזר אחורה ומנסה כביש אחר.'],
+ prim:['Prim','בונה רשת שמחברת את כל הערים באורך הכולל הקטן ביותר: בכל צעד מוסיף את הכביש הקצר ביותר שמחבר עיר חדשה לרשת.']};
+function gen(){const n=11;N=[];let tries=0;while(N.length<n&&tries++<2000){const p={x:60+Math.random()*780,y:50+Math.random()*460};if(N.every(q=>Math.hypot(q.x-p.x,q.y-p.y)>110))N.push({...p,name:NAMES[N.length]})}
+  Ed=[];N.forEach((a,i)=>{const d=N.map((b,j)=>[j,Math.hypot(a.x-b.x,a.y-b.y)]).filter(([j])=>j!==i).sort((x,y)=>x[1]-y[1]).slice(0,3);d.forEach(([j,w])=>{if(!Ed.some(e=>(e.a===i&&e.b===j)||(e.a===j&&e.b===i)))Ed.push({a:i,b:j,w:Math.round(w/10)})})});
+  // ensure connected
+  const par=N.map((_,i)=>i),f=x=>par[x]===x?x:par[x]=f(par[x]);Ed.forEach(e=>par[f(e.a)]=f(e.b));for(let i=1;i<N.length;i++)if(f(i)!==f(0)){const j=0;Ed.push({a:i,b:j,w:Math.round(Math.hypot(N[i].x-N[j].x,N[i].y-N[j].y)/10)});par[f(i)]=f(0)}
+  const o=N.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');$('from').innerHTML=o;$('to').innerHTML=o;$('to').value=N.length-1;reset()}
+const adj=i=>Ed.filter(e=>e.a===i||e.b===i).map(e=>({n:e.a===i?e.b:e.a,w:e.w,e}));
+function compute(){const alg=$('alg').value,s=+$('from').value,t=+$('to').value;steps=[];const L=(m,st)=>steps.push({m,...JSON.parse(JSON.stringify(st))});
+  const st={vis:[],cur:null,dist:{},tree:[],path:[],front:[]};
+  if(alg==='dijkstra'){const D=N.map(()=>Infinity),P=N.map(()=>-1),done=new Set();D[s]=0;st.dist={[s]:0};L(`מתחילים ב${N[s].name}, מרחק 0`,st);
+    while(done.size<N.length){let u=-1;D.forEach((d,i)=>{if(!done.has(i)&&d<Infinity&&(u<0||d<D[u]))u=i});if(u<0)break;done.add(u);st.cur=u;st.vis=[...done];L(`בוחרים את ${N[u].name} (מרחק ${D[u]}), הכי קרובה שעוד לא טופלה`,st);if(u===t)break;
+      adj(u).forEach(({n,w})=>{if(!done.has(n)&&D[u]+w<D[n]){D[n]=D[u]+w;P[n]=u;st.dist[n]=D[n];st.tree=N.map((_,i)=>P[i]>=0?[P[i],i]:null).filter(Boolean);L(`מעדכנים את ${N[n].name}: ${D[u]} + ${w} = ${D[n]}`,st)}})}
+    const path=[];let x=t;while(x>=0){path.unshift(x);x=P[x]}st.path=D[t]<Infinity?path:[];st.cur=null;L(D[t]<Infinity?`✅ המסלול הקצר: ${path.map(i=>N[i].name).join(' ← ')} · ${D[t]} ק״מ`:'אין מסלול',st)}
+  else if(alg==='bfs'||alg==='dfs'){const P=N.map(()=>-1),seen=new Set([s]);let F=[s];st.front=[s];L(`מתחילים ב${N[s].name}`,st);
+    while(F.length){const u=alg==='bfs'?F.shift():F.pop();st.cur=u;st.vis.push(u);st.front=[...F];L(`${alg==='bfs'?'מוציאים מהתור':'מוציאים מהמחסנית'}: ${N[u].name}`,st);if(u===t)break;
+      for(const{n}of adj(u)){if(!seen.has(n)){seen.add(n);P[n]=u;F.push(n);st.front=[...F];st.tree=N.map((_,i)=>P[i]>=0?[P[i],i]:null).filter(Boolean);L(`מגלים את ${N[n].name}`,st)}}}
+    const path=[];let x=t;if(P[t]>=0||t===s){while(x>=0){path.unshift(x);x=P[x]}}st.path=path;st.cur=null;L(path.length?`✅ נמצא מסלול עם ${path.length-1} כבישים: ${path.map(i=>N[i].name).join(' ← ')}`:'אין מסלול',st)}
+  else{const inT=new Set([s]);st.vis=[s];L(`מתחילים את הרשת ב${N[s].name}`,st);let total=0;while(inT.size<N.length){let best=null;Ed.forEach(e=>{const a=inT.has(e.a),b=inT.has(e.b);if(a!==b&&(!best||e.w<best.w))best=e});if(!best)break;const nw=inT.has(best.a)?best.b:best.a;inT.add(nw);total+=best.w;st.tree.push([best.a,best.b]);st.vis=[...inT];st.cur=nw;L(`מוסיפים את ${N[best.a].name}–${N[best.b].name} (${best.w}), הכביש הקצר ביותר לעיר חדשה`,st)}
+    st.cur=null;L(`✅ כל הערים מחוברות. אורך כולל: ${total} ק״מ`,st)}}
+function draw(){const s=steps[si-1]||{vis:[],tree:[],path:[],front:[],dist:{}},alg=$('alg').value;const inTree=(a,b)=>s.tree.some(([x,y])=>(x===a&&y===b)||(x===b&&y===a)),inPath=(a,b)=>{const p=s.path;for(let i=1;i<p.length;i++)if((p[i-1]===a&&p[i]===b)||(p[i-1]===b&&p[i]===a))return true;return false};
+  let h='';Ed.forEach(e=>{const A=N[e.a],B=N[e.b],p=inPath(e.a,e.b),t=inTree(e.a,e.b);h+=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="${p?'#ffd166':t?(alg==='prim'?'#90e0a0':'#4cc9f0'):'#4a4270'}" stroke-width="${p?7:t?4:2}" stroke-linecap="round"/><text x="${(A.x+B.x)/2}" y="${(A.y+B.y)/2-6}" fill="#a9a3c9" font-size="13" text-anchor="middle">${e.w}</text>`});
+  N.forEach((p,i)=>{const v=s.vis.includes(i),c=s.cur===i,f=s.front.includes(i),src=i===+$('from').value,dst=i===+$('to').value&&alg!=='prim';h+=`<g data-n="${i}" style="cursor:grab"><circle cx="${p.x}" cy="${p.y}" r="${c?26:21}" fill="${c?'#ffd166':v?'#4cc9f0':f?'#3a78c4':'#231d4a'}" stroke="${src?'#58d68d':dst?'#ff4d6d':'#a9a3c9'}" stroke-width="${src||dst?4:2}"/><text x="${p.x}" y="${p.y+5}" text-anchor="middle" font-size="12" font-weight="700" fill="${c||v?'#140f2b':'#f3efff'}">${p.name.slice(0,6)}</text>${s.dist[i]!==undefined&&alg==='dijkstra'?`<text x="${p.x}" y="${p.y-30}" text-anchor="middle" font-size="13" font-weight="800" fill="#ffd166">${s.dist[i]}</text>`:''}</g>`});
+  $('g').innerHTML=h;$('log').innerHTML=steps.slice(0,si).map((x,i)=>`<div style="${i===si-1?'color:var(--acc);font-weight:700':''}">${i+1}. ${x.m}</div>`).join('');$('log').scrollTop=1e9;
+  $('st').innerHTML=[['צעד',`${si}/${steps.length}`],['ערים שנבדקו',s.vis.length]].map(([a,b])=>`<div class="stat"><small>${a}</small><b>${b}</b></div>`).join('');const[a,b]=INFO[alg];$('an').textContent=a;$('ad').textContent=b}
+function reset(){clearInterval(timer);timer=null;$('run').textContent='▶ הרצה';compute();si=0;draw()}
+$('step').onclick=()=>{if(si<steps.length){si++;draw()}};
+$('run').onclick=()=>{if(timer){clearInterval(timer);timer=null;$('run').textContent='▶ הרצה';return}if(si>=steps.length)si=0;$('run').textContent='⏸';timer=setInterval(()=>{if(si<steps.length){si++;draw()}else{clearInterval(timer);timer=null;$('run').textContent='▶ הרצה'}},1600-+$('sp').value)};
+['alg','from','to'].forEach(k=>$(k).onchange=reset);$('reset').onclick=reset;$('rnd').onclick=gen;
+let drag=null;const pt=e=>{const r=$('g').getBoundingClientRect();return{x:(e.clientX-r.left)*900/r.width,y:(e.clientY-r.top)*560/r.height}};
+$('g').addEventListener('pointerdown',e=>{const g=e.target.closest('[data-n]');if(g){drag=+g.dataset.n;$('g').setPointerCapture(e.pointerId)}});
+$('g').addEventListener('pointermove',e=>{if(drag===null)return;const p=pt(e);N[drag].x=Math.max(25,Math.min(875,p.x));N[drag].y=Math.max(25,Math.min(535,p.y));draw()});
+$('g').addEventListener('pointerup',()=>{if(drag!==null){drag=null;Ed.forEach(e=>e.w=Math.round(Math.hypot(N[e.a].x-N[e.b].x,N[e.a].y-N[e.b].y)/10));reset()}});
+gen();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

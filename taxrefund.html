@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>החזר מס לשכיר</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#7ee0b0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.job{display:grid;grid-template-columns:1fr 130px 130px 34px;gap:6px;margin-bottom:6px}.big{font-size:2rem;font-weight:800;text-align:center;margin:10px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>💸 בדיקת החזר מס לשכיר</h1>
+<p class="sub">מזינים את הנתונים מטופסי 106 של השנה, והכלי מחשב כמה מס היה צריך לשלם לעומת כמה נוכה בפועל. מתאים למי שהחליף עבודה, עבד בשתי עבודות, תרם, או לא ניצל נקודות זיכוי.</p>
+<div class="grid2">
+  <div class="panel">
+    <h2>🏢 מעסיקים בשנת המס (מטופס 106)</h2>
+    <div class="job muted" style="font-size:.8rem"><span>מעסיק</span><span>הכנסה חייבת (שנתי)</span><span>מס שנוכה</span><span></span></div>
+    <div id="jobs"></div><button id="addj">+ מעסיק</button>
+    <h2 style="margin-top:14px">🎯 נקודות זיכוי</h2>
+    <div class="row"><label class="inline"><input type="radio" name="sx" value="2.25" checked> גבר (2.25)</label><label class="inline"><input type="radio" name="sx" value="2.75"> אישה (2.75)</label></div>
+    <div class="row" style="margin-top:6px"><label style="flex:1">ילדים עד גיל 5<input id="k0" type="number" value="0" min="0"></label><label style="flex:1">ילדים 6–17<input id="k1" type="number" value="0" min="0"></label></div>
+    <div class="row" style="margin-top:6px"><label style="flex:1">נקודות נוספות (תואר, חייל משוחרר, עולה, יישוב מזכה)<input id="extra" type="number" value="0" step="0.5"></label></div>
+  </div>
+  <div class="panel">
+    <h2>🧾 זיכויים וניכויים נוספים</h2>
+    <label>תרומות למוסד מוכר (סעיף 46) בשנה<input id="don" type="number" value="0"></label>
+    <label style="margin-top:6px">ביטוח חיים פרטי (פרמיה שנתית)<input id="life" type="number" value="0"></label>
+    <label style="margin-top:6px">הפקדות עצמאיות לפנסיה (לא דרך המעסיק)<input id="pen" type="number" value="0"></label>
+    <div class="big" id="res"></div>
+    <table><tbody id="t"></tbody></table>
+  </div>
+</div>
+<div class="panel"><h2>💡 סיבות נפוצות להחזר מס</h2><div id="tips" style="line-height:1.9"></div></div>
+<p class="hint">חישוב משוער לפי מדרגות המס ונקודות הזיכוי לשנים 2025–2027. נקודות הזיכוי לילדים משתנות לפי שנת לידה ומי מקבל אותן, ולכן מוצג כאן חישוב מקורב (אם: 1.5–2.5 נקודות לילד צעיר, 1 לילד מבוגר יותר). הגשת בקשה להחזר נעשית בטופס 135 או באתר רשות המסים, עד 6 שנים אחורה. זה לא ייעוץ מס.</p>
+<script>
+const $=id=>document.getElementById(id);const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');
+const BR=[[84120,.10],[120720,.14],[193800,.20],[269280,.31],[560280,.35],[721560,.47],[Infinity,.50]],PT=2904;
+function tax(y){let p=0,t=0;for(const[top,r]of BR){t+=Math.max(0,Math.min(y,top)-p)*r;p=top}return t}
+let J=[{n:'מעסיק (ינואר–אוגוסט)',i:96000,t:6200}];
+function jobs(){$('jobs').innerHTML=J.map((j,i)=>`<div class="job"><input data-i="${i}" data-k="n" value="${j.n}"><input data-i="${i}" data-k="i" type="number" value="${j.i}"><input data-i="${i}" data-k="t" type="number" value="${j.t}"><button data-x="${i}" style="padding:2px 6px">✕</button></div>`).join('')}
+function calc(){const inc=J.reduce((s,j)=>s+(+j.i||0),0),paid=J.reduce((s,j)=>s+(+j.t||0),0),woman=document.querySelector('[name=sx]:checked').value==='2.75';
+  const kidPts=woman?(+$('k0').value||0)*2+(+$('k1').value||0)*1:(+$('k0').value||0)*1.5;const pts=(woman?2.75:2.25)+kidPts+(+$('extra').value||0);
+  const penDed=Math.min(+$('pen').value||0,inc*.07)*.35,don=Math.min(+$('don').value||0,inc*.3),donCr=don>=207?don*.35:0,lifeCr=(+$('life').value||0)*.25;
+  const gross=tax(inc),due=Math.max(0,gross-pts*PT-donCr-lifeCr-penDed),diff=paid-due;
+  $('res').innerHTML=diff>50?`<span style="color:#90e0a0">החזר משוער: ${f(diff)} 🎉</span>`:diff<-50?`<span style="color:#ff8fab">חוב משוער: ${f(-diff)}</span>`:'<span class="muted">אין הפרש משמעותי</span>';
+  $('t').innerHTML=[['הכנסה חייבת (כל המעסיקים)',inc],['מס לפי מדרגות',gross],['נקודות זיכוי ('+pts+')',-pts*PT],['זיכוי תרומות (35%)',-donCr],['זיכוי ביטוח חיים (25%)',-lifeCr],['זיכוי פנסיה עצמאית',-penDed],['מס שהיה צריך לשלם',due],['מס שנוכה בפועל',paid]].filter(r=>r[1]).map(([a,b])=>`<tr><td>${a}</td><td class="num">${f(b)}</td></tr>`).join('');
+  const tips=[];if(J.length>1)tips.push('💼 עבדת אצל יותר ממעסיק אחד: לעתים קרובות נוכה מס לא מדויק, בעיקר אם לא נעשה תיאום מס.');if(+$('don').value>=207)tips.push('🎗️ תרומות מעל 207 ₪ למוסד מוכר מזכות ב־35% זיכוי.');
+  if(inc<200000&&paid>0)tips.push('📅 אם לא עבדת את כל השנה, המעסיק ניכה מס כאילו תעבוד 12 חודשים, ולרוב מגיע החזר.');if(kidPts)tips.push('👶 נקודות זיכוי לילדים שלא עודכנו בטופס 101 מגיעות בהחזר.');if(+$('extra').value)tips.push('🎓 נקודות על תואר, שחרור מצבא או עלייה לא תמיד נכללות אוטומטית בשכר.');
+  tips.push('📉 הפסדים בשוק ההון, הוצאות על הורה במוסד או ילד עם מוגבלות יכולים לזכות בהחזר נוסף.');$('tips').innerHTML=tips.join('<br>')}
+document.addEventListener('input',e=>{const d=e.target.dataset;if(d.i!==undefined)J[d.i][d.k]=d.k==='n'?e.target.value:+e.target.value;calc()});
+document.addEventListener('change',calc);
+$('jobs').onclick=e=>{const x=e.target.dataset.x;if(x!==undefined){J.splice(+x,1);jobs();calc()}};$('addj').onclick=()=>{J.push({n:'מעסיק',i:0,t:0});jobs();calc()};
+jobs();calc();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

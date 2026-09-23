@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחולל קבלות וחשבוניות</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#7ee0b0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1200px!important}
+.cols{display:grid;grid-template-columns:420px 1fr;gap:16px;align-items:start}
+.it{display:grid;grid-template-columns:1fr 60px 90px 30px;gap:6px;margin-bottom:5px}
+.doc{background:#fff;color:#1d1d1f;border-radius:6px;padding:34px 38px;min-height:900px;font-family:Arial,"Segoe UI",sans-serif;font-size:14px;line-height:1.5;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.doc h2{margin:0;font-size:24px;color:var(--dc)}
+.doc .hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--dc);padding-bottom:14px;margin-bottom:18px}
+.doc table{width:100%;border-collapse:collapse;margin-top:14px}
+.doc th{background:var(--dc);color:#fff;padding:7px;text-align:right}
+.doc td{padding:7px;border-bottom:1px solid #e5e5ea}
+.doc .tot td{border:0;padding:4px 7px}
+.doc .n{text-align:left;direction:ltr}
+.doc img{max-height:70px;max-width:180px}
+.doc .foot{margin-top:40px;border-top:1px solid #ddd;padding-top:10px;color:#666;font-size:12px}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+@media print{body{background:#fff;padding:0}.back,h1,.sub,.side,.hint{display:none!important}.cols{display:block}.doc{box-shadow:none;min-height:0;padding:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🧾 מחולל קבלות וחשבוניות</h1>
+<p class="sub">מפיקים קבלה, חשבונית מס או חשבונית מס/קבלה עם מספור אוטומטי, מע״מ, לוגו ופרטי תשלום, ומדפיסים או שומרים כ־PDF. הפרטים של העסק נשמרים לפעם הבאה.</p>
+<div class="cols">
+  <div class="side">
+    <div class="panel">
+      <h2>🏢 פרטי העסק</h2>
+      <label>שם העסק<input id="bn"></label>
+      <div class="row" style="margin-top:6px"><label style="flex:1">ע.מ / ח.פ<input id="bid"></label><label style="flex:1">סוג<select id="bt"><option value="m">עוסק מורשה</option><option value="p">עוסק פטור</option><option value="c">חברה בע״מ</option></select></label></div>
+      <label style="margin-top:6px">כתובת וטלפון<input id="ba"></label>
+      <label style="margin-top:6px">לוגו (קובץ)<input type="file" id="logo" accept="image/*"></label>
+      <label style="margin-top:6px">צבע<input type="color" id="dc" value="#1f6f5c"></label>
+    </div>
+    <div class="panel">
+      <h2>📄 המסמך</h2>
+      <div class="row"><label style="flex:1">סוג<select id="dt"><option value="r">קבלה</option><option value="i">חשבונית מס</option><option value="ir" selected>חשבונית מס / קבלה</option><option value="q">הצעת מחיר</option></select></label><label style="width:110px">מספר<input id="no" type="number"></label></div>
+      <div class="row" style="margin-top:6px"><label style="flex:1">תאריך<input type="date" id="date"></label><label style="flex:1">מספר הקצאה<input id="alloc" placeholder="אם נדרש"></label></div>
+      <label style="margin-top:6px">לכבוד (שם הלקוח)<input id="cn"></label>
+      <div class="row" style="margin-top:6px"><label style="flex:1">ע.מ / ת.ז לקוח<input id="cid"></label><label style="flex:1">כתובת לקוח<input id="ca"></label></div>
+    </div>
+    <div class="panel">
+      <h2>🧺 פריטים</h2>
+      <div class="it muted" style="font-size:.78rem"><span>תיאור</span><span>כמות</span><span>מחיר ליח׳</span><span></span></div>
+      <div id="items"></div><button id="add">+ פריט</button>
+      <label class="inline" style="margin-top:8px"><input type="checkbox" id="incl"> המחירים כוללים מע״מ</label>
+      <div class="row" style="margin-top:6px"><label style="flex:1">הנחה (%)<input id="disc" type="number" value="0"></label><label style="flex:1">אמצעי תשלום<select id="pay"><option>העברה בנקאית</option><option>מזומן</option><option>אשראי</option><option>צ׳ק</option><option>ביט / פייבוקס</option></select></label></div>
+      <label style="margin-top:6px">הערות<input id="note"></label>
+    </div>
+    <div class="row"><button class="pri" onclick="print()">🖨️ הדפסה / PDF</button><button id="nextno">⏭ מסמך חדש (מספר הבא)</button></div>
+  </div>
+  <div class="doc" id="doc"></div>
+</div>
+<p class="hint">למסמכים רשמיים: עוסק מורשה מוציא חשבונית מס, ועוסק פטור מוציא קבלה או חשבון עסקה בלבד. בחשבוניות מעל הסף שנקבע נדרש מספר הקצאה מרשות המסים. לפי ההוראות לניהול ספרים ייתכן שתצטרכו תוכנה רשומה. הכלי הזה מתאים לעסק קטן ולשימוש מזדמן.</p>
+<script>
+const $=id=>document.getElementById(id);const f=v=>v.toLocaleString('he-IL',{minimumFractionDigits:2,maximumFractionDigits:2});const e=s=>String(s||'').replace(/</g,'&lt;');
+const F=['bn','bid','bt','ba','dc','dt','no','date','alloc','cn','cid','ca','incl','disc','pay','note'];
+let S;try{S=JSON.parse(localStorage.getItem('receipt'))}catch{}
+if(!S)S={bn:'ישראלי ושות׳',bid:'514018932',bt:'m',ba:'רחוב הרצל 1, תל אביב · 03-1234567',dc:'#1f6f5c',dt:'ir',no:1001,cn:'לקוח לדוגמה בע״מ',cid:'',ca:'',disc:0,pay:'העברה בנקאית',note:'',items:[{d:'שירותי הנהלת חשבונות – חודש',q:1,p:1200},{d:'הכנת דוח שנתי',q:1,p:2500}],logo:''};
+function load(){F.forEach(k=>{const el=$(k);if(S[k]===undefined)return;el.type==='checkbox'?el.checked=S[k]:el.value=S[k]});if(!$('date').value)$('date').value=new Date().toISOString().slice(0,10)}
+function items(){$('items').innerHTML=S.items.map((it,i)=>`<div class="it"><input data-i="${i}" data-k="d" value="${e(it.d).replace(/"/g,'&quot;')}"><input data-i="${i}" data-k="q" type="number" value="${it.q}"><input data-i="${i}" data-k="p" type="number" step="0.01" value="${it.p}"><button data-x="${i}" style="padding:2px 6px">✕</button></div>`).join('')}
+function render(){F.forEach(k=>{const el=$(k);S[k]=el.type==='checkbox'?el.checked:el.value});try{localStorage.setItem('receipt',JSON.stringify(S))}catch{}
+  const patur=S.bt==='p',T={r:'קבלה',i:'חשבונית מס',ir:'חשבונית מס / קבלה',q:'הצעת מחיר'}[S.dt]+'',title=patur&&S.dt!=='q'&&S.dt!=='r'?'חשבון עסקה':T;
+  let sum=S.items.reduce((s,it)=>s+(+it.q||0)*(+it.p||0),0);const disc=sum*(+S.disc||0)/100;sum-=disc;const vatR=patur?0:.18;const net=S.incl?sum/(1+vatR):sum,vat=net*vatR,tot=net+vat;
+  const lic={m:'עוסק מורשה',p:'עוסק פטור',c:'ח.פ.'}[S.bt];
+  $('doc').style.setProperty('--dc',S.dc);
+  $('doc').innerHTML=`<div class="hd"><div>${S.logo?`<img src="${S.logo}"><br>`:''}<b style="font-size:18px">${e(S.bn)}</b><br>${lic} ${e(S.bid)}<br>${e(S.ba)}</div><div style="text-align:left"><h2>${title}</h2><div>מס׳ <b>${e(S.no)}</b></div><div>תאריך: ${S.date?S.date.split('-').reverse().join('/'):''}</div>${S.alloc?`<div>מספר הקצאה: ${e(S.alloc)}</div>`:''}<div style="color:#888;font-size:12px">מקור</div></div></div>
+  <div><b>לכבוד:</b> ${e(S.cn)}${S.cid?` · ${e(S.cid)}`:''}${S.ca?`<br>${e(S.ca)}`:''}</div>
+  <table><thead><tr><th>תיאור</th><th class="n">כמות</th><th class="n">מחיר</th><th class="n">סה״כ</th></tr></thead><tbody>${S.items.map(it=>`<tr><td>${e(it.d)}</td><td class="n">${it.q}</td><td class="n">${f(+it.p||0)}</td><td class="n">${f((+it.q||0)*(+it.p||0))}</td></tr>`).join('')}</tbody></table>
+  <table class="tot" style="width:280px;margin-right:auto;margin-left:0">${disc?`<tr><td>הנחה ${S.disc}%</td><td class="n">-${f(disc)}</td></tr>`:''}${patur?'':`<tr><td>סה״כ לפני מע״מ</td><td class="n">${f(net)}</td></tr><tr><td>מע״מ 18%</td><td class="n">${f(vat)}</td></tr>`}<tr><td><b style="font-size:16px">סה״כ לתשלום</b></td><td class="n"><b style="font-size:16px">₪ ${f(tot)}</b></td></tr></table>
+  ${S.dt==='r'||S.dt==='ir'?`<p><b>התקבל ב:</b> ${e(S.pay)} · ₪ ${f(tot)}</p>`:''}${S.note?`<p>${e(S.note)}</p>`:''}
+  <div class="foot">${S.dt==='q'?'הצעה זו בתוקף ל־30 יום.':'המסמך הופק באמצעות קופסת ההפתעות.'} ${patur&&S.dt!=='q'?'עוסק פטור: המסמך אינו חשבונית מס.':''}<br><br>חתימה: ____________________</div>`}
+document.addEventListener('input',ev=>{const d=ev.target.dataset;if(d.i!==undefined){S.items[d.i][d.k]=d.k==='d'?ev.target.value:+ev.target.value}render()});
+$('items').onclick=ev=>{const x=ev.target.dataset.x;if(x!==undefined){S.items.splice(+x,1);items();render()}};
+$('add').onclick=()=>{S.items.push({d:'',q:1,p:0});items();render()};
+$('logo').onchange=ev=>{const fl=ev.target.files[0];if(!fl)return;const r=new FileReader();r.onload=()=>{S.logo=r.result;render()};r.readAsDataURL(fl)};
+$('nextno').onclick=()=>{$('no').value=(+$('no').value||0)+1;$('cn').value='';$('cid').value='';$('ca').value='';$('alloc').value='';$('note').value='';S.items=[{d:'',q:1,p:0}];items();render()};
+load();items();render();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

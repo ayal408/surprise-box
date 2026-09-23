@@ -100,5 +100,6 @@ b.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY});
 b.addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx,dy=e.clientY-sy;sx=null;if(Math.max(Math.abs(dx),Math.abs(dy))<25)return;if(document.getElementById('msg').classList.contains('show'))return;move(Math.abs(dx)>Math.abs(dy)?(dx<0?0:1):(dy<0?2:3))});
 start();
 </script>
+<script src="dl.js" defer></script>
 </body>
 </html>

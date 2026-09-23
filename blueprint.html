@@ -83,5 +83,6 @@ $('scale').onchange=draw;$('ppm').oninput=list;
 $('png').onclick=()=>{const c2=document.createElement('canvas');c2.width=cv.width;c2.height=cv.height;const y=c2.getContext('2d');y.fillStyle='#0b3d91';y.fillRect(0,0,c2.width,c2.height);y.drawImage(cv,0,0);const a=document.createElement('a');a.download='שרטוט.png';a.href=c2.toDataURL();a.click()};
 addEventListener('resize',size);size();
 </script>
+<script src="dl.js" defer></script>
 </body>
 </html>

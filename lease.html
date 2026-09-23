@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ליסינג מול קנייה</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#4cc9f0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+canvas{width:100%;height:240px;display:block}.win td{background:rgba(144,224,160,.14)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🚗 ליסינג מול קנייה</h1>
+<p class="sub">משווים את העלות האמיתית של רכב לאורך כמה שנים: קנייה במזומן או במימון, מול ליסינג פרטי. כולל ירידת ערך, ריבית, ביטוח וטיפולים, ומה ששווה הכסף שלא הושקע.</p>
+<div class="grid2">
+  <div class="panel">
+    <h2>🛒 קנייה</h2>
+    <label>מחיר הרכב (₪)<input id="price" type="number" value="160000"></label>
+    <div class="row" style="margin-top:6px"><label style="flex:1">מקדמה (₪)<input id="down" type="number" value="60000"></label><label style="flex:1">ריבית הלוואה (%)<input id="rate" type="number" value="6.5" step="0.1"></label></div>
+    <div class="row" style="margin-top:6px"><label style="flex:1">ירידת ערך בשנה (%)<input id="dep" type="number" value="12"></label><label style="flex:1">ביטוח וטיפולים בשנה (₪)<input id="run" type="number" value="9000"></label></div>
+  </div>
+  <div class="panel">
+    <h2>📝 ליסינג</h2>
+    <div class="row"><label style="flex:1">תשלום חודשי (₪)<input id="lm" type="number" value="2600"></label><label style="flex:1">מקדמה (₪)<input id="ld" type="number" value="15000"></label></div>
+    <label class="inline" style="margin-top:6px"><input type="checkbox" id="linc" checked> הליסינג כולל ביטוח וטיפולים</label>
+    <label style="margin-top:6px">ביטוח בליסינג (אם לא כלול, ₪ לשנה)<input id="lrun" type="number" value="5000"></label>
+    <div class="row" style="margin-top:6px"><label style="flex:1">תקופה (שנים)<input id="yrs" type="number" value="3" min="1" max="7"></label><label style="flex:1">תשואה חלופית על הכסף (%)<input id="alt" type="number" value="4" step="0.5"></label></div>
+  </div>
+</div>
+<div class="panel"><table><thead><tr><th></th><th class="num">קנייה</th><th class="num">ליסינג</th></tr></thead><tbody id="t"></tbody></table><p id="rec" style="font-size:1.2rem;font-weight:700;margin:12px 0 0"></p></div>
+<div class="panel"><h2>עלות מצטברת לאורך הזמן</h2><canvas id="cv"></canvas></div>
+<p class="hint">בקנייה העלות הנטו היא כל מה ששולם פחות מה שהרכב שווה בסוף התקופה. "הכסף שלא הושקע" הוא התשואה שהייתה מתקבלת על המקדמה אילו הושקעה. לעסקים יש שיקולי מע״מ ומס (שווי שימוש, פחת) שלא נכללים כאן. הערכה בלבד.</p>
+<script>
+const $=id=>document.getElementById(id);const f=v=>'₪'+Math.round(v).toLocaleString('he-IL');const v=id=>+$(id).value||0;
+function sim(){const Y=Math.max(1,v('yrs')),n=Y*12,P=v('price'),D=Math.min(v('down'),P),L=P-D,r=v('rate')/1200,pm=L?(r?L*r/(1-Math.pow(1+r,-n)):L/n):0,alt=v('alt')/100;
+  const buy=[],lease=[];let b=D,l=v('ld');for(let m=1;m<=n;m++){b+=pm+v('run')/12;l+=v('lm')+($('linc').checked?0:v('lrun')/12);if(m%12===0||m===n){const val=P*Math.pow(1-v('dep')/100,m/12);buy.push(b-val);lease.push(l)}}
+  const resale=P*Math.pow(1-v('dep')/100,Y),oppB=D*(Math.pow(1+alt,Y)-1),oppL=v('ld')*(Math.pow(1+alt,Y)-1);
+  return{Y,pm,resale,buyPaid:b,leasePaid:l,buyNet:b-resale+oppB,leaseNet:l+oppL,oppB,oppL,buy,lease}}
+function calc(){const s=sim(),bw=s.buyNet<=s.leaseNet;
+  $('t').innerHTML=[['תשלום חודשי',s.pm+v('run')/12,v('lm')+($('linc').checked?0:v('lrun')/12)],['סה״כ שולם',s.buyPaid,s.leasePaid],['שווי הרכב בסוף',s.resale,0],['הכסף שלא הושקע (הפסד תשואה)',s.oppB,s.oppL]].map(([n,a,b])=>`<tr><td>${n}</td><td class="num">${f(a)}</td><td class="num">${f(b)}</td></tr>`).join('')+`<tr class="win"><td><b>עלות נטו ל־${s.Y} שנים</b></td><td class="num" style="${bw?'color:#90e0a0':''}"><b>${f(s.buyNet)}</b></td><td class="num" style="${!bw?'color:#90e0a0':''}"><b>${f(s.leaseNet)}</b></td></tr>`;
+  $('rec').textContent=`${bw?'🛒 קנייה':'📝 ליסינג'} זול יותר ב־${f(Math.abs(s.buyNet-s.leaseNet))} על פני ${s.Y} שנים (${f(Math.abs(s.buyNet-s.leaseNet)/s.Y/12)} בחודש).`;chart(s)}
+function chart(s){const cv=$('cv'),d=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;cv.width=W*d;cv.height=H*d;const x=cv.getContext('2d');x.scale(d,d);const all=[0,...s.buy,...s.lease],mx=Math.max(...all),mn=Math.min(0,...all);
+  const X=i=>60+(W-80)*i/(s.buy.length),Y=val=>H-24-(val-mn)/(mx-mn||1)*(H-40);x.font='11px Segoe UI';x.fillStyle='#a9a3c9';x.textAlign='right';x.strokeStyle='rgba(255,255,255,.08)';
+  for(let i=0;i<=3;i++){const val=mn+(mx-mn)*i/3;x.beginPath();x.moveTo(56,Y(val));x.lineTo(W,Y(val));x.stroke();x.fillText(Math.round(val/1000)+'K',52,Y(val)+4)}
+  [[s.buy,'#4cc9f0','קנייה'],[s.lease,'#ff9f68','ליסינג']].forEach(([a,c,n],k)=>{x.strokeStyle=c;x.lineWidth=3;x.beginPath();x.moveTo(X(0),Y(0));a.forEach((val,i)=>x.lineTo(X(i+1),Y(val)));x.stroke();x.fillStyle=c;x.textAlign='right';x.fillText('● '+n,W-10,16+k*15)});
+  x.fillStyle='#a9a3c9';x.textAlign='center';s.buy.forEach((_,i)=>x.fillText('שנה '+(i+1),X(i+1),H-6))}
+document.querySelectorAll('input').forEach(i=>i.oninput=calc);addEventListener('resize',calc);calc();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

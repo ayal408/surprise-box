@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הפרשי הצמדה וריבית</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#9b9bff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>📈 מחשבון הפרשי הצמדה וריבית</h1>
+<p class="sub">מעדכנים סכום ישן להיום: הצמדה למדד (לפי המדדים שתזינו) וריבית פשוטה או דריבית. מתאים לחובות, לפסקי דין, לשכר דירה צמוד ולהחזרים.</p>
+<div class="grid2">
+  <div class="panel">
+    <label>קרן (₪)<input id="amt" type="number" value="50000"></label>
+    <div class="row" style="margin-top:6px"><label style="flex:1">מתאריך<input type="date" id="d0" value="2022-01-01"></label><label style="flex:1">עד תאריך<input type="date" id="d1"></label></div>
+    <h2 style="margin-top:14px">📊 הצמדה</h2>
+    <div class="row"><label style="flex:1">מדד בסיס (בתאריך ההתחלה)<input id="i0" type="number" step="0.1" value="100"></label><label style="flex:1">מדד קובע (אחרון)<input id="i1" type="number" step="0.1" value="112.4"></label></div>
+    <label class="inline" style="margin-top:6px"><input type="checkbox" id="floor" checked> בלי הצמדה שלילית (אם המדד ירד, נשארים עם הקרן)</label>
+    <h2 style="margin-top:14px">💹 ריבית</h2>
+    <div class="row"><label style="flex:1">ריבית שנתית (%)<input id="r" type="number" value="4" step="0.1"></label><label style="flex:1">שיטה<select id="m"><option value="s">ריבית פשוטה</option><option value="c">ריבית דריבית (שנתית)</option><option value="cm">דריבית חודשית</option></select></label></div>
+    <label style="margin-top:6px">הריבית מחושבת על<select id="base"><option value="linked">הקרן אחרי הצמדה</option><option value="orig">הקרן המקורית</option></select></label>
+  </div>
+  <div class="panel">
+    <div class="stats"><div class="stat"><small>הפרשי הצמדה</small><b id="lk"></b></div><div class="stat"><small>ריבית</small><b id="int"></b></div><div class="stat"><small>סה״כ מעודכן</small><b id="tot"></b></div></div>
+    <table style="margin-top:12px"><tbody id="t"></tbody></table>
+    <button id="cp" style="margin-top:10px">📋 העתקת החישוב</button>
+  </div>
+</div>
+<p class="hint">את ערכי המדד (מדד המחירים לצרכן) מקבלים באתר הלשכה המרכזית לסטטיסטיקה. חשוב להשתמש באותו בסיס מדד לשני הערכים. ריבית פיגורים לפי חוק פסיקת ריבית והצמדה נקבעת מעת לעת, והכלי לא מחשב אותה אוטומטית. חישוב לצורך הערכה בלבד.</p>
+<script>
+const $=id=>document.getElementById(id);const f=v=>'₪'+v.toLocaleString('he-IL',{minimumFractionDigits:2,maximumFractionDigits:2});const v=id=>+$(id).value||0;
+function calc(){const A=v('amt'),d0=new Date($('d0').value),d1=new Date($('d1').value),days=Math.max(0,(d1-d0)/864e5),yrs=days/365;
+  let ratio=v('i0')?v('i1')/v('i0'):1;if($('floor').checked)ratio=Math.max(1,ratio);const linked=A*ratio,lk=linked-A;
+  const b=$('base').value==='linked'?linked:A,r=v('r')/100,m=$('m').value;const intr=m==='s'?b*r*yrs:m==='c'?b*(Math.pow(1+r,yrs)-1):b*(Math.pow(1+r/12,yrs*12)-1);
+  $('lk').textContent=f(lk);$('int').textContent=f(intr);$('tot').textContent=f(linked+intr);
+  $('t').innerHTML=[['תקופה',`${Math.floor(yrs)} שנים ו־${Math.round((yrs%1)*365)} ימים`],['שינוי במדד',((v('i1')/v('i0')-1)*100).toFixed(2)+'%'],['קרן מקורית',f(A)],['קרן צמודה',f(linked)],['ריבית',f(intr)],['סה״כ',f(linked+intr)]].map(([a,b])=>`<tr><td>${a}</td><td class="num">${b}</td></tr>`).join('')}
+document.querySelectorAll('input,select').forEach(i=>i.oninput=calc);
+$('cp').onclick=()=>{navigator.clipboard.writeText([...$('t').querySelectorAll('tr')].map(r=>r.innerText.replace('\t',': ')).join('\n'));$('cp').textContent='✓ הועתק';setTimeout(()=>$('cp').textContent='📋 העתקת החישוב',1400)};
+$('d1').value=new Date().toISOString().slice(0,10);calc();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>
