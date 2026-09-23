@@ -68,6 +68,12 @@ th{color:var(--muted);font-weight:600}
   <button class="pri" id="merge">⬇ הורדה כקובץ אחד</button><button id="split">✂️ כל עמוד כקובץ נפרד</button><button id="extract">📤 רק המסומנים</button>
 </div>
 <div class="pages" id="pages"></div>
+<div class="panel">
+  <h2>🔖 סימניות ומספור עמודים</h2>
+  <p class="hint">סימנייה בכל שורה: שם | מספר עמוד בקובץ הסופי. למשל: מבוא | 1. הסימניות יתווספו בהורדת הקובץ המאוחד.</p>
+  <textarea id="bookmarks" rows="5" style="width:100%;max-width:650px" placeholder="מבוא | 1&#10;פרק ראשון | 3" aria-label="סימניות PDF"></textarea>
+  <label class="inline"><input id="pageNumbers" type="checkbox"> הוספת מספרי עמודים בתחתית הקובץ המאוחד</label>
+</div>
 <p class="hint">טיפ: לחיצה על עמוד מסמנת אותו. גרירה משנה את הסדר. לפיצול לפי טווח (למשל עמודים 3–7) מסמנים אותם ולוחצים "רק המסומנים". קבצי PDF מוגנים בסיסמה לא נתמכים.</p>
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -81,14 +87,17 @@ async function addFiles(files){for(const f of files){const bytes=new Uint8Array(
   else{const url=URL.createObjectURL(f);P.push({s,idx:0,rot:0,sel:false,thumb:url});render()}}}
 function render(){$('pages').innerHTML=P.map((p,i)=>`<div class="pg ${p.sel?'sel':''}" draggable="true" data-i="${i}"><span class="n">${i+1}</span><img src="${p.thumb}" style="max-width:100%;max-height:160px;background:#fff;border-radius:4px;transform:rotate(${p.rot}deg)"><span class="src">${p.s.name} · ${p.s.type==='pdf'?'עמ׳ '+(p.idx+1):'תמונה'}</span><div class="bt"><button data-r="${i}">⟳</button><button data-up="${i}">→</button><button data-dn="${i}">←</button><button data-x="${i}">✕</button></div></div>`).join('');
   const s=P.filter(p=>p.sel).length;$('cnt').textContent=P.length?`${P.length} עמודים${s?` · ${s} מסומנים`:''}`:'אין עמודים'}
-async function build(list){const out=await PDFLib.PDFDocument.create();const cache=new Map();
+function parseBookmarks(count){const raw=$('bookmarks').value.trim();if(!raw)return [];return raw.split(/\r?\n/).filter(s=>s.trim()).map((line,i)=>{const match=line.match(/^(.+?)\s*\|\s*(\d+)\s*$/);if(!match)throw Error(`סימנייה בשורה ${i+1}: כתבו שם | מספר עמוד`);const page=Number(match[2]);if(page<1||page>count)throw Error(`סימנייה בשורה ${i+1}: מספר העמוד צריך להיות בין 1 ל־${count}`);return {title:match[1].trim(),page:page-1}})}
+function addBookmarks(doc,entries){if(!entries.length)return;const {PDFName,PDFHexString}=PDFLib,ctx=doc.context,root=ctx.obj({Type:PDFName.of('Outlines')}),rootRef=ctx.register(root);const items=entries.map(({title,page})=>ctx.obj({Title:PDFHexString.fromText(title),Parent:rootRef,Dest:ctx.obj([doc.getPage(page).ref,PDFName.of('Fit')])}));const refs=items.map(item=>ctx.register(item));items.forEach((item,i)=>{if(i)item.set(PDFName.of('Prev'),refs[i-1]);if(i<items.length-1)item.set(PDFName.of('Next'),refs[i+1])});root.set(PDFName.of('First'),refs[0]);root.set(PDFName.of('Last'),refs.at(-1));root.set(PDFName.of('Count'),ctx.obj(entries.length));doc.catalog.set(PDFName.of('Outlines'),rootRef);doc.catalog.set(PDFName.of('PageMode'),PDFName.of('UseOutlines'))}
+async function build(list,options={}){const bookmarks=options.bookmarks?parseBookmarks(list.length):[];const out=await PDFLib.PDFDocument.create();const cache=new Map();
   for(const p of list){if(p.s.type==='pdf'){let src=cache.get(p.s);if(!src){src=await PDFLib.PDFDocument.load(p.s.bytes,{ignoreEncryption:true});cache.set(p.s,src)}const[pg]=await out.copyPages(src,[p.idx]);pg.setRotation(PDFLib.degrees((pg.getRotation().angle+p.rot)%360));out.addPage(pg)}
     else{let img;const png=p.s.mime.includes('png');try{img=png?await out.embedPng(p.s.bytes):await out.embedJpg(p.s.bytes)}catch{const b=await toJpg(p.thumb);img=await out.embedJpg(b)}const A4=[595,842],sc=Math.min(A4[0]/img.width,A4[1]/img.height,1),w=img.width*sc,h=img.height*sc;const pg=out.addPage(A4);pg.drawImage(img,{x:(A4[0]-w)/2,y:(A4[1]-h)/2,width:w,height:h});if(p.rot)pg.setRotation(PDFLib.degrees(p.rot))}}
-  return out.save()}
+  if(options.pageNumbers){const font=await out.embedFont(PDFLib.StandardFonts.Helvetica);out.getPages().forEach((pg,i)=>{const label=String(i+1),size=10;pg.drawText(label,{x:(pg.getWidth()-font.widthOfTextAtSize(label,size))/2,y:12,size,font,color:PDFLib.rgb(.3,.3,.3)})})}
+  addBookmarks(out,bookmarks);return out.save()}
 async function toJpg(url){const im=new Image();im.src=url;await im.decode();const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);return new Uint8Array(await (await fetch(c.toDataURL('image/jpeg',.9))).arrayBuffer())}
 function dl(bytes,name){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));a.download=name+'.pdf';a.click()}
 async function run(btn,fn){if(!P.length)return;const t=btn.textContent;btn.textContent='⏳ מעבד...';btn.disabled=true;try{await fn()}catch(e){alert('שגיאה: '+e.message)}btn.textContent=t;btn.disabled=false}
-$('merge').onclick=e=>run(e.target,async()=>dl(await build(P),$('fname').value||'מאוחד'));
+$('merge').onclick=e=>run(e.target,async()=>dl(await build(P,{bookmarks:true,pageNumbers:$('pageNumbers').checked}),$('fname').value||'מאוחד'));
 $('extract').onclick=e=>run(e.target,async()=>{const s=P.filter(p=>p.sel);if(!s.length){alert('סמנו קודם עמודים');return}dl(await build(s),($('fname').value||'קובץ')+'-נבחרים')});
 $('split').onclick=e=>run(e.target,async()=>{for(let i=0;i<P.length;i++){dl(await build([P[i]]),`${$('fname').value||'עמוד'}-${i+1}`);await new Promise(r=>setTimeout(r,250))}});
 $('all').onclick=()=>{const v=!P.every(p=>p.sel);P.forEach(p=>p.sel=v);render()};
