@@ -2,6 +2,8 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>קופסת ההפתעות</title>
 <style>
@@ -10,7 +12,7 @@
 body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#7a1d5a 0%,transparent 50%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:28px 16px 40px}
 .wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
 header{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.gift{font-size:3.4rem;animation:bob 2.4s ease-in-out infinite;display:inline-block}
+.gift{width:72px;height:72px;animation:bob 2.4s ease-in-out infinite;display:inline-block;filter:drop-shadow(0 6px 14px rgba(247,37,133,.45))}
 @keyframes bob{50%{transform:translateY(-8px) rotate(-6deg)}}
 h1{margin:0;font-size:clamp(2rem,6vw,3.1rem);background:linear-gradient(90deg,#ffd60a,#f72585,#4cc9f0);-webkit-background-clip:text;background-clip:text;color:transparent}
 header p{margin:4px 0 0;color:var(--muted)}
@@ -37,14 +39,14 @@ a.card span{color:var(--muted);line-height:1.5;font-size:.95rem}
 #results .empty{color:var(--muted);text-align:center;padding:30px}
 footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:14px}
 .wrap>*{min-width:0}
-@media(max-width:720px){nav.tabs{grid-template-columns:repeat(3,1fr);position:static;gap:8px;background:none}.tab{padding:10px 4px}.ti{font-size:1.5rem}.tn{font-size:.85rem}.grid{grid-template-columns:1fr}header{gap:10px}.gift{font-size:2.6rem}}
+@media(max-width:720px){nav.tabs{grid-template-columns:repeat(3,1fr);position:static;gap:8px;background:none}.tab{padding:10px 4px}.ti{font-size:1.5rem}.tn{font-size:.85rem}.grid{grid-template-columns:1fr}header{gap:10px}.gift{width:56px;height:56px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <span class="gift">🎁</span>
+    <img class="gift" src="icon.svg" alt="" width="72" height="72">
     <div><h1>קופסת ההפתעות</h1><p>111 כלים, משחקים והפתעות. בוחרים נושא ולוחצים על כרטיס.</p></div>
     <label class="search"><input id="q" type="search" placeholder="🔍 חיפוש בכל הכלים (למשל: מע״מ, שבת, ירח)" aria-label="חיפוש"></label>
   </header>
