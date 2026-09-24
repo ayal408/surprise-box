@@ -127,7 +127,9 @@ function rows(){const out=[];
     if($('self').checked)add(base,'ביטוח לאומי לעצמאי',month,1,'יום בסיס בלבד — בדקו דחיות בלוח הביטוח הלאומי','self');
     if($('employer').checked)add(base,'ביטוח לאומי לעובדים (102)',month,1,'יום בסיס בלבד — בדקו דחיות בלוח הביטוח הלאומי','employer');
   }
-  // Calendar dates are local civil dates. Hide past rows after applying known extensions.\n  const today=new Date();today.setHours(0,0,0,0);\n  return out.filter(x=>x.date>=today).sort((a,b)=>a.date-b.date||a.name.localeCompare(b.name,'he'));
+  // Calendar dates are local civil dates. Hide past rows after applying known extensions.
+  const today=new Date();today.setHours(0,0,0,0);
+  return out.filter(x=>x.date>=today).sort((a,b)=>a.date-b.date||a.name.localeCompare(b.name,'he'));
 }
 function render(){const out=rows(),body=$('tb');body.replaceChildren();for(const x of out){const tr=document.createElement('tr');for(const value of [pretty(x.date),x.name,x.period,x.note]){const td=document.createElement('td');td.textContent=value;tr.append(td)}const td=document.createElement('td'),link=document.createElement('a');link.href=x.source==='self'?SELF_URL:x.source==='employer'?EMPLOYER_URL:x.source==='wage'?WAGE_URL:x.source==='payslip'?PAYSLIP_URL:x.source==='emergency'?'https://www.gov.il/he/pages/sa050326-2':TAX_URL;link.target='_blank';link.rel='noopener noreferrer';link.textContent='מקור רשמי';td.append(link);tr.append(td);body.append(tr)}const first=out[0];$('next').textContent=first?'המועד הקרוב בתקופות 2026: '+pretty(first.date)+' — '+out.filter(x=>+x.date===+first.date).map(x=>x.name).join(', ')+'.':'לא נותרו מועדים לתקופות הדיווח של 2026.';
   try{localStorage.setItem('deadlines-v2',JSON.stringify(Object.fromEntries(['vat','vatPeriod','advance','advancePeriod','withholding','withholdingPeriod','self','employer','payroll','payslip'].map(id=>[id,$(id).type==='checkbox'?$(id).checked:$(id).value]))))}catch{}}
