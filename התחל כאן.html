@@ -48,26 +48,17 @@ footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padd
 <div class="wrap">
   <header>
     <img class="gift" src="icon.svg" alt="" width="72" height="72">
-    <div><h1>קופסת ההפתעות</h1><p>142 כלים, משחקים והפתעות. בוחרים נושא ולוחצים על כרטיס.</p></div>
+    <div><h1>קופסת ההפתעות</h1><p>138 כלים, משחקים והפתעות. בוחרים נושא ולוחצים על כרטיס.</p></div>
     <label class="search"><input id="q" type="search" placeholder="🔍 חיפוש בכל הכלים (למשל: מע״מ, שבת, ירח)" aria-label="חיפוש"></label>
   </header>
   <nav class="tabs" role="tablist">
-    <button class="tab" role="tab" data-tab="acc" style="--t:#7ee0b0"><span class="ti">📊</span><span class="tn">חשבונות ומיסים</span><span class="tc">28</span></button><button class="tab" role="tab" data-tab="home" style="--t:#ffd166"><span class="ti">🏠</span><span class="tn">בית ומשפחה</span><span class="tc">20</span></button><button class="tab" role="tab" data-tab="prod" style="--t:#90e0a0"><span class="ti">✅</span><span class="tn">פרודוקטיביות</span><span class="tc">13</span></button><button class="tab" role="tab" data-tab="tools" style="--t:#9bd1ff"><span class="ti">🧰</span><span class="tn">כלים</span><span class="tc">21</span></button><button class="tab" role="tab" data-tab="work" style="--t:#ff9f68"><span class="ti">💼</span><span class="tn">ניהול ומייל</span><span class="tc">9</span></button><button class="tab" role="tab" data-tab="dev" style="--t:#5fc1cf"><span class="ti">💻</span><span class="tn">מפתחים</span><span class="tc">21</span></button><button class="tab" role="tab" data-tab="science" style="--t:#c49bff"><span class="ti">🔭</span><span class="tn">מדע וחלל</span><span class="tc">11</span></button><button class="tab" role="tab" data-tab="games" style="--t:#ff8fab"><span class="ti">🎮</span><span class="tn">משחקים ומוזיקה</span><span class="tc">19</span></button>
+    <button class="tab" role="tab" data-tab="acc" style="--t:#7ee0b0"><span class="ti">📊</span><span class="tn">חשבונות ועסקים</span><span class="tc">18</span></button><button class="tab" role="tab" data-tab="home" style="--t:#ffd166"><span class="ti">🏠</span><span class="tn">בית ומשפחה</span><span class="tc">20</span></button><button class="tab" role="tab" data-tab="prod" style="--t:#90e0a0"><span class="ti">✅</span><span class="tn">פרודוקטיביות</span><span class="tc">13</span></button><button class="tab" role="tab" data-tab="tools" style="--t:#9bd1ff"><span class="ti">🧰</span><span class="tn">כלים</span><span class="tc">11</span></button><button class="tab" role="tab" data-tab="work" style="--t:#ff9f68"><span class="ti">💼</span><span class="tn">ניהול ומייל</span><span class="tc">9</span></button><button class="tab" role="tab" data-tab="dev" style="--t:#5fc1cf"><span class="ti">💻</span><span class="tn">מפתחים</span><span class="tc">8</span></button><button class="tab" role="tab" data-tab="science" style="--t:#c49bff"><span class="ti">🔭</span><span class="tn">מדע וחלל</span><span class="tc">11</span></button><button class="tab" role="tab" data-tab="games" style="--t:#ff8fab"><span class="ti">🎮</span><span class="tn">משחקים ומוזיקה</span><span class="tc">19</span></button>
+    <button class="tab" role="tab" data-tab="tax" style="--t:#7ee0b0"><span class="ti">🧾</span><span class="tn">מיסים ושכר</span><span class="tc">10</span></button>
+    <button class="tab" role="tab" data-tab="creative" style="--t:#ffba81"><span class="ti">🎨</span><span class="tn">כתיבה ויצירה</span><span class="tc">10</span></button>
+    <button class="tab" role="tab" data-tab="algorithms" style="--t:#58d68d"><span class="ti">🧠</span><span class="tn">אלגוריתמים</span><span class="tc">9</span></button>
   </nav>
   <section class="panel" role="tabpanel" id="p-acc" data-tab="acc" hidden>
-    <h3>מיסים ושכר</h3>
-    <div class="grid">
-      <a class="card" href="salary.html" style="--c:#7ee0b0"><span class="ic">💰</span><b>מחשבון שכר נטו</b><span>מברוטו לנטו לפי מדרגות מס, נקודות זיכוי, ביטוח לאומי, מס בריאות ופנסיה.</span></a>
-      <a class="card" href="selfemp.html" style="--c:#7ee0b0"><span class="ic">🧾</span><b>מס לעצמאי</b><span>מס הכנסה, ביטוח לאומי לעצמאי, הטבות פנסיה והשתלמות ומקדמות חודשיות מומלצות.</span></a>
-      <a class="card" href="dividend.html" style="--c:#c49bff"><span class="ic">⚖️</span><b>משכורת מול דיבידנד</b><span>לבעל שליטה: איזו חלוקה בין משכורת לדיבידנד משאירה הכי הרבה נטו, עם גרף.</span></a>
-      <a class="card" href="taxrefund.html" style="--c:#7ee0b0"><span class="ic">💸</span><b>בדיקת החזר מס לשכיר</b><span>מזינים נתונים מטופסי 106 ומקבלים הערכה אם מגיע החזר, ועל מה.</span></a>
-      <a class="card" href="employer.html" style="--c:#ff9f68"><span class="ic">🏢</span><b>עלות מעביד</b><span>כמה עובד עולה באמת: ביטוח לאומי מעסיק, פנסיה, פיצויים, השתלמות, הבראה ונסיעות.</span></a>
-      <a class="card" href="employee.html" style="--c:#4cc9f0"><span class="ic">👔</span><b>זכויות עובד</b><span>ימי חופשה, דמי הבראה, ימי מחלה ופיצויי פיטורין לפי ותק, כולל תקרת הפטור ממס.</span></a>
-      <a class="card" href="overtime.html" style="--c:#ff9f68"><span class="ic">⏰</span><b>שעות נוספות</b><span>מחלק שעות ל־100%, 125% ו־150%, כולל שבת וחג, ומחשב שכר שבועי וחודשי.</span></a>
-      <a class="card" href="vat.html" style="--c:#ffd166"><span class="ic">🧮</span><b>מחשבון מע״מ</b><span>הוספה והפחתה של מע״מ, רשימת חשבוניות עם סיכום ובדיקת עוסק פטור או מורשה.</span></a>
-      <a class="card" href="expenses.html" style="--c:#7ee0b0"><span class="ic">🧾</span><b>מסווג הוצאות מוכרות</b><span>מדביקים הוצאות ומקבלים סיווג, כמה מוכר במס וכמה מע״מ אפשר לקזז, לפי הכללים בישראל.</span></a>
-      <a class="card" href="rental.html" style="--c:#ffd166"><span class="ic">🏘️</span><b>מס על שכירות</b><span>פטור, 10% או מס רגיל: מה המס בכל מסלול להכנסה משכירות, ואיזה מסלול משתלם.</span></a>
-    </div>
+
     <h3>הנהלת חשבונות</h3>
     <div class="grid">
       <a class="card" href="receipt.html" style="--c:#7ee0b0"><span class="ic">🧾</span><b>מחולל קבלות וחשבוניות</b><span>קבלה, חשבונית מס או חשבונית מס/קבלה עם מספור, מע״מ, לוגו והדפסה כ־PDF.</span></a>
@@ -152,27 +143,13 @@ footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padd
     </div>
   </section>
   <section class="panel" role="tabpanel" id="p-tools" data-tab="tools" hidden>
-    <h3>כתיבה והקלדה</h3>
-    <div class="grid">
-      <a class="card" href="hebkeys.html" style="--c:#f78c6b"><span class="ic">✍️</span><b>עוזר הקלדה בעברית</b><span>מקלדת על המסך, הקלדה פונטית (shalom → שלום), ניקוד, הכתבה בקול ומספר במילים לצ׳קים.</span></a>
-      <a class="card" href="dictate.html" style="--c:#f78c6b"><span class="ic">🎙️</span><b>הקלטה ותמלול</b><span>מדברים והטקסט נכתב, עם פקודות קוליות לפיסוק ורשימת פתקים שמורים.</span></a>
-      <a class="card" href="textlab.html" style="--c:#9b9bff"><span class="ic">🔤</span><b>מעבדת הטקסט</b><span>ספירת מילים, תיקון טקסט שהוקלד בשפה הלא נכונה, הסרת ניקוד, מיון, חיפוש והחלפה.</span></a>
-      <a class="card" href="typewriter.html" style="--c:#d9b98a"><span class="ic">✒️</span><b>מכונת הכתיבה</b><span>כתיבת מכתבים עם צליל של מכונת כתיבה אמיתית, תבניות מוכנות (תודה, פנייה רשמית, יומן), מצב ריכוז והדפסה.</span></a>
-      <a class="card" href="typing.html" style="--c:#9b9bff"><span class="ic">⌨️</span><b>אצבעות קסם</b><span>הקלדה עיוורת בעברית עם מקלדת מונפשת, צבעים לכל אצבע, מדידת מהירות ודיוק ומפת חום של הטעויות.</span></a>
-    </div>
+
     <h3>החלטות והגרלות</h3>
     <div class="grid">
       <a class="card" href="wheel.html" style="--c:#ffe14d"><span class="ic">🎡</span><b>גלגל ההחלטות</b><span>מה אוכלים? מי עושה כלים? כותבים אפשרויות, מסובבים את הגלגל, והוא מחליט. יש אפשרויות מוכנות והיסטוריה.</span></a>
       <a class="card" href="random.html" style="--c:#ffb703"><span class="ic">🎲</span><b>מחולל אקראיות</b><span>קוביות, מטבע, מספר אקראי, בחירת זוכה וחלוקה הוגנת לקבוצות.</span></a>
     </div>
-    <h3>יצירה ועיצוב</h3>
-    <div class="grid">
-      <a class="card" href="colors.html" style="--c:#ff8fab"><span class="ic">🎨</span><b>מעבדת הצבעים</b><span>קודי צבע, פלטות מתאימות, בדיקת ניגודיות לנגישות ושליפת צבעים מתמונה.</span></a>
-      <a class="card" href="whiteboard.html" style="--c:#4cc9f0"><span class="ic">🖍️</span><b>לוח ציור</b><span>עט, מרקר, צורות, חצים וטקסט, עם ביטול, רקע משבצות ושמירה כתמונה.</span></a>
-      <a class="card" href="pixel.html" style="--c:#ffcd75"><span class="ic">👾</span><b>סטודיו פיקסלים</b><span>עורך ציורי פיקסלים בסגנון 8 ביט: עט, דלי, דוגם צבע, מצב מראה, ביטול ושמירה כ־PNG בגדלים שונים.</span></a>
-      <a class="card" href="blueprint.html" style="--c:#6aa8ff"><span class="ic">📐</span><b>שרטוט הדירה</b><span>גוררים חדרים על רשת של שרטוט ומקבלים מידות, שטח במ״ר, שטח משוקלל למרפסות ומחסן ושווי משוער. אפשר לשמור כתמונה.</span></a>
-      <a class="card" href="newspaper.html" style="--c:#c9b98f"><span class="ic">📰</span><b>העיתון שלך</b><span>עמוד ראשי של עיתון וינטג׳ עם הכותרת הראשית עליך: מזינים שם ועיר ומקבלים גיליון מצחיק שאפשר להדפיס.</span></a>
-    </div>
+
     <h3>שימושי</h3>
     <div class="grid">
       <a class="card" href="pdftool.html" style="--c:#ff8fab"><span class="ic">📑</span><b>מאחד ומפצל PDF</b><span>מאחדים, מפצלים, מסדרים ומסובבים עמודים, מוסיפים סימניות ומספרי עמודים והופכים תמונות ל־PDF.</span></a>
@@ -204,26 +181,11 @@ footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padd
     </div>
   </section>
   <section class="panel" role="tabpanel" id="p-dev" data-tab="dev" hidden>
-    <h3>אלגוריתמים בתנועה</h3>
-    <div class="grid">
-      <a class="card" href="algo.html" style="--c:#58d68d"><span class="ic">💻</span><b>מעבדת האלגוריתמים</b><span>7 אלגוריתמי מיון בפעולה, עם צליל ומצב מרוץ ראש בראש. רואים בעיניים למה O(n log n) מנצח את O(n²).</span></a>
-      <a class="card" href="pathfind.html" style="--c:#58d68d"><span class="ic">🧭</span><b>מעבדת מציאת מסלול</b><span>A*, דייקסטרה, BFS ו־DFS במבוך שמציירים בעצמכם, כולל מרוץ בין האלגוריתמים.</span></a>
-      <a class="card" href="graphs.html" style="--c:#4cc9f0"><span class="ic">🕸️</span><b>אלגוריתמים על גרפים</b><span>דרך קצרה בין ערים, סריקות BFS/DFS ועץ פורש מינימלי, צעד אחרי צעד.</span></a>
-      <a class="card" href="datastruct.html" style="--c:#c49bff"><span class="ic">🧱</span><b>מעבדת מבני נתונים</b><span>מחסנית, תור, רשימה מקושרת ועץ חיפוש בינארי בתנועה, עם סיבוכיות לכל פעולה.</span></a>
-      <a class="card" href="recursion.html" style="--c:#ff9f68"><span class="ic">🌀</span><b>מעבדת רקורסיה</b><span>מגדלי הנוי עם מחסנית קריאות, ועץ פיבונאצ׳י עם ובלי memoization.</span></a>
-      <a class="card" href="bits.html" style="--c:#90e0a0"><span class="ic">💡</span><b>מעבדת ביטים ובינארי</b><span>ביטים שמדליקים בלחיצה, משלים ל־2, AND/OR/XOR, ולמה 0.1+0.2 ≠ 0.3.</span></a>
-      <a class="card" href="hashtable.html" style="--c:#ffd166"><span class="ic">#️⃣</span><b>איך עובדת טבלת גיבוב</b><span>פונקציות גיבוב, התנגשויות, שרשור מול probing והכפלה אוטומטית של הטבלה.</span></a>
-      <a class="card" href="binarysearch.html" style="--c:#ffd166"><span class="ic">🔎</span><b>חיפוש בינארי בתנועה</b><span>מוצאים ערך ברשימה ממוינת, חצי בכל צעד, עם מצביעים וקוד מודגש.</span></a>
-      <a class="card" href="dynamicprogramming.html" style="--c:#58d68d"><span class="ic">🧮</span><b>תכנות דינמי בתנועה</b><span>ממלאים טבלת מרחק עריכה בין מילים, תא אחר תא, ומגלים את המסלול המיטבי.</span></a>
-      <a class="card" href="neural.html" style="--c:#c49bff"><span class="ic">🧠</span><b>רשת נוירונים בתנועה</b><span>רואים רשת לומדת להפריד בין נקודות, עם שכבות, נוירונים וקצב למידה שמשנים בזמן אמת.</span></a>
-      <a class="card" href="crypto.html" style="--c:#ff8fab"><span class="ic">🔐</span><b>מעבדת הצפנה</b><span>קיסר, ויז׳נר ואתב״ש, שבירת צופן בניתוח תדירויות, ו־RSA עם מספרים קטנים צעד אחרי צעד.</span></a>
-      <a class="card" href="internet.html" style="--c:#4cc9f0"><span class="ic">🌐</span><b>איך עובד האינטרנט</b><span>DNS, TCP, TLS ו־HTTP כחבילות שעוברות על המסך, מהקלדת הכתובת ועד שהאתר מופיע.</span></a>
-    </div>
+
     <h3>לומדים פיתוח בתנועה</h3>
     <div class="grid">
       <a class="card" href="gitlab.html" style="--c:#58d68d"><span class="ic">🌿</span><b>Git בתנועה</b><span>מתרגלים ענפים, commits ומיזוג עם פקודות וגרף שמתעדכן בזמן אמת.</span></a>
       <a class="card" href="sqllab.html" style="--c:#9bd1ff"><span class="ic">🗃️</span><b>SQL בתנועה</b><span>מריצים SELECT, WHERE, ORDER BY, LIMIT ו־JOIN ורואים איך השורות משתנות בכל שלב.</span></a>
-      <a class="card" href="sql.html" style="--c:#5fc1cf"><span class="ic">🗄️</span><b>ארגז חול SQL</b><span>מסד נתונים אמיתי בדפדפן עם טבלאות של חנות, דוגמאות JOIN ותרגילים עם בדיקה אוטומטית.</span></a>
     </div>
     <h3>כלי קוד ונתונים</h3>
     <div class="grid">
@@ -255,6 +217,53 @@ footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padd
     <div class="grid">
       <a class="card" href="life.html" style="--c:#7cf2c4"><span class="ic">🦠</span><b>חיים מלאכותיים</b><span>אלפי חלקיקים עם כמה חוקי משיכה פשוטים, ומהם נוצרים תאים, נחשים וגלקסיות שנעים. אפשר לשנות את החוקים בזמן אמת.</span></a>
       <a class="card" href="terminal.html" style="--c:#33ff66"><span class="ic">🖥️</span><b>הטרמינל</b><span>מסך מחשב ירוק מפעם עם פקודות: מחשבון, קוביות, בדיחות, עובדות, משחק ניחוש וגשם דיגיטלי כמו במטריקס.</span></a>
+    </div>
+  </section>
+  <section class="panel" role="tabpanel" id="p-tax" data-tab="tax" hidden>
+    <h3>מיסים ושכר</h3>
+    <div class="grid">
+      <a class="card" href="salary.html" style="--c:#7ee0b0"><span class="ic">💰</span><b>מחשבון שכר נטו</b><span>מברוטו לנטו לפי מדרגות מס, נקודות זיכוי, ביטוח לאומי, מס בריאות ופנסיה.</span></a>
+      <a class="card" href="selfemp.html" style="--c:#7ee0b0"><span class="ic">🧾</span><b>מס לעצמאי</b><span>מס הכנסה, ביטוח לאומי לעצמאי, הטבות פנסיה והשתלמות ומקדמות חודשיות מומלצות.</span></a>
+      <a class="card" href="dividend.html" style="--c:#c49bff"><span class="ic">⚖️</span><b>משכורת מול דיבידנד</b><span>לבעל שליטה: איזו חלוקה בין משכורת לדיבידנד משאירה הכי הרבה נטו, עם גרף.</span></a>
+      <a class="card" href="taxrefund.html" style="--c:#7ee0b0"><span class="ic">💸</span><b>בדיקת החזר מס לשכיר</b><span>מזינים נתונים מטופסי 106 ומקבלים הערכה אם מגיע החזר, ועל מה.</span></a>
+      <a class="card" href="employer.html" style="--c:#ff9f68"><span class="ic">🏢</span><b>עלות מעביד</b><span>כמה עובד עולה באמת: ביטוח לאומי מעסיק, פנסיה, פיצויים, השתלמות, הבראה ונסיעות.</span></a>
+      <a class="card" href="employee.html" style="--c:#4cc9f0"><span class="ic">👔</span><b>זכויות עובד</b><span>ימי חופשה, דמי הבראה, ימי מחלה ופיצויי פיטורין לפי ותק, כולל תקרת הפטור ממס.</span></a>
+      <a class="card" href="overtime.html" style="--c:#ff9f68"><span class="ic">⏰</span><b>שעות נוספות</b><span>מחלק שעות ל־100%, 125% ו־150%, כולל שבת וחג, ומחשב שכר שבועי וחודשי.</span></a>
+      <a class="card" href="vat.html" style="--c:#ffd166"><span class="ic">🧮</span><b>מחשבון מע״מ</b><span>הוספה והפחתה של מע״מ, רשימת חשבוניות עם סיכום ובדיקת עוסק פטור או מורשה.</span></a>
+      <a class="card" href="expenses.html" style="--c:#7ee0b0"><span class="ic">🧾</span><b>מסווג הוצאות מוכרות</b><span>מדביקים הוצאות ומקבלים סיווג, כמה מוכר במס וכמה מע״מ אפשר לקזז, לפי הכללים בישראל.</span></a>
+      <a class="card" href="rental.html" style="--c:#ffd166"><span class="ic">🏘️</span><b>מס על שכירות</b><span>פטור, 10% או מס רגיל: מה המס בכל מסלול להכנסה משכירות, ואיזה מסלול משתלם.</span></a>
+    </div>
+  </section>
+  <section class="panel" role="tabpanel" id="p-creative" data-tab="creative" hidden>
+    <h3>כתיבה והקלדה</h3>
+    <div class="grid">
+      <a class="card" href="hebkeys.html" style="--c:#f78c6b"><span class="ic">✍️</span><b>עוזר הקלדה בעברית</b><span>מקלדת על המסך, הקלדה פונטית (shalom → שלום), ניקוד, הכתבה בקול ומספר במילים לצ׳קים.</span></a>
+      <a class="card" href="dictate.html" style="--c:#f78c6b"><span class="ic">🎙️</span><b>הקלטה ותמלול</b><span>מדברים והטקסט נכתב, עם פקודות קוליות לפיסוק ורשימת פתקים שמורים.</span></a>
+      <a class="card" href="textlab.html" style="--c:#9b9bff"><span class="ic">🔤</span><b>מעבדת הטקסט</b><span>ספירת מילים, תיקון טקסט שהוקלד בשפה הלא נכונה, הסרת ניקוד, מיון, חיפוש והחלפה.</span></a>
+      <a class="card" href="typewriter.html" style="--c:#d9b98a"><span class="ic">✒️</span><b>מכונת הכתיבה</b><span>כתיבת מכתבים עם צליל של מכונת כתיבה אמיתית, תבניות מוכנות (תודה, פנייה רשמית, יומן), מצב ריכוז והדפסה.</span></a>
+      <a class="card" href="typing.html" style="--c:#9b9bff"><span class="ic">⌨️</span><b>אצבעות קסם</b><span>הקלדה עיוורת בעברית עם מקלדת מונפשת, צבעים לכל אצבע, מדידת מהירות ודיוק ומפת חום של הטעויות.</span></a>
+    </div>
+    <h3>יצירה ועיצוב</h3>
+    <div class="grid">
+      <a class="card" href="colors.html" style="--c:#ff8fab"><span class="ic">🎨</span><b>מעבדת הצבעים</b><span>קודי צבע, פלטות מתאימות, בדיקת ניגודיות לנגישות ושליפת צבעים מתמונה.</span></a>
+      <a class="card" href="whiteboard.html" style="--c:#4cc9f0"><span class="ic">🖍️</span><b>לוח ציור</b><span>עט, מרקר, צורות, חצים וטקסט, עם ביטול, רקע משבצות ושמירה כתמונה.</span></a>
+      <a class="card" href="pixel.html" style="--c:#ffcd75"><span class="ic">👾</span><b>סטודיו פיקסלים</b><span>עורך ציורי פיקסלים בסגנון 8 ביט: עט, דלי, דוגם צבע, מצב מראה, ביטול ושמירה כ־PNG בגדלים שונים.</span></a>
+      <a class="card" href="blueprint.html" style="--c:#6aa8ff"><span class="ic">📐</span><b>שרטוט הדירה</b><span>גוררים חדרים על רשת של שרטוט ומקבלים מידות, שטח במ״ר, שטח משוקלל למרפסות ומחסן ושווי משוער. אפשר לשמור כתמונה.</span></a>
+      <a class="card" href="newspaper.html" style="--c:#c9b98f"><span class="ic">📰</span><b>העיתון שלך</b><span>עמוד ראשי של עיתון וינטג׳ עם הכותרת הראשית עליך: מזינים שם ועיר ומקבלים גיליון מצחיק שאפשר להדפיס.</span></a>
+    </div>
+  </section>
+  <section class="panel" role="tabpanel" id="p-algorithms" data-tab="algorithms" hidden>
+    <h3>אלגוריתמים בתנועה</h3>
+    <div class="grid">
+      <a class="card" href="algo.html" style="--c:#58d68d"><span class="ic">💻</span><b>מעבדת האלגוריתמים</b><span>7 אלגוריתמי מיון בפעולה, עם צליל ומצב מרוץ ראש בראש. רואים בעיניים למה O(n log n) מנצח את O(n²).</span></a>
+      <a class="card" href="pathfind.html" style="--c:#58d68d"><span class="ic">🧭</span><b>מעבדת מציאת מסלול</b><span>A*, דייקסטרה, BFS ו־DFS במבוך שמציירים בעצמכם, כולל מרוץ בין האלגוריתמים.</span></a>
+      <a class="card" href="graphs.html" style="--c:#4cc9f0"><span class="ic">🕸️</span><b>אלגוריתמים על גרפים</b><span>דרך קצרה בין ערים, סריקות BFS/DFS ועץ פורש מינימלי, צעד אחרי צעד.</span></a>
+      <a class="card" href="datastruct.html" style="--c:#c49bff"><span class="ic">🧱</span><b>מעבדת מבני נתונים</b><span>מחסנית, תור, רשימה מקושרת ועץ חיפוש בינארי בתנועה, עם סיבוכיות לכל פעולה.</span></a>
+      <a class="card" href="recursion.html" style="--c:#ff9f68"><span class="ic">🌀</span><b>מעבדת רקורסיה</b><span>מגדלי הנוי עם מחסנית קריאות, ועץ פיבונאצ׳י עם ובלי memoization.</span></a>
+      <a class="card" href="bits.html" style="--c:#90e0a0"><span class="ic">💡</span><b>מעבדת ביטים ובינארי</b><span>ביטים שמדליקים בלחיצה, משלים ל־2, AND/OR/XOR, ולמה 0.1+0.2 ≠ 0.3.</span></a>
+      <a class="card" href="hashtable.html" style="--c:#ffd166"><span class="ic">#️⃣</span><b>איך עובדת טבלת גיבוב</b><span>פונקציות גיבוב, התנגשויות, שרשור מול probing והכפלה אוטומטית של הטבלה.</span></a>
+      <a class="card" href="binarysearch.html" style="--c:#ffd166"><span class="ic">🔎</span><b>חיפוש בינארי בתנועה</b><span>מוצאים ערך ברשימה ממוינת, חצי בכל צעד, עם מצביעים וקוד מודגש.</span></a>
+      <a class="card" href="dynamicprogramming.html" style="--c:#58d68d"><span class="ic">🧮</span><b>תכנות דינמי בתנועה</b><span>ממלאים טבלת מרחק עריכה בין מילים, תא אחר תא, ומגלים את המסלול המיטבי.</span></a>
     </div>
   </section>
   <section class="panel" role="tabpanel" id="p-games" data-tab="games" hidden>
@@ -303,6 +312,7 @@ function show(k){if(!panels.some(p=>p.dataset.tab===k))k=panels[0].dataset.tab;
 tabs.forEach(t=>t.onclick=()=>show(t.dataset.tab));
 addEventListener('hashchange',()=>show(location.hash.slice(1)));
 const all=[...new Map([...document.querySelectorAll('section[data-tab] a.card')].map(a=>[a.getAttribute('href'),a])).values()];
+tabs.forEach(t=>{t.querySelector('.tc').textContent=document.querySelectorAll('section[data-tab="'+t.dataset.tab+'"] a.card').length});
 const norm=s=>s.replace(/[\u0591-\u05C7״׳"'־-]/g,'').toLowerCase();
 document.getElementById('q').addEventListener('input',e=>{const q=norm(e.target.value.trim());const R=document.getElementById('results');
   if(!q){show(localStorage.getItem('hub-tab')||location.hash.slice(1));return}
