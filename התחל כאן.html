@@ -19,7 +19,7 @@ header p{margin:4px 0 0;color:var(--muted)}
 .search{flex:1;min-width:220px;display:flex}
 .search input{width:100%;font:inherit;font-size:1.05rem;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
 .search input:focus{outline:2px solid #ffd60a;outline-offset:1px}
-nav.tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;position:sticky;top:0;z-index:5;padding:8px 0;background:linear-gradient(var(--bg) 70%,transparent)}
+nav.tabs{display:grid;grid-template-columns:repeat(9,minmax(105px,1fr));gap:8px;position:sticky;top:0;z-index:5;padding:8px 0;background:linear-gradient(var(--bg) 70%,transparent);overflow-x:auto;scrollbar-width:thin}
 .tab{font:inherit;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px;border-radius:18px;background:var(--card);border:1px solid var(--line);transition:transform .2s,background .2s,border-color .2s}
 .tab:hover{transform:translateY(-3px);border-color:var(--t)}
 .tab[aria-selected="true"]{background:color-mix(in srgb,var(--t) 22%,transparent);border-color:var(--t);box-shadow:0 6px 24px color-mix(in srgb,var(--t) 30%,transparent)}
@@ -40,7 +40,7 @@ a.card span{color:var(--muted);line-height:1.5;font-size:.95rem}
 .dlall{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 18px}.dlall a{background:linear-gradient(90deg,#f72585,#7209b7);color:#fff;text-decoration:none;font-weight:700;padding:10px 18px;border-radius:12px}.dlall span{color:var(--muted);font-size:.9rem}
 footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:14px}
 .wrap>*{min-width:0}
-@media(max-width:720px){nav.tabs{grid-template-columns:repeat(3,1fr);position:static;gap:8px;background:none}.tab{padding:10px 4px}.ti{font-size:1.5rem}.tn{font-size:.85rem}.grid{grid-template-columns:1fr}header{gap:10px}.gift{width:56px;height:56px}}
+@media(max-width:720px){nav.tabs{display:flex;position:sticky;gap:8px;background:var(--bg);scroll-snap-type:x mandatory}.tab{min-width:112px;flex:0 0 112px;scroll-snap-align:start;padding:10px 4px}.ti{font-size:1.5rem}.tn{font-size:.85rem}.grid{grid-template-columns:1fr}header{gap:10px}.gift{width:56px;height:56px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -51,27 +51,22 @@ footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padd
     <div><h1>קופסת ההפתעות</h1><p>142 כלים, משחקים והפתעות. בוחרים נושא ולוחצים על כרטיס.</p></div>
     <label class="search"><input id="q" type="search" placeholder="🔍 חיפוש בכל הכלים (למשל: מע״מ, שבת, ירח)" aria-label="חיפוש"></label>
   </header>
-  <nav class="tabs" role="tablist">
-    <button class="tab" role="tab" data-tab="acc" style="--t:#7ee0b0"><span class="ti">📊</span><span class="tn">חשבונות ועסקים</span><span class="tc">18</span></button><button class="tab" role="tab" data-tab="home" style="--t:#ffd166"><span class="ti">🏠</span><span class="tn">בית ומשפחה</span><span class="tc">14</span></button><button class="tab" role="tab" data-tab="prod" style="--t:#90e0a0"><span class="ti">✅</span><span class="tn">פרודוקטיביות</span><span class="tc">13</span></button><button class="tab" role="tab" data-tab="tools" style="--t:#9bd1ff"><span class="ti">🧰</span><span class="tn">כלים</span><span class="tc">11</span></button><button class="tab" role="tab" data-tab="work" style="--t:#ff9f68"><span class="ti">💼</span><span class="tn">ניהול ומייל</span><span class="tc">9</span></button><button class="tab" role="tab" data-tab="dev" style="--t:#5fc1cf"><span class="ti">💻</span><span class="tn">מפתחים</span><span class="tc">11</span></button><button class="tab" role="tab" data-tab="science" style="--t:#c49bff"><span class="ti">🔭</span><span class="tn">מדע ולמידה</span><span class="tc">5</span></button><button class="tab" role="tab" data-tab="games" style="--t:#ff8fab"><span class="ti">🎮</span><span class="tn">משחקים ומוזיקה</span><span class="tc">19</span></button>
+  <nav class="tabs" role="tablist" aria-label="קטגוריות — גללו לצדדים להצגת עוד">
+    <button class="tab" role="tab" data-tab="acc" style="--t:#7ee0b0"><span class="ti">📊</span><span class="tn">כסף ותכנון</span><span class="tc">10</span></button>
+    <button class="tab" role="tab" data-tab="accounting" style="--t:#7cf2c4"><span class="ti">📒</span><span class="tn">הנהלת חשבונות</span><span class="tc">8</span></button><button class="tab" role="tab" data-tab="home" style="--t:#ffd166"><span class="ti">🏠</span><span class="tn">ניהול הבית</span><span class="tc">7</span></button>
+    <button class="tab" role="tab" data-tab="wellbeing" style="--t:#90e0a0"><span class="ti">💚</span><span class="tn">משפחה ורוגע</span><span class="tc">7</span></button><button class="tab" role="tab" data-tab="prod" style="--t:#90e0a0"><span class="ti">✅</span><span class="tn">כסף וסדר</span><span class="tc">8</span></button>
+    <button class="tab" role="tab" data-tab="planning" style="--t:#90e0a0"><span class="ti">📅</span><span class="tn">תכנון יומי</span><span class="tc">5</span></button><button class="tab" role="tab" data-tab="tools" style="--t:#9bd1ff"><span class="ti">🧰</span><span class="tn">כלים</span><span class="tc">11</span></button><button class="tab" role="tab" data-tab="work" style="--t:#ff9f68"><span class="ti">💼</span><span class="tn">ניהול ומייל</span><span class="tc">9</span></button><button class="tab" role="tab" data-tab="dev" style="--t:#5fc1cf"><span class="ti">💻</span><span class="tn">מפתחים</span><span class="tc">11</span></button><button class="tab" role="tab" data-tab="science" style="--t:#c49bff"><span class="ti">🔭</span><span class="tn">מדע ולמידה</span><span class="tc">5</span></button><button class="tab" role="tab" data-tab="games" style="--t:#ff8fab"><span class="ti">🎮</span><span class="tn">משחקי חשיבה ומוזיקה</span><span class="tc">9</span></button>
+    <button class="tab" role="tab" data-tab="arcade" style="--t:#ff8fab"><span class="ti">🕹️</span><span class="tn">משחקי ארקייד</span><span class="tc">10</span></button>
     <button class="tab" role="tab" data-tab="tax" style="--t:#7ee0b0"><span class="ti">🧾</span><span class="tn">מיסים ושכר</span><span class="tc">10</span></button>
-    <button class="tab" role="tab" data-tab="creative" style="--t:#ffba81"><span class="ti">🎨</span><span class="tn">כתיבה ויצירה</span><span class="tc">10</span></button>
+    <button class="tab" role="tab" data-tab="creative" style="--t:#ffba81"><span class="ti">🎨</span><span class="tn">עיצוב ויצירה</span><span class="tc">5</span></button>
+    <button class="tab" role="tab" data-tab="writing" style="--t:#f78c6b"><span class="ti">✍️</span><span class="tn">כתיבה והקלדה</span><span class="tc">5</span></button>
     <button class="tab" role="tab" data-tab="algorithms" style="--t:#58d68d"><span class="ti">🧠</span><span class="tn">אלגוריתמים</span><span class="tc">10</span></button>
     <button class="tab" role="tab" data-tab="calendar" style="--t:#ffd166"><span class="ti">🕯️</span><span class="tn">שבת ולוח עברי</span><span class="tc">6</span></button>
     <button class="tab" role="tab" data-tab="space" style="--t:#b3a8ff"><span class="ti">🪐</span><span class="tn">חלל ואסטרונומיה</span><span class="tc">6</span></button>
   </nav>
   <section class="panel" role="tabpanel" id="p-acc" data-tab="acc" hidden>
 
-    <h3>הנהלת חשבונות</h3>
-    <div class="grid">
-      <a class="card" href="receipt.html" style="--c:#7ee0b0"><span class="ic">🧾</span><b>מחולל קבלות וחשבוניות</b><span>קבלה, חשבונית מס או חשבונית מס/קבלה עם מספור, מע״מ, לוגו והדפסה כ־PDF.</span></a>
-      <a class="card" href="trialbal.html" style="--c:#9bd1ff"><span class="ic">📑</span><b>ממאזן בוחן לדוחות</b><span>מדביקים מאזן בוחן ומקבלים בדיקת איזון, רווח והפסד, מאזן מקוצר ויחסים פיננסיים.</span></a>
-      <a class="card" href="reconcile.html" style="--c:#7cf2c4"><span class="ic">🔗</span><b>התאמת סכומים</b><span>מדביקים דף בנק מול כרטסת, והכלי מתאים סכומים ומציג מה לא הותאם, כולל חיפוש צירופים.</span></a>
-      <a class="card" href="aging.html" style="--c:#ff8fab"><span class="ic">⏳</span><b>גיול חובות ושוטף+</b><span>מחשבון שוטף+30/60/90, חשבוניות פתוחות לפי ימי איחור ותזכורת תשלום מוכנה ללקוח.</span></a>
-      <a class="card" href="depreciation.html" style="--c:#9b9bff"><span class="ic">📉</span><b>מחשבון פחת</b><span>לוח פחת בקו ישר לפי שיעורי התקנות, חישוב יחסי לשנה הראשונה ורשימת נכסים שנתית.</span></a>
-      <a class="card" href="deadlines.html" style="--c:#ff8fab"><span class="ic">📅</span><b>לוח מועדי דיווח</b><span>מע״מ, ניכויים, מקדמות וביטוח לאומי לפי סוג העסק, דחייה אוטומטית בחגים וייצוא ליומן.</span></a>
-      <a class="card" href="idcheck.html" style="--c:#90e0a0"><span class="ic">🔎</span><b>בודק ת״ז, ח.פ. ו־IBAN</b><span>ספרת ביקורת לת״ז ולמספר חברה, בדיקת IBAN ובנייתו מבנק, סניף וחשבון.</span></a>
-      <a class="card" href="quote.html" style="--c:#8ab6e0"><span class="ic">🧾</span><b>הצעת מחיר / חשבון עסקה</b><span>מחולל מסמכים לעסק: לוגו, פריטים, הנחה, מע"מ 18% או עוסק פטור, תצוגה מקדימה והדפסה כ־PDF.</span></a>
-    </div>
+
     <h3>פיננסים ותכנון</h3>
     <div class="grid">
       <a class="card" href="cashflow.html" style="--c:#58d68d"><span class="ic">💧</span><b>תחזית תזרים מזומנים</b><span>12 חודשים קדימה עם הכנסות, הוצאות, מע״מ דו־חודשי והתראה לפני חריגה מהמסגרת.</span></a>
@@ -88,12 +83,7 @@ footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padd
   </section>
   <section class="panel" role="tabpanel" id="p-home" data-tab="home" hidden>
 
-    <h3>משפחה</h3>
-    <div class="grid">
-      <a class="card" href="familytree.html" style="--c:#90e0a0"><span class="ic">🌳</span><b>עץ משפחה</b><span>בונים עץ משפחה עם דורות, בני זוג ותאריכים עבריים, ומדפיסים או שומרים כתמונה.</span></a>
-      <a class="card" href="greetings.html" style="--c:#ffd166"><span class="ic">🎉</span><b>מחולל ברכות</b><span>ברכות ליום הולדת, חתונה, בר מצווה, לידה וחגים, לוואטסאפ או ככרטיס מעוצב.</span></a>
-      <a class="card" href="kidsavings.html" style="--c:#58d68d"><span class="ic">👧</span><b>חיסכון לכל ילד</b><span>כמה יצטבר לכל ילד עד גיל 18 או 21, עם הפקדות ביטוח לאומי, ההורים ותשואה.</span></a>
-    </div>
+
     <h3>ניהול הבית</h3>
     <div class="grid">
       <a class="card" href="chores.html" style="--c:#ffb703"><span class="ic">⭐</span><b>לוח תורנויות לילדים</b><span>מחלקים מטלות בסבב הוגן בין הילדים, מסמנים מה בוצע וצוברים כוכבים לפרס.</span></a>
@@ -104,23 +94,10 @@ footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padd
       <a class="card" href="fuel.html" style="--c:#ff9f43"><span class="ic">🚗</span><b>עלות נסיעה</b><span>דלק או חשמל, אגרה וחניה, כמה זה יוצא לכל נוסע ובחודש של נסיעות קבועות.</span></a>
       <a class="card" href="ready.html" style="--c:#a9c06a"><span class="ic">🛡️</span><b>הבית מוכן</b><span>רשימת ציוד חירום לבית ולממ"ד, עם כמויות שמחושבות לפי מספר בני הבית.</span></a>
     </div>
-    <h3>בריאות ורוגע</h3>
-    <div class="grid">
-      <a class="card" href="cpr.html" style="--c:#ff4a60"><span class="ic">❤️</span><b>יד על הלב</b><span>מאמן החייאה: קצב של 110 לחיצות בדקה, שעון, יומן אירוע לצוות מד"א ומדריכים לחנק, לשבץ ולדימום.</span></a>
-      <a class="card" href="breathe.html" style="--c:#57c2b1"><span class="ic">🌬️</span><b>רגע של נשימה</b><span>ארבעה תרגילי נשימה מונחים עם כדור מונפש וצליל עדין, להרגעה ולשינה.</span></a>
-      <a class="card" href="focus.html" style="--c:#5fc1cf"><span class="ic">🫧</span><b>בועת ריכוז</b><span>טיימר פומודורו עם צלילי רקע שנוצרים בזמן אמת (גשם, גלים, אח בוערת, רעש חום) שאפשר לערבב, וספירה של סבבי העבודה היום.</span></a>
-      <a class="card" href="garden.html" style="--c:#e0567a"><span class="ic">🌷</span><b>גן תודה</b><span>כל דבר שאת מודה עליו מגדל פרח בגן חי, עם פרפרים ביום, גחליליות בלילה ושמיים שמשתנים לפי השעה.</span></a>
-    </div>
+
   </section>
   <section class="panel" role="tabpanel" id="p-prod" data-tab="prod" hidden>
-    <h3>תכנון יום ושבוע</h3>
-    <div class="grid">
-      <a class="card" href="dayplan.html" style="--c:#90e0a0"><span class="ic">☀️</span><b>מתכנן יומי</b><span>שלושת הדברים החשובים של היום, משימות שגוררים ללוח שעות, זמן פנוי והעברה למחר.</span></a>
-      <a class="card" href="meals.html" style="--c:#ff9f68"><span class="ic">🍲</span><b>תכנון ארוחות שבועי</b><span>מה אוכלים כל יום, מאגר מנות, מילוי אקראי ורשימת קניות מרוכזת לשבוע.</span></a>
-      <a class="card" href="habits.html" style="--c:#90e0a0"><span class="ic">🌱</span><b>מעקב הרגלים</b><span>מסמנים כל יום מה עשיתם ורואים רצפים, אחוזי הצלחה ומפת חום של 12 שבועות.</span></a>
-      <a class="card" href="timers.html" style="--c:#4cc9f0"><span class="ic">⏱️</span><b>שעון עצר וטיימרים</b><span>שעון עצר עם הקפות, והרבה טיימרים במקביל (ביצים, פסטה, כביסה) עם צליל והתראה.</span></a>
-      <a class="card" href="countdown.html" style="--c:#ff5fd8"><span class="ic">⏳</span><b>ספירה לאחור</b><span>כמה זמן נשאר לחופשה, ליום הולדת או למבחן, בעיצוב ניאון של שנות ה־80. כמה אירועים במקביל, והם נשמרים.</span></a>
-    </div>
+
     <h3>כסף אישי</h3>
     <div class="grid">
       <a class="card" href="spend.html" style="--c:#ff9f68"><span class="ic">💳</span><b>מעקב הוצאות יומי</b><span>רושמים הוצאה בשתי לחיצות, ורואים את היום, השבוע והחודש מול תקציב לכל קטגוריה.</span></a>
@@ -224,14 +201,7 @@ footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padd
     </div>
   </section>
   <section class="panel" role="tabpanel" id="p-creative" data-tab="creative" hidden>
-    <h3>כתיבה והקלדה</h3>
-    <div class="grid">
-      <a class="card" href="hebkeys.html" style="--c:#f78c6b"><span class="ic">✍️</span><b>עוזר הקלדה בעברית</b><span>מקלדת על המסך, הקלדה פונטית (shalom → שלום), ניקוד, הכתבה בקול ומספר במילים לצ׳קים.</span></a>
-      <a class="card" href="dictate.html" style="--c:#f78c6b"><span class="ic">🎙️</span><b>הקלטה ותמלול</b><span>מדברים והטקסט נכתב, עם פקודות קוליות לפיסוק ורשימת פתקים שמורים.</span></a>
-      <a class="card" href="textlab.html" style="--c:#9b9bff"><span class="ic">🔤</span><b>מעבדת הטקסט</b><span>ספירת מילים, תיקון טקסט שהוקלד בשפה הלא נכונה, הסרת ניקוד, מיון, חיפוש והחלפה.</span></a>
-      <a class="card" href="typewriter.html" style="--c:#d9b98a"><span class="ic">✒️</span><b>מכונת הכתיבה</b><span>כתיבת מכתבים עם צליל של מכונת כתיבה אמיתית, תבניות מוכנות (תודה, פנייה רשמית, יומן), מצב ריכוז והדפסה.</span></a>
-      <a class="card" href="typing.html" style="--c:#9b9bff"><span class="ic">⌨️</span><b>אצבעות קסם</b><span>הקלדה עיוורת בעברית עם מקלדת מונפשת, צבעים לכל אצבע, מדידת מהירות ודיוק ומפת חום של הטעויות.</span></a>
-    </div>
+
     <h3>יצירה ועיצוב</h3>
     <div class="grid">
       <a class="card" href="colors.html" style="--c:#ff8fab"><span class="ic">🎨</span><b>מעבדת הצבעים</b><span>קודי צבע, פלטות מתאימות, בדיקת ניגודיות לנגישות ושליפת צבעים מתמונה.</span></a>
@@ -278,13 +248,55 @@ footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padd
       <a class="card" href="gravity.html" style="--c:#ffb703"><span class="ic">🪐</span><b>ארגז חול של כבידה</b><span>משגרים כוכבי לכת ורואים מסלולים, התנגשויות וכוכבים כפולים, עם מצבים מוכנים.</span></a>
     </div>
   </section>
-  <section class="panel" role="tabpanel" id="p-games" data-tab="games" hidden>
-    <h3>משחקי מילים וחשיבה</h3>
+  <section class="panel" role="tabpanel" id="p-accounting" data-tab="accounting" hidden>
+    <h3>הנהלת חשבונות</h3>
     <div class="grid">
-      <a class="card" href="wordle.html" style="--c:#58d68d"><span class="ic">🟩</span><b>וורדל עברי</b><span>מילה בת 5 אותיות בשש הזדמנויות. מילה יומית, מצב תרגול, רצפים ושיתוף תוצאה.</span></a>
-      <a class="card" href="bulls.html" style="--c:#ffb703"><span class="ic">🎯</span><b>בול פגיעה</b><span>מנחשים את המספר הסודי לפי רמזים של בול ופגיעה, עם 3 עד 5 ספרות ושיא אישי.</span></a>
-      <a class="card" href="tictactoe.html" style="--c:#ff8fab"><span class="ic">❌</span><b>איקס עיגול</b><span>נגד חבר או נגד המחשב בשלוש רמות, כולל רמה שלא מפסידה, ולוח 4×4.</span></a>
+      <a class="card" href="receipt.html" style="--c:#7ee0b0"><span class="ic">🧾</span><b>מחולל קבלות וחשבוניות</b><span>קבלה, חשבונית מס או חשבונית מס/קבלה עם מספור, מע״מ, לוגו והדפסה כ־PDF.</span></a>
+      <a class="card" href="trialbal.html" style="--c:#9bd1ff"><span class="ic">📑</span><b>ממאזן בוחן לדוחות</b><span>מדביקים מאזן בוחן ומקבלים בדיקת איזון, רווח והפסד, מאזן מקוצר ויחסים פיננסיים.</span></a>
+      <a class="card" href="reconcile.html" style="--c:#7cf2c4"><span class="ic">🔗</span><b>התאמת סכומים</b><span>מדביקים דף בנק מול כרטסת, והכלי מתאים סכומים ומציג מה לא הותאם, כולל חיפוש צירופים.</span></a>
+      <a class="card" href="aging.html" style="--c:#ff8fab"><span class="ic">⏳</span><b>גיול חובות ושוטף+</b><span>מחשבון שוטף+30/60/90, חשבוניות פתוחות לפי ימי איחור ותזכורת תשלום מוכנה ללקוח.</span></a>
+      <a class="card" href="depreciation.html" style="--c:#9b9bff"><span class="ic">📉</span><b>מחשבון פחת</b><span>לוח פחת בקו ישר לפי שיעורי התקנות, חישוב יחסי לשנה הראשונה ורשימת נכסים שנתית.</span></a>
+      <a class="card" href="deadlines.html" style="--c:#ff8fab"><span class="ic">📅</span><b>לוח מועדי דיווח</b><span>מע״מ, ניכויים, מקדמות וביטוח לאומי לפי סוג העסק, דחייה אוטומטית בחגים וייצוא ליומן.</span></a>
+      <a class="card" href="idcheck.html" style="--c:#90e0a0"><span class="ic">🔎</span><b>בודק ת״ז, ח.פ. ו־IBAN</b><span>ספרת ביקורת לת״ז ולמספר חברה, בדיקת IBAN ובנייתו מבנק, סניף וחשבון.</span></a>
+      <a class="card" href="quote.html" style="--c:#8ab6e0"><span class="ic">🧾</span><b>הצעת מחיר / חשבון עסקה</b><span>מחולל מסמכים לעסק: לוגו, פריטים, הנחה, מע"מ 18% או עוסק פטור, תצוגה מקדימה והדפסה כ־PDF.</span></a>
     </div>
+  </section>
+  <section class="panel" role="tabpanel" id="p-wellbeing" data-tab="wellbeing" hidden>
+    <h3>משפחה</h3>
+    <div class="grid">
+      <a class="card" href="familytree.html" style="--c:#90e0a0"><span class="ic">🌳</span><b>עץ משפחה</b><span>בונים עץ משפחה עם דורות, בני זוג ותאריכים עבריים, ומדפיסים או שומרים כתמונה.</span></a>
+      <a class="card" href="greetings.html" style="--c:#ffd166"><span class="ic">🎉</span><b>מחולל ברכות</b><span>ברכות ליום הולדת, חתונה, בר מצווה, לידה וחגים, לוואטסאפ או ככרטיס מעוצב.</span></a>
+      <a class="card" href="kidsavings.html" style="--c:#58d68d"><span class="ic">👧</span><b>חיסכון לכל ילד</b><span>כמה יצטבר לכל ילד עד גיל 18 או 21, עם הפקדות ביטוח לאומי, ההורים ותשואה.</span></a>
+    </div>
+    <h3>בריאות ורוגע</h3>
+    <div class="grid">
+      <a class="card" href="cpr.html" style="--c:#ff4a60"><span class="ic">❤️</span><b>יד על הלב</b><span>מאמן החייאה: קצב של 110 לחיצות בדקה, שעון, יומן אירוע לצוות מד"א ומדריכים לחנק, לשבץ ולדימום.</span></a>
+      <a class="card" href="breathe.html" style="--c:#57c2b1"><span class="ic">🌬️</span><b>רגע של נשימה</b><span>ארבעה תרגילי נשימה מונחים עם כדור מונפש וצליל עדין, להרגעה ולשינה.</span></a>
+      <a class="card" href="focus.html" style="--c:#5fc1cf"><span class="ic">🫧</span><b>בועת ריכוז</b><span>טיימר פומודורו עם צלילי רקע שנוצרים בזמן אמת (גשם, גלים, אח בוערת, רעש חום) שאפשר לערבב, וספירה של סבבי העבודה היום.</span></a>
+      <a class="card" href="garden.html" style="--c:#e0567a"><span class="ic">🌷</span><b>גן תודה</b><span>כל דבר שאת מודה עליו מגדל פרח בגן חי, עם פרפרים ביום, גחליליות בלילה ושמיים שמשתנים לפי השעה.</span></a>
+    </div>
+  </section>
+  <section class="panel" role="tabpanel" id="p-planning" data-tab="planning" hidden>
+    <h3>תכנון יום ושבוע</h3>
+    <div class="grid">
+      <a class="card" href="dayplan.html" style="--c:#90e0a0"><span class="ic">☀️</span><b>מתכנן יומי</b><span>שלושת הדברים החשובים של היום, משימות שגוררים ללוח שעות, זמן פנוי והעברה למחר.</span></a>
+      <a class="card" href="meals.html" style="--c:#ff9f68"><span class="ic">🍲</span><b>תכנון ארוחות שבועי</b><span>מה אוכלים כל יום, מאגר מנות, מילוי אקראי ורשימת קניות מרוכזת לשבוע.</span></a>
+      <a class="card" href="habits.html" style="--c:#90e0a0"><span class="ic">🌱</span><b>מעקב הרגלים</b><span>מסמנים כל יום מה עשיתם ורואים רצפים, אחוזי הצלחה ומפת חום של 12 שבועות.</span></a>
+      <a class="card" href="timers.html" style="--c:#4cc9f0"><span class="ic">⏱️</span><b>שעון עצר וטיימרים</b><span>שעון עצר עם הקפות, והרבה טיימרים במקביל (ביצים, פסטה, כביסה) עם צליל והתראה.</span></a>
+      <a class="card" href="countdown.html" style="--c:#ff5fd8"><span class="ic">⏳</span><b>ספירה לאחור</b><span>כמה זמן נשאר לחופשה, ליום הולדת או למבחן, בעיצוב ניאון של שנות ה־80. כמה אירועים במקביל, והם נשמרים.</span></a>
+    </div>
+  </section>
+  <section class="panel" role="tabpanel" id="p-writing" data-tab="writing" hidden>
+    <h3>כתיבה והקלדה</h3>
+    <div class="grid">
+      <a class="card" href="hebkeys.html" style="--c:#f78c6b"><span class="ic">✍️</span><b>עוזר הקלדה בעברית</b><span>מקלדת על המסך, הקלדה פונטית (shalom → שלום), ניקוד, הכתבה בקול ומספר במילים לצ׳קים.</span></a>
+      <a class="card" href="dictate.html" style="--c:#f78c6b"><span class="ic">🎙️</span><b>הקלטה ותמלול</b><span>מדברים והטקסט נכתב, עם פקודות קוליות לפיסוק ורשימת פתקים שמורים.</span></a>
+      <a class="card" href="textlab.html" style="--c:#9b9bff"><span class="ic">🔤</span><b>מעבדת הטקסט</b><span>ספירת מילים, תיקון טקסט שהוקלד בשפה הלא נכונה, הסרת ניקוד, מיון, חיפוש והחלפה.</span></a>
+      <a class="card" href="typewriter.html" style="--c:#d9b98a"><span class="ic">✒️</span><b>מכונת הכתיבה</b><span>כתיבת מכתבים עם צליל של מכונת כתיבה אמיתית, תבניות מוכנות (תודה, פנייה רשמית, יומן), מצב ריכוז והדפסה.</span></a>
+      <a class="card" href="typing.html" style="--c:#9b9bff"><span class="ic">⌨️</span><b>אצבעות קסם</b><span>הקלדה עיוורת בעברית עם מקלדת מונפשת, צבעים לכל אצבע, מדידת מהירות ודיוק ומפת חום של הטעויות.</span></a>
+    </div>
+  </section>
+  <section class="panel" role="tabpanel" id="p-arcade" data-tab="arcade" hidden>
     <h3>אולם המשחקים</h3>
     <div class="grid">
       <a class="card" href="2048.html" style="--c:#ffb703"><span class="ic">🔢</span><b>2048</b><span>מחליקים אריחים, מאחדים זוגות ומטפסים עד 2048. עם ביטול מהלך, שיא אישי ותמיכה בהחלקה בטלפון.</span></a>
@@ -298,6 +310,15 @@ footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padd
       <a class="card" href="breakout.html" style="--c:#ff9f43"><span class="ic">🧱</span><b>שובר הלבנים</b><span>מחבט, כדור וקיר צבעוני. שלבים הולכים וקשים, ובונוסים של מחבט רחב, שלושה כדורים וחיים.</span></a>
       <a class="card" href="puzzle15.html" style="--c:#5fc1cf"><span class="ic">🔲</span><b>פאזל ההזזה</b><span>פאזל 15 הקלאסי בגדלים 3×3 עד 5×5, עם מספרים או תמונה, וכל ערבוב הוא פתיר.</span></a>
     </div>
+  </section>
+  <section class="panel" role="tabpanel" id="p-games" data-tab="games" hidden>
+    <h3>משחקי מילים וחשיבה</h3>
+    <div class="grid">
+      <a class="card" href="wordle.html" style="--c:#58d68d"><span class="ic">🟩</span><b>וורדל עברי</b><span>מילה בת 5 אותיות בשש הזדמנויות. מילה יומית, מצב תרגול, רצפים ושיתוף תוצאה.</span></a>
+      <a class="card" href="bulls.html" style="--c:#ffb703"><span class="ic">🎯</span><b>בול פגיעה</b><span>מנחשים את המספר הסודי לפי רמזים של בול ופגיעה, עם 3 עד 5 ספרות ושיא אישי.</span></a>
+      <a class="card" href="tictactoe.html" style="--c:#ff8fab"><span class="ic">❌</span><b>איקס עיגול</b><span>נגד חבר או נגד המחשב בשלוש רמות, כולל רמה שלא מפסידה, ולוח 4×4.</span></a>
+    </div>
+
     <h3>עוד הפתעות</h3>
     <div class="grid">
       <a class="card" href="bingo.html" style="--c:#ffd166"><span class="ic">🎟️</span><b>בינגו אישי</b><span>כרטיס בינגו מהמילים שלכם, עם ערבוב, סימון משבצות והדפסה.</span></a>

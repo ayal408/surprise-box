@@ -53,50 +53,39 @@ tr.past{opacity:.4}
 <div class="wrap">
   <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
   <h1>📅 לוח מועדי דיווח ותשלום</h1>
-<p class="sub">כל המועדים של החודשים הקרובים: מע״מ, ניכויים, מקדמות וביטוח לאומי, לפי סוג העסק. מועד שנופל בשישי, בשבת או בחג עובר ליום העסקים הבא. אפשר לייצא ליומן עם תזכורות.</p>
+<p class="sub">תכנון מועדי בסיס חודשיים. המועדים בפועל עשויים להשתנות לפי לוח רשות המסים והביטוח הלאומי, חגים, דחיות והוראות מיוחדות.</p>
 <div class="panel row">
-  <label>מע״מ<select id="vat"><option value="1">חודשי</option><option value="2" selected>דו־חודשי</option><option value="0">עוסק פטור (אין דיווח שוטף)</option></select></label>
-  <label>מקדמות מס הכנסה<select id="adv"><option value="1" selected>חודשי</option><option value="2">דו־חודשי</option><option value="0">אין</option></select></label>
-  <label>ניכויים ממשכורת (102)<select id="emp"><option value="1" selected>יש עובדים – חודשי</option><option value="2">דו־חודשי (מעסיק קטן)</option><option value="0">אין עובדים</option></select></label>
-  <label>ביטוח לאומי עצמאי<select id="bl"><option value="1" selected>חודשי</option><option value="0">לא רלוונטי</option></select></label>
-  <label class="inline" style="align-self:end"><input type="checkbox" id="online" checked> דיווח מקוון במע״מ (עד ה־19)</label>
+  <label>דוח מע״מ<select id="vat"><option value="online">מקוון רגיל — 19</option><option value="regular">רגיל — 15</option><option value="detailed">דיווח מפורט — 23</option><option value="off">ללא דיווח תקופתי</option></select></label>
+  <label>תדירות מע״מ<select id="vatPeriod"><option value="1">חודשי</option><option value="2" selected>דו־חודשי לפי התיק</option></select></label>
+  <label>מקדמות מס הכנסה<select id="advance"><option value="online">מקוון — 19</option><option value="regular">רגיל — 15</option><option value="off">אין דרישה למקדמות</option></select></label>
+  <label>תדירות מקדמות<select id="advancePeriod"><option value="1">חודשי</option><option value="2">דו־חודשי אם אושר</option></select></label>
+  <label>ניכויים למס הכנסה<select id="withholding"><option value="regular">יש דיווח — 16</option><option value="off">אין תיק ניכויים</option></select></label>
+  <label>תדירות ניכויים<select id="withholdingPeriod"><option value="1">חודשי</option><option value="2">דו־חודשי אם אושר</option></select></label>
+  <label class="inline"><input type="checkbox" id="self" checked> מקדמות ביטוח לאומי לעצמאי — 15</label>
+  <label class="inline"><input type="checkbox" id="employer"> דיווח ותשלום ביטוח לאומי לעובדים — 15</label>
 </div>
 <div class="panel next" id="next"></div>
-<div class="panel">
-  <div class="row" style="justify-content:space-between"><h2 style="margin:0">📋 12 החודשים הקרובים</h2><button id="ics">📅 ייצוא ליומן (ICS) עם תזכורת</button></div>
-  <table style="margin-top:8px"><thead><tr><th>תאריך</th><th>דיווח</th><th>על תקופה</th><th class="num">בעוד</th></tr></thead><tbody id="tb"></tbody></table>
-</div>
-<div class="panel"><h2>🗓️ מועדים שנתיים (מקובלים)</h2><table><tbody id="yr"></tbody></table></div>
-<p class="hint">המועדים לפי הכללים המקובלים: דיווח ותשלום עד ה־15 בחודש שאחרי התקופה, ובמע״מ מקוון עד ה־19. רשות המסים וביטוח לאומי מפרסמים לפעמים דחיות, והמועדים השנתיים משתנים לפי הסדר הארכות המייצגים. לפני הגשה כדאי לבדוק באתר רשות המסים.</p>
+<div class="panel"><h2>מועדי בסיס ב־12 החודשים הקרובים</h2><div style="overflow-x:auto"><table><thead><tr><th>מועד בסיס</th><th>דיווח ותשלום</th><th>עבור תקופה</th><th>בדיקת מקור</th></tr></thead><tbody id="tb"></tbody></table></div></div>
+<div class="panel"><h2>אימות התאריך לפני דיווח</h2><p>הטבלה מציגה את יום הבסיס החודשי בלבד. היא אינה מחשבת דחייה לשבת, לחג או להארכה נקודתית; גם ייצוא ליומן הוסר כדי שלא ישמור מועד שגוי.</p><div class="row"><a href="https://www.gov.il/he/pages/pa151025-2" target="_blank" rel="noopener noreferrer">מועדי רשות המסים לשנת 2026</a><a href="https://www.gov.il/he/service/reporting-or-payment-of-vat-reports" target="_blank" rel="noopener noreferrer">דיווח מע״מ רגיל</a><a href="https://www.gov.il/he/service/detailed-vat-reporting" target="_blank" rel="noopener noreferrer">דיווח מפורט במע״מ</a><a href="https://www.btl.gov.il/Pages/BenefitsPaymentDates.aspx" target="_blank" rel="noopener noreferrer">לוח הביטוח הלאומי</a></div></div>
+<p class="hint">דוח ניכויים למס הכנסה ותשלום ביטוח לאומי לעובדים הם חיובים נפרדים. לעוסק פטור אין דוח מע״מ תקופתי, אך יש הצהרת מחזור שנתית במועד שמפרסמת רשות המסים. מועד דוח שנתי, טופסי 126/856 והארכות למייצגים אינם מוצגים כאן, מפני שהם דורשים בדיקה לפי שנת המס וההודעות העדכניות.</p>
 <script>
 const $=id=>document.getElementById(id);
-const HF=new Intl.DateTimeFormat('en-u-ca-hebrew',{day:'numeric',month:'long',timeZone:'UTC'});
-function hol(d){const p=HF.formatToParts(new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))),m=p.find(x=>x.type==='month').value,dd=+p.find(x=>x.type==='day').value;
-  return(m==='Tishri'&&[1,2,10,15,22].includes(dd))||(m==='Nisan'&&[15,21].includes(dd))||(m==='Sivan'&&dd===6)}
-const add=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
-function biz(d){let x=new Date(d);while(x.getDay()===5||x.getDay()===6||hol(x))x=add(x,1);return x}
-const MN=d=>d.toLocaleDateString('he-IL',{month:'long'});
-function items(){const now=new Date();now.setHours(0,0,0,0);const out=[],o=$('online').checked;
-  for(let k=-1;k<13;k++){const due=new Date(now.getFullYear(),now.getMonth()+k,1),prev=new Date(due.getFullYear(),due.getMonth()-1,1),pm=prev.getMonth();
-    const per=(n)=>n===1?MN(prev):`${MN(new Date(prev.getFullYear(),pm-1,1))}–${MN(prev)}`;
-    const push=(day,name,n,ic)=>{const d=biz(new Date(due.getFullYear(),due.getMonth(),day));out.push({d,name,per:per(n),ic})};
-    const v=+$('vat').value,a=+$('adv').value,e=+$('emp').value;
-    if(v===1||(v===2&&pm%2===1))push(o?19:15,'דיווח ותשלום מע״מ',v,'🧾');
-    if(a===1||(a===2&&pm%2===1))push(15,'מקדמות מס הכנסה',a,'💼');
-    if(e===1||(e===2&&pm%2===1))push(15,'ניכויים: מס הכנסה וביטוח לאומי (102)',e,'👥');
-    if(+$('bl').value)push(15,'ביטוח לאומי עצמאי',1,'🛡️')}
-  return out.filter(x=>x.d>=add(now,-20)).sort((a,b)=>a.d-b.d)}
-function render(){const now=new Date();now.setHours(0,0,0,0);const L=items();const up=L.filter(x=>x.d>=now);
-  const nx=up[0];if(nx){const same=up.filter(x=>+x.d===+nx.d),days=Math.round((nx.d-now)/864e5);$('next').innerHTML=`⏳ המועד הקרוב: <b>${nx.d.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'})}</b> (${days===0?'היום!':days===1?'מחר':'בעוד '+days+' ימים'})<br>${same.map(x=>x.ic+' '+x.name+' · '+x.per).join('<br>')}`}else $('next').textContent='אין מועדים קרובים לפי ההגדרות';
-  $('tb').innerHTML=L.slice(0,40).map(x=>{const days=Math.round((x.d-now)/864e5);return`<tr class="${days<0?'past':days<=7?'soon':''}"><td>${x.d.toLocaleDateString('he-IL',{weekday:'short',day:'numeric',month:'numeric',year:'2-digit'})}</td><td>${x.ic} ${x.name}</td><td>${x.per}</td><td class="num">${days<0?'עבר':days+' ימים'}</td></tr>`}).join('');
-  try{localStorage.setItem('deadlines',JSON.stringify(['vat','adv','emp','bl'].map(k=>$(k).value).concat([$('online').checked])))}catch{}}
-const y=new Date().getFullYear();
-$('yr').innerHTML=[['טופס 106 לעובדים','עד 31 במרץ'],['דוח שנתי מעסיק (126) ודוח ניכויים (856)','בדרך כלל עד סוף אפריל'],['דוח שנתי ליחיד (1301) ולחברה (1214)','בדרך כלל עד סוף מאי, ולמייצגים לפי הסדר הארכות'],['הצהרת הון','לפי דרישה, בדרך כלל תוך 120 יום'],['דוח שנתי למע״מ (לעוסק פטור)','עד סוף ינואר'],['עדכון מקדמות לשנה החדשה','עם קבלת הודעת פקיד השומה']].map(([a,b])=>`<tr><td>${a}</td><td class="muted">${b}</td></tr>`).join('');
-$('ics').onclick=()=>{const ds=d=>d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');let s='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//surprise-box//deadlines//HE\r\n';
-  items().forEach((x,i)=>{s+=`BEGIN:VEVENT\r\nUID:dl-${ds(x.d)}-${i}@surprise-box\r\nDTSTART;VALUE=DATE:${ds(x.d)}\r\nDTEND;VALUE=DATE:${ds(add(x.d,1))}\r\nSUMMARY:${x.name} (${x.per})\r\nBEGIN:VALARM\r\nTRIGGER:-P2D\r\nACTION:DISPLAY\r\nDESCRIPTION:${x.name}\r\nEND:VALARM\r\nEND:VEVENT\r\n`});
-  s+='END:VCALENDAR';const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'text/calendar'}));a.download='מועדי-דיווח.ics';a.click()};
-try{const s=JSON.parse(localStorage.getItem('deadlines'));if(s){['vat','adv','emp','bl'].forEach((k,i)=>$(k).value=s[i]);$('online').checked=s[4]}}catch{}
-document.querySelectorAll('select,input').forEach(i=>i.onchange=render);render();
+const monthly=(year,month,period)=>period===1||month%2===1;
+function rows(){const today=new Date();today.setHours(0,0,0,0);const out=[];
+  for(let k=-1;k<14;k++){const due=new Date(today.getFullYear(),today.getMonth()+k,1),prev=new Date(due.getFullYear(),due.getMonth()-1,1),month=prev.getMonth();
+    const period=n=>n===1?prev.toLocaleDateString('he-IL',{month:'long',year:'numeric'}):new Date(prev.getFullYear(),month-1,1).toLocaleDateString('he-IL',{month:'long',year:'numeric'})+'–'+prev.toLocaleDateString('he-IL',{month:'long',year:'numeric'});
+    const add=(day,name,n,source)=>out.push({date:new Date(due.getFullYear(),due.getMonth(),day),name,period:period(n),source});
+    const v=$('vat').value,vp=+$('vatPeriod').value,a=$('advance').value,ap=+$('advancePeriod').value,w=$('withholding').value,wp=+$('withholdingPeriod').value;
+    if(v!=='off'&&monthly(due.getFullYear(),month,vp))add(v==='detailed'?23:v==='online'?19:15,'מע״מ'+(v==='detailed'?' מפורט':''),vp,'tax');
+    if(a!=='off'&&monthly(due.getFullYear(),month,ap))add(a==='online'?19:15,'מקדמות מס הכנסה',ap,'tax');
+    if(w!=='off'&&monthly(due.getFullYear(),month,wp))add(16,'ניכויים למס הכנסה',wp,'tax');
+    if($('self').checked)add(15,'ביטוח לאומי לעצמאי',1,'btl');
+    if($('employer').checked)add(15,'ביטוח לאומי לעובדים (102)',1,'btl')}
+  return out.filter(x=>x.date>=today&&x.date<new Date(today.getFullYear(),today.getMonth()+12,1)).sort((a,b)=>a.date-b.date||a.name.localeCompare(b.name,'he'))}
+function render(){const out=rows(),body=$('tb');body.replaceChildren();for(const x of out){const tr=document.createElement('tr');for(const value of [x.date.toLocaleDateString('he-IL',{day:'numeric',month:'numeric',year:'numeric'}),x.name,x.period]){const td=document.createElement('td');td.textContent=value;tr.append(td)}const td=document.createElement('td'),link=document.createElement('a');link.href=x.source==='btl'?'https://www.btl.gov.il/Pages/BenefitsPaymentDates.aspx':'https://www.gov.il/he/pages/pa151025-2';link.target='_blank';link.rel='noopener noreferrer';link.textContent='בדקו מועד בפועל';td.append(link);tr.append(td);body.append(tr)}const first=out[0];$('next').textContent=first?'מועד הבסיס הקרוב: '+first.date.toLocaleDateString('he-IL')+' — '+out.filter(x=>+x.date===+first.date).map(x=>x.name).join(', ')+'. יש לבדוק את המועד בפועל בקישור הרשמי.':'אין מועדים לפי הבחירות הנוכחיות.';
+  try{localStorage.setItem('deadlines-v2',JSON.stringify(Object.fromEntries(['vat','vatPeriod','advance','advancePeriod','withholding','withholdingPeriod','self','employer'].map(id=>[id,$(id).type==='checkbox'?$(id).checked:$(id).value]))))}catch{}}
+try{const saved=JSON.parse(localStorage.getItem('deadlines-v2'));if(saved)for(const [id,value] of Object.entries(saved)){const node=$(id);if(node&&node.type==='checkbox')node.checked=!!value;else if(node&&[...node.options].some(o=>o.value===value))node.value=value}}catch{}
+document.querySelectorAll('select,input').forEach(node=>node.addEventListener('change',render));render();
 </script>
 </div>
 <script src="dl.js" defer></script>

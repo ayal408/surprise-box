@@ -44,14 +44,15 @@ th{color:var(--muted);font-weight:600}
 .tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .wrap{max-width:720px!important}
-.flag{font-size:7rem;text-align:center;line-height:1.2}
+.flag{font-size:5rem;text-align:center;line-height:1.2;min-height:150px;display:grid;place-items:center}
+.flag img{display:block;width:min(210px,70vw);aspect-ratio:4/3;object-fit:contain;border-radius:8px;box-shadow:0 10px 24px rgba(0,0,0,.25)}
 .qq{font-size:1.6rem;font-weight:800;text-align:center;margin:8px 0}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .opts button{font-size:1.2rem;padding:14px}
 .opts button.ok{background:#3aa55c;border-color:#3aa55c}.opts button.bad{background:#d62839;border-color:#d62839}
 .bar{height:8px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden}.bar div{height:100%;background:var(--acc);transition:width 1s linear}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}.card span{font-size:2.4rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}.card .flag-preview{display:block;font-size:2.4rem;min-height:58px}.card img{width:72px;height:54px;object-fit:contain;border-radius:4px}
 </style>
 </head>
 <body>
@@ -72,11 +73,12 @@ th{color:var(--muted);font-weight:600}
 const $=id=>document.getElementById(id);
 const D=`🇮🇱|ישראל|ירושלים|אסיה;🇺🇸|ארצות הברית|וושינגטון|אמריקה;🇬🇧|בריטניה|לונדון|אירופה;🇫🇷|צרפת|פריז|אירופה;🇩🇪|גרמניה|ברלין|אירופה;🇮🇹|איטליה|רומא|אירופה;🇪🇸|ספרד|מדריד|אירופה;🇵🇹|פורטוגל|ליסבון|אירופה;🇳🇱|הולנד|אמסטרדם|אירופה;🇧🇪|בלגיה|בריסל|אירופה;🇨🇭|שווייץ|ברן|אירופה;🇦🇹|אוסטריה|וינה|אירופה;🇬🇷|יוון|אתונה|אירופה;🇨🇾|קפריסין|ניקוסיה|אירופה;🇵🇱|פולין|ורשה|אירופה;🇨🇿|צ׳כיה|פראג|אירופה;🇭🇺|הונגריה|בודפשט|אירופה;🇷🇴|רומניה|בוקרשט|אירופה;🇧🇬|בולגריה|סופיה|אירופה;🇺🇦|אוקראינה|קייב|אירופה;🇷🇺|רוסיה|מוסקבה|אירופה;🇸🇪|שוודיה|שטוקהולם|אירופה;🇳🇴|נורווגיה|אוסלו|אירופה;🇩🇰|דנמרק|קופנהגן|אירופה;🇫🇮|פינלנד|הלסינקי|אירופה;🇮🇪|אירלנד|דבלין|אירופה;🇮🇸|איסלנד|רייקיאוויק|אירופה;🇭🇷|קרואטיה|זאגרב|אירופה;🇷🇸|סרביה|בלגרד|אירופה;🇬🇪|גאורגיה|טביליסי|אסיה;🇹🇷|טורקיה|אנקרה|אסיה;🇯🇴|ירדן|עמאן|אסיה;🇪🇬|מצרים|קהיר|אפריקה;🇱🇧|לבנון|ביירות|אסיה;🇸🇦|ערב הסעודית|ריאד|אסיה;🇦🇪|איחוד האמירויות|אבו דאבי|אסיה;🇧🇭|בחריין|מנאמה|אסיה;🇲🇦|מרוקו|רבאט|אפריקה;🇮🇳|הודו|ניו דלהי|אסיה;🇨🇳|סין|בייג׳ינג|אסיה;🇯🇵|יפן|טוקיו|אסיה;🇰🇷|דרום קוריאה|סיאול|אסיה;🇹🇭|תאילנד|בנגקוק|אסיה;🇻🇳|וייטנאם|האנוי|אסיה;🇵🇭|הפיליפינים|מנילה|אסיה;🇮🇩|אינדונזיה|ג׳קרטה|אסיה;🇸🇬|סינגפור|סינגפור|אסיה;🇲🇾|מלזיה|קואלה לומפור|אסיה;🇳🇵|נפאל|קטמנדו|אסיה;🇵🇰|פקיסטן|איסלמבאד|אסיה;🇮🇷|איראן|טהרן|אסיה;🇰🇿|קזחסטן|אסטנה|אסיה;🇺🇿|אוזבקיסטן|טשקנט|אסיה;🇦🇿|אזרבייג׳ן|באקו|אסיה;🇨🇦|קנדה|אוטווה|אמריקה;🇲🇽|מקסיקו|מקסיקו סיטי|אמריקה;🇧🇷|ברזיל|ברזיליה|אמריקה;🇦🇷|ארגנטינה|בואנוס איירס|אמריקה;🇨🇱|צ׳ילה|סנטיאגו|אמריקה;🇵🇪|פרו|לימה|אמריקה;🇨🇴|קולומביה|בוגוטה|אמריקה;🇻🇪|ונצואלה|קראקס|אמריקה;🇨🇺|קובה|הוואנה|אמריקה;🇺🇾|אורוגוואי|מונטווידאו|אמריקה;🇵🇦|פנמה|פנמה סיטי|אמריקה;🇨🇷|קוסטה ריקה|סן חוסה|אמריקה;🇿🇦|דרום אפריקה|פרטוריה|אפריקה;🇳🇬|ניגריה|אבוג׳ה|אפריקה;🇰🇪|קניה|ניירובי|אפריקה;🇪🇹|אתיופיה|אדיס אבבה|אפריקה;🇬🇭|גאנה|אקרה|אפריקה;🇹🇳|תוניסיה|תוניס|אפריקה;🇹🇿|טנזניה|דודומה|אפריקה;🇺🇬|אוגנדה|קמפלה|אפריקה;🇷🇼|רואנדה|קיגאלי|אפריקה;🇸🇳|סנגל|דקאר|אפריקה;🇦🇺|אוסטרליה|קנברה|אוקיאניה;🇳🇿|ניו זילנד|ולינגטון|אוקיאניה;🇫🇯|פיג׳י|סובה|אוקיאניה;🇵🇬|פפואה גינאה החדשה|פורט מורסבי|אוקיאניה`.split(';').map(s=>{const[f,n,c,k]=s.split('|');return{f,n,c,k}});
 let pool=[],cur=null,sc=0,ok=0,tot=0,str=0,tmr=null,left=0,lock=false;
+function flagNode(country){const code=Array.from(country.f).map(ch=>String.fromCharCode(ch.codePointAt(0)-0x1f1e6+97)).join('');const img=document.createElement('img');img.src='flags/'+code+'.svg';img.alt='דגל '+country.n;img.loading='lazy';img.onerror=()=>img.replaceWith(document.createTextNode(country.f));return img}
 try{$('best').textContent=localStorage.getItem('geo-best')||0}catch{}
 const sh=a=>[...a].sort(()=>Math.random()-.5);
 function list(){return D.filter(x=>!$('cont').value||x.k===$('cont').value)}
 function next(){lock=false;const L=list();if(!pool.length)pool=sh(L);cur=pool.pop();const m=$('mode').value;let q,ans,field;
-  if(m==='flag'){q='איזו מדינה זו?';ans=cur.n;field='n';$('fl').textContent=cur.f}else if(m==='cap'){q=`מה הבירה של ${cur.n}?`;ans=cur.c;field='c';$('fl').textContent=cur.f}else if(m==='rcap'){q=`${cur.c} היא הבירה של…`;ans=cur.n;field='n';$('fl').textContent='🏛️'}else{q=`באיזו יבשת נמצאת ${cur.n}?`;ans=cur.k;field='k';$('fl').textContent=cur.f}
+  if(m==='flag'){q='איזו מדינה זו?';ans=cur.n;field='n';$('fl').replaceChildren(flagNode(cur))}else if(m==='cap'){q=`מה הבירה של ${cur.n}?`;ans=cur.c;field='c';$('fl').replaceChildren(flagNode(cur))}else if(m==='rcap'){q=`${cur.c} היא הבירה של…`;ans=cur.n;field='n';$('fl').textContent='🏛️'}else{q=`באיזו יבשת נמצאת ${cur.n}?`;ans=cur.k;field='k';$('fl').replaceChildren(flagNode(cur))}
   const others=field==='k'?['אירופה','אסיה','אפריקה','אמריקה','אוקיאניה'].filter(x=>x!==ans):sh(D.filter(x=>x[field]!==ans&&(!$('cont').value||x.k===cur.k)).map(x=>x[field]));
   const opts=sh([ans,...[...new Set(others)].slice(0,3)]);$('qq').textContent=q;$('opts').innerHTML=opts.map(o=>`<button data-o="${o}">${o}</button>`).join('');$('opts').dataset.ans=ans;
   clearInterval(tmr);$('tb').style.transition='none';$('tb').style.width='100%';if($('timer').checked){left=10;requestAnimationFrame(()=>{$('tb').style.transition='width 10s linear';$('tb').style.width='0%'});tmr=setTimeout(()=>answer(null),10000)}}
@@ -85,7 +87,7 @@ function answer(o){if(lock)return;lock=true;clearTimeout(tmr);const ans=$('opts'
   if(o===ans){ok++;str++;sc+=10+Math.min(str,10)*2}else str=0;$('sc').textContent=sc;$('ok').textContent=`${ok}/${tot}`;$('st').textContent=str;
   try{if(sc>+(localStorage.getItem('geo-best')||0)){localStorage.setItem('geo-best',sc);$('best').textContent=sc}}catch{}setTimeout(next,o===ans?700:1500)}
 $('opts').onclick=e=>{const o=e.target.dataset.o;if(o)answer(o)};
-function start(){const m=$('mode').value;$('learn').hidden=m!=='learn';$('game').hidden=m==='learn';if(m==='learn'){$('cards').innerHTML=list().map(x=>`<div class="card"><span>${x.f}</span><div><b>${x.n}</b></div><small class="muted">${x.c} · ${x.k}</small></div>`).join('');return}sc=ok=tot=str=0;pool=[];['sc','st'].forEach(k=>$(k).textContent=0);$('ok').textContent='0/0';next()}
+function start(){const m=$('mode').value;$('learn').hidden=m!=='learn';$('game').hidden=m==='learn';if(m==='learn'){$('cards').replaceChildren(...list().map(x=>{const card=document.createElement('div'),preview=document.createElement('span'),name=document.createElement('div'),info=document.createElement('small');card.className='card';preview.className='flag-preview';preview.append(flagNode(x));name.textContent=x.n;info.className='muted';info.textContent=x.c+' · '+x.k;card.append(preview,name,info);return card}));return}sc=ok=tot=str=0;pool=[];['sc','st'].forEach(k=>$(k).textContent=0);$('ok').textContent='0/0';next()}
 $('start').onclick=start;$('mode').onchange=start;$('cont').onchange=start;
 start();
 </script>
