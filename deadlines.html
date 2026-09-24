@@ -47,6 +47,11 @@ th{color:var(--muted);font-weight:600}
 .next b{color:var(--acc);font-size:1.4rem}
 tr.soon td{background:rgba(255,143,171,.1)}
 tr.past{opacity:.4}
+tr.internal td{background:rgba(255,206,122,.08)}
+tr.upcoming td{border-top:2px solid var(--acc)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.tools label{min-width:165px}
+#count{color:var(--muted);margin:8px 0 0}
 </style>
 </head>
 <body>
@@ -68,7 +73,7 @@ tr.past{opacity:.4}
   <label class="inline"><input type="checkbox" id="employer"> דיווח ותשלום ביטוח לאומי לעובדים — 15</label>
 </div>
 <div class="panel next" id="next"></div>
-<div class="panel"><h2>מועדים מהיום והלאה — תקופות דיווח 2026</h2><div style="overflow-x:auto"><table><thead><tr><th>מועד שנקבע</th><th>דיווח ותשלום</th><th>עבור תקופה</th><th>דחייה והסבר</th><th>מקור</th></tr></thead><tbody id="tb"></tbody></table></div></div>
+<div class="panel"><h2>מועדים מהיום והלאה — תקופות דיווח 2026</h2><div class="tools"><label>חיפוש מועד<input id="search" type="search" placeholder="למשל מע״מ, שכר או ניכויים"></label><label>טווח תאריכים<select id="range"><option value="all">כל המועדים</option><option value="7">7 הימים הקרובים</option><option value="30">30 הימים הקרובים</option><option value="90">90 הימים הקרובים</option></select></label><label>סוג מועד<select id="kind"><option value="all">הכול</option><option value="tax">רשות המסים</option><option value="btl">ביטוח לאומי</option><option value="work">שכר ותלושים</option><option value="internal">תזכורות פנימיות</option></select></label></div><p id="count" aria-live="polite"></p><div style="overflow-x:auto"><table><thead><tr><th>מועד שנקבע</th><th>דיווח ותשלום</th><th>עבור תקופה</th><th>דחייה והסבר</th><th>מקור</th></tr></thead><tbody id="tb"></tbody></table></div></div>
 <div class="panel"><h2>אימות התאריך לפני דיווח</h2><p>מוצגים רק מועדים מהיום והלאה, בסדר כרונולוגי. למסים מוצגים התאריכים שנקבעו בהודעת רשות המסים לשנת 2026, כולל הדחיות שפורסמו; לביטוח הלאומי מוצג יום הבסיס בלבד ויש לבדוק דחיות בלוח העדכני. מועדי דיווח מקוון מיוחדים, ארכות למייצגים והודעות חירום עשויים לשנות את התאריך בהתאם לנסיבות הדיווח.</p><div class="row"><a href="https://www.gov.il/he/pages/pa151025-2" target="_blank" rel="noopener noreferrer">מועדי רשות המסים לשנת 2026</a><a href="https://www.gov.il/he/service/reporting-or-payment-of-vat-reports" target="_blank" rel="noopener noreferrer">דיווח מע״מ רגיל</a><a href="https://www.gov.il/he/service/detailed-vat-reporting" target="_blank" rel="noopener noreferrer">דיווח מפורט במע״מ</a><a href="https://www.btl.gov.il/Insurance/National%20Insurance/type_list/Self_Employed/Pages/howtopay.aspx" target="_blank" rel="noopener noreferrer">מועד תשלום לעצמאי בביטוח הלאומי</a><a href="https://www.btl.gov.il/Insurance/Maasik/MToshavYisrael/DivuahVetashlum/Pages/Divuhach.aspx" target="_blank" rel="noopener noreferrer">דיווח ותשלום למעסיק בביטוח הלאומי</a></div></div>
 <p class="hint">תזכורת סוף החודש למקדמות משקפת את נוהל התשלום אצלכם ואינה משנה את המועד החוקי לדיווח ולתשלום. מקדמות מס הכנסה אינן נדחות אוטומטית לסוף החודש: המועד הרגיל הוא 15 בחודש שאחרי תקופת הדיווח, בכפוף לדחיות שפורסמו; בתשלום מקוון המועד עשוי להיות 19 בחודש או מועד מאוחר יותר שנקבע בטבלה. בדקו את הדרישה בתיק ואת הודעות רשות המסים. שכר חודשי משולם בתום חודש העבודה; ה־9 בחודש הבא הוא מועד מסירת התלוש ואינו מועד תשלום השכר. דוח ניכויים למס הכנסה ותשלום ביטוח לאומי לעובדים הם חיובים נפרדים. לעוסק פטור אין דוח מע״מ תקופתי, אך יש הצהרת מחזור שנתית במועד שמפרסמת רשות המסים. מועד דוח שנתי, טופסי 126/856 והארכות למייצגים אינם מוצגים כאן, מפני שהם דורשים בדיקה לפי שנת המס וההודעות העדכניות.</p>
 <script>
@@ -133,10 +138,32 @@ function rows(){const out=[];
   const today=new Date();today.setHours(0,0,0,0);
   return out.filter(x=>x.date>=today).sort((a,b)=>a.date-b.date||a.name.localeCompare(b.name,'he'));
 }
-function render(){const out=rows(),body=$('tb');body.replaceChildren();for(const x of out){const tr=document.createElement('tr');for(const value of [pretty(x.date),x.name,x.period,x.note]){const td=document.createElement('td');td.textContent=value;tr.append(td)}const td=document.createElement('td'),link=document.createElement('a');link.href=x.source==='internal'?'#':x.source==='self'?SELF_URL:x.source==='employer'?EMPLOYER_URL:x.source==='wage'?WAGE_URL:x.source==='payslip'?PAYSLIP_URL:x.source==='emergency'?'https://www.gov.il/he/pages/sa050326-2':TAX_URL;link.target='_blank';link.rel='noopener noreferrer';link.textContent=x.source==='internal'?'הגדרה פנימית':'מקור רשמי';if(x.source==='internal')link.removeAttribute('href');td.append(link);tr.append(td);body.append(tr)}const first=out[0];$('next').textContent=first?'המועד הקרוב בתקופות 2026: '+pretty(first.date)+' — '+out.filter(x=>+x.date===+first.date).map(x=>x.name).join(', ')+'.':'לא נותרו מועדים לתקופות הדיווח של 2026.';
-  try{localStorage.setItem('deadlines-v2',JSON.stringify(Object.fromEntries(['vat','vatPeriod','advance','advancePeriod','withholding','withholdingPeriod','self','employer','payroll','payslip','advanceMonthEnd'].map(id=>[id,$(id).type==='checkbox'?$(id).checked:$(id).value]))))}catch{}}
+function render(){
+  const all=rows(),body=$('tb');
+  const query=$('search').value.trim().toLocaleLowerCase('he-IL');
+  const range=$('range').value,kind=$('kind').value;
+  const start=new Date();start.setHours(0,0,0,0);
+  const end=range==='all'?null:new Date(start.getFullYear(),start.getMonth(),start.getDate()+Number(range));
+  const matchesKind=x=>kind==='all'||kind==='tax'&&['tax','emergency'].includes(x.source)||kind==='btl'&&['self','employer'].includes(x.source)||kind==='work'&&['wage','payslip'].includes(x.source)||kind==='internal'&&x.source==='internal';
+  const visible=all.filter(x=>(!end||x.date<end)&&matchesKind(x)&&(!query||[x.name,x.period,x.note,pretty(x.date)].join(' ').toLocaleLowerCase('he-IL').includes(query)));
+  body.replaceChildren();
+  visible.forEach((x,i)=>{
+    const tr=document.createElement('tr');
+    if(x.source==='internal')tr.classList.add('internal');
+    if(i===0)tr.classList.add('upcoming');
+    for(const value of [pretty(x.date),x.name,x.period,x.note]){const td=document.createElement('td');td.textContent=value;tr.append(td)}
+    const td=document.createElement('td');
+    if(x.source==='internal'){td.textContent='הגדרה פנימית'}
+    else {const link=document.createElement('a');link.href=x.source==='self'?SELF_URL:x.source==='employer'?EMPLOYER_URL:x.source==='wage'?WAGE_URL:x.source==='payslip'?PAYSLIP_URL:x.source==='emergency'?'https://www.gov.il/he/pages/sa050326-2':TAX_URL;link.target='_blank';link.rel='noopener noreferrer';link.textContent='מקור רשמי';td.append(link)}
+    tr.append(td);body.append(tr);
+  });
+  $('count').textContent='מוצגים '+visible.length+' מתוך '+all.length+' מועדים עתידיים.';
+  const first=visible[0];
+  $('next').textContent=first?'המועד הקרוב לפי הסינון: '+pretty(first.date)+' — '+visible.filter(x=>+x.date===+first.date).map(x=>x.name).join(', ')+'.':'אין מועדים בטווח ובסינון שנבחרו.';
+  try{localStorage.setItem('deadlines-v2',JSON.stringify(Object.fromEntries(['vat','vatPeriod','advance','advancePeriod','withholding','withholdingPeriod','self','employer','payroll','payslip','advanceMonthEnd'].map(id=>[id,$(id).type==='checkbox'?$(id).checked:$(id).value]))))}catch{}
+}
 try{const saved=JSON.parse(localStorage.getItem('deadlines-v2'));if(saved)for(const [id,value] of Object.entries(saved)){const node=$(id);if(node&&node.type==='checkbox')node.checked=!!value;else if(node&&[...node.options].some(o=>o.value===value))node.value=value}}catch{}
-document.querySelectorAll('select,input').forEach(node=>node.addEventListener('change',render));render();
+document.querySelectorAll('select,input').forEach(node=>node.addEventListener('change',render));$('search').addEventListener('input',render);render();
 </script>
 </div>
 <script src="dl.js" defer></script>
