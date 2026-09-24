@@ -57,7 +57,7 @@ tr.past{opacity:.4}
 <div class="panel row">
   <label>דוח מע״מ<select id="vat"><option value="regular">תקופתי — לפי טבלת רשות המסים</option><option value="detailed">דיווח מפורט — לפי הטבלה</option><option value="off">ללא דיווח תקופתי</option></select></label>
   <label>תדירות מע״מ<select id="vatPeriod"><option value="1">חודשי</option><option value="2" selected>דו־חודשי לפי התיק</option></select></label>
-  <label>מקדמות מס הכנסה<select id="advance"><option value="regular">לפי טבלת רשות המסים</option><option value="off">אין דרישה למקדמות</option></select></label>
+  <label>מקדמות מס הכנסה<select id="advance"><option value="regular">מועד רגיל — לפי טבלת 2026</option><option value="online">תשלום מקוון — 19 או דחייה מאוחרת יותר</option><option value="off">אין דרישה למקדמות</option></select></label>
   <label>תדירות מקדמות<select id="advancePeriod"><option value="1">חודשי</option><option value="2">דו־חודשי אם אושר</option></select></label>
   <label>ניכויים למס הכנסה<select id="withholding"><option value="regular">לפי טבלת רשות המסים</option><option value="off">אין תיק ניכויים</option></select></label>
   <label>תדירות ניכויים<select id="withholdingPeriod"><option value="1">חודשי</option><option value="2">דו־חודשי אם אושר</option></select></label>
@@ -69,7 +69,7 @@ tr.past{opacity:.4}
 <div class="panel next" id="next"></div>
 <div class="panel"><h2>מועדים מהיום והלאה — תקופות דיווח 2026</h2><div style="overflow-x:auto"><table><thead><tr><th>מועד שנקבע</th><th>דיווח ותשלום</th><th>עבור תקופה</th><th>דחייה והסבר</th><th>מקור</th></tr></thead><tbody id="tb"></tbody></table></div></div>
 <div class="panel"><h2>אימות התאריך לפני דיווח</h2><p>מוצגים רק מועדים מהיום והלאה, בסדר כרונולוגי. למסים מוצגים התאריכים שנקבעו בהודעת רשות המסים לשנת 2026, כולל הדחיות שפורסמו; לביטוח הלאומי מוצג יום הבסיס בלבד ויש לבדוק דחיות בלוח העדכני. מועדי דיווח מקוון מיוחדים, ארכות למייצגים והודעות חירום עשויים לשנות את התאריך בהתאם לנסיבות הדיווח.</p><div class="row"><a href="https://www.gov.il/he/pages/pa151025-2" target="_blank" rel="noopener noreferrer">מועדי רשות המסים לשנת 2026</a><a href="https://www.gov.il/he/service/reporting-or-payment-of-vat-reports" target="_blank" rel="noopener noreferrer">דיווח מע״מ רגיל</a><a href="https://www.gov.il/he/service/detailed-vat-reporting" target="_blank" rel="noopener noreferrer">דיווח מפורט במע״מ</a><a href="https://www.btl.gov.il/Insurance/National%20Insurance/type_list/Self_Employed/Pages/howtopay.aspx" target="_blank" rel="noopener noreferrer">מועד תשלום לעצמאי בביטוח הלאומי</a><a href="https://www.btl.gov.il/Insurance/Maasik/MToshavYisrael/DivuahVetashlum/Pages/Divuhach.aspx" target="_blank" rel="noopener noreferrer">דיווח ותשלום למעסיק בביטוח הלאומי</a></div></div>
-<p class="hint">שכר חודשי משולם בתום חודש העבודה; ה־9 בחודש הבא הוא מועד מסירת התלוש ואינו מועד תשלום השכר. דוח ניכויים למס הכנסה ותשלום ביטוח לאומי לעובדים הם חיובים נפרדים. לעוסק פטור אין דוח מע״מ תקופתי, אך יש הצהרת מחזור שנתית במועד שמפרסמת רשות המסים. מועד דוח שנתי, טופסי 126/856 והארכות למייצגים אינם מוצגים כאן, מפני שהם דורשים בדיקה לפי שנת המס וההודעות העדכניות.</p>
+<p class="hint">מקדמות מס הכנסה אינן נדחות אוטומטית לסוף החודש: המועד הרגיל הוא 15 בחודש שאחרי תקופת הדיווח, בכפוף לדחיות שפורסמו; בתשלום מקוון המועד עשוי להיות 19 בחודש או מועד מאוחר יותר שנקבע בטבלה. בדקו את הדרישה בתיק ואת הודעות רשות המסים. שכר חודשי משולם בתום חודש העבודה; ה־9 בחודש הבא הוא מועד מסירת התלוש ואינו מועד תשלום השכר. דוח ניכויים למס הכנסה ותשלום ביטוח לאומי לעובדים הם חיובים נפרדים. לעוסק פטור אין דוח מע״מ תקופתי, אך יש הצהרת מחזור שנתית במועד שמפרסמת רשות המסים. מועד דוח שנתי, טופסי 126/856 והארכות למייצגים אינם מוצגים כאן, מפני שהם דורשים בדיקה לפי שנת המס וההודעות העדכניות.</p>
 <script>
 const $=id=>document.getElementById(id);
 // Indexed by the REPORTING month (January=1). The due date is in the following month.
@@ -115,7 +115,12 @@ function rows(){const out=[];
       const emergency=month===2&&!isDetailed;
       add(emergency?'2026-03-26':scheduled,'מע״מ'+(isDetailed?' מפורט':''),month,vp,emergency?'הארכת חירום ל־26.3.2026 (הודעה מ־5.3.2026); המועד בטבלה המקורית: '+pretty(dateFrom(scheduled)):explanation(isDetailed?detailedRule:vatRule),emergency?'emergency':'tax');
     }
-    if(a!=='off'&&(ap===1||month%2===0))add(vat,'מקדמות מס הכנסה',month,ap,explanation(vatRule),'tax');
+    if(a!=='off'&&(ap===1||month%2===0)){
+      // Online advances are due on the 19th unless the published legal deadline is later.
+      const online=dueYear+'-'+dueMonth+'-19';
+      const advanceDate=a==='online'&&dateFrom(online)>dateFrom(vat)?online:vat;
+      add(advanceDate,'מקדמות מס הכנסה',month,ap,a==='online'&&advanceDate===online?'דיווח מקוון: עד 19 בחודש; אין ארכה אוטומטית עד סוף החודש':explanation(vatRule),'tax');
+    }
     if(w!=='off'&&(wp===1||month%2===0))add(withholding,'ניכויים למס הכנסה',month,wp,explanation(withholdingRule),'tax');
     if($('payroll').checked){const end=new Date(2026,month,0);add(end.getFullYear()+'-'+String(end.getMonth()+1).padStart(2,'0')+'-'+String(end.getDate()).padStart(2,'0'),'תשלום שכר חודשי',month,1,'בתום חודש העבודה (שכר חודשי); בדקו הסדר העסקה','wage')}
     if($('payslip').checked)add(dueYear+'-'+dueMonth+'-09','מסירת תלוש שכר',month,1,'עד היום התשיעי בחודש הבא; אינו מועד תשלום השכר','payslip');
