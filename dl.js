@@ -25,9 +25,28 @@
       alert('ההורדה עובדת מהאתר עצמו: https://ayal408.github.io/surprise-box/');
       return;
     }
-    // Keep links to the site (icon, back link, shared files) working from the saved copy.
+    // Strip the site's navigation and shared download control from the copy.
+    // This does not remove the tool's own export buttons (PDF, PNG, CSV, etc.).
     const base = url.replace(/[^/]*$/, '');
-    if (!/<base\s/i.test(html)) html = html.replace(/<head[^>]*>/i, m => m + `\n<base href="${base}">`);
+    const page = new DOMParser().parseFromString(html, 'text/html');
+    page.querySelectorAll('a[href]').forEach(link => {
+      try {
+        const target = new URL(link.getAttribute('href'), base);
+        if (decodeURIComponent(target.pathname.split('/').pop()) === 'התחל כאן.html') link.remove();
+      } catch { /* Leave unrelated or malformed links as they are. */ }
+    });
+    page.querySelectorAll('script[src]').forEach(script => {
+      try {
+        if (new URL(script.getAttribute('src'), base).pathname.split('/').pop() === 'dl.js') script.remove();
+      } catch { /* Preserve unrelated scripts. */ }
+    });
+    page.querySelectorAll('button[aria-label="הורדת הכלי"]').forEach(button => button.remove());
+    if (!page.querySelector('base')) {
+      const baseTag = page.createElement('base');
+      baseTag.href = base;
+      page.head.prepend(baseTag);
+    }
+    html = '<!DOCTYPE html>\n' + page.documentElement.outerHTML;
     const name = (document.title || 'כלי').replace(/[\\/:*?"<>|]/g, '') + '.html';
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
