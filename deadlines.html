@@ -53,36 +53,72 @@ tr.past{opacity:.4}
 <div class="wrap">
   <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
   <h1>📅 לוח מועדי דיווח ותשלום</h1>
-<p class="sub">תכנון מועדי בסיס חודשיים. המועדים בפועל עשויים להשתנות לפי לוח רשות המסים והביטוח הלאומי, חגים, דחיות והוראות מיוחדות.</p>
+<p class="sub">מועדי רשות המסים לשנת הדיווח 2026, כולל הדחיות שנקבעו בטבלה הרשמית. מועדי הביטוח הלאומי מוצגים בנפרד לפי יום הבסיס.</p>
 <div class="panel row">
-  <label>דוח מע״מ<select id="vat"><option value="online">מקוון רגיל — 19</option><option value="regular">רגיל — 15</option><option value="detailed">דיווח מפורט — 23</option><option value="off">ללא דיווח תקופתי</option></select></label>
+  <label>דוח מע״מ<select id="vat"><option value="regular">תקופתי — לפי טבלת רשות המסים</option><option value="detailed">דיווח מפורט — לפי הטבלה</option><option value="off">ללא דיווח תקופתי</option></select></label>
   <label>תדירות מע״מ<select id="vatPeriod"><option value="1">חודשי</option><option value="2" selected>דו־חודשי לפי התיק</option></select></label>
-  <label>מקדמות מס הכנסה<select id="advance"><option value="online">מקוון — 19</option><option value="regular">רגיל — 15</option><option value="off">אין דרישה למקדמות</option></select></label>
+  <label>מקדמות מס הכנסה<select id="advance"><option value="regular">לפי טבלת רשות המסים</option><option value="off">אין דרישה למקדמות</option></select></label>
   <label>תדירות מקדמות<select id="advancePeriod"><option value="1">חודשי</option><option value="2">דו־חודשי אם אושר</option></select></label>
-  <label>ניכויים למס הכנסה<select id="withholding"><option value="regular">יש דיווח — 16</option><option value="off">אין תיק ניכויים</option></select></label>
+  <label>ניכויים למס הכנסה<select id="withholding"><option value="regular">לפי טבלת רשות המסים</option><option value="off">אין תיק ניכויים</option></select></label>
   <label>תדירות ניכויים<select id="withholdingPeriod"><option value="1">חודשי</option><option value="2">דו־חודשי אם אושר</option></select></label>
   <label class="inline"><input type="checkbox" id="self" checked> מקדמות ביטוח לאומי לעצמאי — 15</label>
   <label class="inline"><input type="checkbox" id="employer"> דיווח ותשלום ביטוח לאומי לעובדים — 15</label>
 </div>
 <div class="panel next" id="next"></div>
-<div class="panel"><h2>מועדי בסיס ב־12 החודשים הקרובים</h2><div style="overflow-x:auto"><table><thead><tr><th>מועד בסיס</th><th>דיווח ותשלום</th><th>עבור תקופה</th><th>בדיקת מקור</th></tr></thead><tbody id="tb"></tbody></table></div></div>
-<div class="panel"><h2>אימות התאריך לפני דיווח</h2><p>הטבלה מציגה את יום הבסיס החודשי בלבד. היא אינה מחשבת דחייה לשבת, לחג או להארכה נקודתית; גם ייצוא ליומן הוסר כדי שלא ישמור מועד שגוי.</p><div class="row"><a href="https://www.gov.il/he/pages/pa151025-2" target="_blank" rel="noopener noreferrer">מועדי רשות המסים לשנת 2026</a><a href="https://www.gov.il/he/service/reporting-or-payment-of-vat-reports" target="_blank" rel="noopener noreferrer">דיווח מע״מ רגיל</a><a href="https://www.gov.il/he/service/detailed-vat-reporting" target="_blank" rel="noopener noreferrer">דיווח מפורט במע״מ</a><a href="https://www.btl.gov.il/Pages/BenefitsPaymentDates.aspx" target="_blank" rel="noopener noreferrer">לוח הביטוח הלאומי</a></div></div>
+<div class="panel"><h2>כל תקופות הדיווח של 2026</h2><div style="overflow-x:auto"><table><thead><tr><th>מועד שנקבע</th><th>דיווח ותשלום</th><th>עבור תקופה</th><th>דחייה והסבר</th><th>מקור</th></tr></thead><tbody id="tb"></tbody></table></div></div>
+<div class="panel"><h2>אימות התאריך לפני דיווח</h2><p>למסים מוצגים התאריכים שנקבעו בהודעת רשות המסים לשנת 2026; לביטוח הלאומי מוצג יום הבסיס בלבד ויש לבדוק דחיות בלוח העדכני. מועדי דיווח מקוון מיוחדים, ארכות למייצגים והודעות חירום עשויים לשנות את התאריך בהתאם לנסיבות הדיווח.</p><div class="row"><a href="https://www.gov.il/he/pages/pa151025-2" target="_blank" rel="noopener noreferrer">מועדי רשות המסים לשנת 2026</a><a href="https://www.gov.il/he/service/reporting-or-payment-of-vat-reports" target="_blank" rel="noopener noreferrer">דיווח מע״מ רגיל</a><a href="https://www.gov.il/he/service/detailed-vat-reporting" target="_blank" rel="noopener noreferrer">דיווח מפורט במע״מ</a><a href="https://www.btl.gov.il/Insurance/National%20Insurance/type_list/Self_Employed/Pages/howtopay.aspx" target="_blank" rel="noopener noreferrer">מועד תשלום לעצמאי בביטוח הלאומי</a><a href="https://www.btl.gov.il/Insurance/Maasik/MToshavYisrael/DivuahVetashlum/Pages/Divuhach.aspx" target="_blank" rel="noopener noreferrer">דיווח ותשלום למעסיק בביטוח הלאומי</a></div></div>
 <p class="hint">דוח ניכויים למס הכנסה ותשלום ביטוח לאומי לעובדים הם חיובים נפרדים. לעוסק פטור אין דוח מע״מ תקופתי, אך יש הצהרת מחזור שנתית במועד שמפרסמת רשות המסים. מועד דוח שנתי, טופסי 126/856 והארכות למייצגים אינם מוצגים כאן, מפני שהם דורשים בדיקה לפי שנת המס וההודעות העדכניות.</p>
 <script>
 const $=id=>document.getElementById(id);
-const monthly=(year,month,period)=>period===1||month%2===1;
-function rows(){const today=new Date();today.setHours(0,0,0,0);const out=[];
-  for(let k=-1;k<14;k++){const due=new Date(today.getFullYear(),today.getMonth()+k,1),prev=new Date(due.getFullYear(),due.getMonth()-1,1),month=prev.getMonth();
-    const period=n=>n===1?prev.toLocaleDateString('he-IL',{month:'long',year:'numeric'}):new Date(prev.getFullYear(),month-1,1).toLocaleDateString('he-IL',{month:'long',year:'numeric'})+'–'+prev.toLocaleDateString('he-IL',{month:'long',year:'numeric'});
-    const add=(day,name,n,source)=>out.push({date:new Date(due.getFullYear(),due.getMonth(),day),name,period:period(n),source});
+// Indexed by the REPORTING month (January=1). The due date is in the following month.
+// Source: Israel Tax Authority, 15 Oct 2025, https://www.gov.il/he/pages/pa151025-2
+// Fields: regular VAT / income advances, income withholding, detailed VAT, section references.
+// The special March 2026 emergency extension for February VAT is handled separately below.
+const TAX_2026 = [
+  null,
+  ['2026-02-16','2026-02-16','2026-02-23','4','',''],
+  ['2026-03-16','2026-03-16','2026-03-26','4','','7'],
+  ['2026-04-27','2026-04-27','2026-04-27','7','7','7'],
+  ['2026-05-18','2026-05-18','2026-05-26','4','4','4+7'],
+  ['2026-06-15','2026-06-16','2026-06-23','','',''],
+  ['2026-07-15','2026-07-16','2026-07-27','','','7'],
+  ['2026-08-17','2026-08-17','2026-08-24','4','4','4'],
+  ['2026-09-24','2026-09-24','2026-09-24','7','7','7'],
+  ['2026-10-19','2026-10-19','2026-10-26','7','', '4'],
+  ['2026-11-16','2026-11-16','2026-11-23','4','',''],
+  ['2026-12-15','2026-12-16','2026-12-23','','',''],
+  ['2027-01-18','2027-01-18','2027-01-26','4','4','7']
+];
+const TAX_URL='https://www.gov.il/he/pages/pa151025-2';
+const BTL_URL='https://www.btl.gov.il/Pages/BenefitsPaymentDates.aspx';
+const SELF_URL='https://www.btl.gov.il/Insurance/National%20Insurance/type_list/Self_Employed/Pages/howtopay.aspx';
+const EMPLOYER_URL='https://www.btl.gov.il/Insurance/Maasik/MToshavYisrael/DivuahVetashlum/Pages/Divuhach.aspx';
+const dateFrom=s=>new Date(Number(s.slice(0,4)),Number(s.slice(5,7))-1,Number(s.slice(8,10)));
+const pretty=d=>d.toLocaleDateString('he-IL',{day:'numeric',month:'numeric',year:'numeric'});
+const periodName=(month,count)=>{const end=new Date(2026,month-1,1);return count===1?end.toLocaleDateString('he-IL',{month:'long',year:'numeric'}):new Date(2026,month-2,1).toLocaleDateString('he-IL',{month:'long',year:'numeric'})+'–'+end.toLocaleDateString('he-IL',{month:'long',year:'numeric'})};
+const explanation=section=>section?('נדחה לפי סעיף '+section+' בהודעת רשות המסים'):'לפי הטבלה הרשמית';
+function rows(){const out=[];
+  const add=(date,name,month,count,note,source)=>out.push({date:dateFrom(date),name,period:periodName(month,count),note,source});
+  for(let month=1;month<=12;month++){
+    const [vat,withholding,detailed,vatRule,withholdingRule,detailedRule]=TAX_2026[month];
+    const due=new Date(2026,month,1),dueYear=due.getFullYear(),dueMonth=String(due.getMonth()+1).padStart(2,'0');
+    const base=dueYear+'-'+dueMonth+'-15';
     const v=$('vat').value,vp=+$('vatPeriod').value,a=$('advance').value,ap=+$('advancePeriod').value,w=$('withholding').value,wp=+$('withholdingPeriod').value;
-    if(v!=='off'&&monthly(due.getFullYear(),month,vp))add(v==='detailed'?23:v==='online'?19:15,'מע״מ'+(v==='detailed'?' מפורט':''),vp,'tax');
-    if(a!=='off'&&monthly(due.getFullYear(),month,ap))add(a==='online'?19:15,'מקדמות מס הכנסה',ap,'tax');
-    if(w!=='off'&&monthly(due.getFullYear(),month,wp))add(16,'ניכויים למס הכנסה',wp,'tax');
-    if($('self').checked)add(15,'ביטוח לאומי לעצמאי',1,'btl');
-    if($('employer').checked)add(15,'ביטוח לאומי לעובדים (102)',1,'btl')}
-  const horizon=new Date(today.getFullYear()+1,today.getMonth(),today.getDate());return out.filter(x=>x.date>=today&&x.date<horizon).sort((a,b)=>a.date-b.date||a.name.localeCompare(b.name,'he'))}
-function render(){const out=rows(),body=$('tb');body.replaceChildren();for(const x of out){const tr=document.createElement('tr');for(const value of [x.date.toLocaleDateString('he-IL',{day:'numeric',month:'numeric',year:'numeric'}),x.name,x.period]){const td=document.createElement('td');td.textContent=value;tr.append(td)}const td=document.createElement('td'),link=document.createElement('a');link.href=x.source==='btl'?'https://www.btl.gov.il/Pages/BenefitsPaymentDates.aspx':'https://www.gov.il/he/pages/pa151025-2';link.target='_blank';link.rel='noopener noreferrer';link.textContent='בדקו מועד בפועל';td.append(link);tr.append(td);body.append(tr)}const first=out[0];$('next').textContent=first?'מועד הבסיס הקרוב: '+first.date.toLocaleDateString('he-IL')+' — '+out.filter(x=>+x.date===+first.date).map(x=>x.name).join(', ')+'. יש לבדוק את המועד בפועל בקישור הרשמי.':'אין מועדים לפי הבחירות הנוכחיות.';
+    // For a two-month cycle, the report is due after February, April, etc.
+    if(v!=='off'&&(vp===1||month%2===0)){
+      const isDetailed=v==='detailed',scheduled=isDetailed?detailed:vat;
+      // Emergency order of 5 March 2026: February VAT (monthly or Jan-Feb bi-monthly) extended to 26 March.
+      const emergency=month===2&&!isDetailed;
+      add(emergency?'2026-03-26':scheduled,'מע״מ'+(isDetailed?' מפורט':''),month,vp,emergency?'הארכת חירום ל־26.3.2026 (הודעה מ־5.3.2026); המועד בטבלה המקורית: '+pretty(dateFrom(scheduled)):explanation(isDetailed?detailedRule:vatRule),emergency?'emergency':'tax');
+    }
+    if(a!=='off'&&(ap===1||month%2===0))add(vat,'מקדמות מס הכנסה',month,ap,explanation(vatRule),'tax');
+    if(w!=='off'&&(wp===1||month%2===0))add(withholding,'ניכויים למס הכנסה',month,wp,explanation(withholdingRule),'tax');
+    if($('self').checked)add(base,'ביטוח לאומי לעצמאי',month,1,'יום בסיס בלבד — בדקו דחיות בלוח הביטוח הלאומי','self');
+    if($('employer').checked)add(base,'ביטוח לאומי לעובדים (102)',month,1,'יום בסיס בלבד — בדקו דחיות בלוח הביטוח הלאומי','employer');
+  }
+  return out.sort((a,b)=>a.date-b.date||a.name.localeCompare(b.name,'he'));
+}
+function render(){const out=rows(),body=$('tb');body.replaceChildren();for(const x of out){const tr=document.createElement('tr');for(const value of [pretty(x.date),x.name,x.period,x.note]){const td=document.createElement('td');td.textContent=value;tr.append(td)}const td=document.createElement('td'),link=document.createElement('a');link.href=x.source==='self'?SELF_URL:x.source==='employer'?EMPLOYER_URL:x.source==='emergency'?'https://www.gov.il/he/pages/sa050326-2':TAX_URL;link.target='_blank';link.rel='noopener noreferrer';link.textContent='מקור רשמי';td.append(link);tr.append(td);body.append(tr)}const today=new Date();today.setHours(0,0,0,0);const first=out.find(x=>x.date>=today);$('next').textContent=first?'המועד הקרוב בתקופות 2026: '+pretty(first.date)+' — '+out.filter(x=>+x.date===+first.date).map(x=>x.name).join(', ')+'.':'לא נותרו מועדים לתקופות הדיווח של 2026.';
   try{localStorage.setItem('deadlines-v2',JSON.stringify(Object.fromEntries(['vat','vatPeriod','advance','advancePeriod','withholding','withholdingPeriod','self','employer'].map(id=>[id,$(id).type==='checkbox'?$(id).checked:$(id).value]))))}catch{}}
 try{const saved=JSON.parse(localStorage.getItem('deadlines-v2'));if(saved)for(const [id,value] of Object.entries(saved)){const node=$(id);if(node&&node.type==='checkbox')node.checked=!!value;else if(node&&[...node.options].some(o=>o.value===value))node.value=value}}catch{}
 document.querySelectorAll('select,input').forEach(node=>node.addEventListener('change',render));render();
