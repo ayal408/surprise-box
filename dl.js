@@ -25,8 +25,7 @@
       alert('ההורדה עובדת מהאתר עצמו: https://ayal408.github.io/surprise-box/');
       return;
     }
-    // Strip the site's navigation and shared download control from the copy.
-    // This does not remove the tool's own export buttons (PDF, PNG, CSV, etc.).
+    // Strip navigation and download controls from the saved copy.
     const base = url.replace(/[^/]*$/, '');
     const page = new DOMParser().parseFromString(html, 'text/html');
     page.querySelectorAll('a[href]').forEach(link => {
@@ -41,6 +40,11 @@
       } catch { /* Preserve unrelated scripts. */ }
     });
     page.querySelectorAll('button[aria-label="הורדת הכלי"]').forEach(button => button.remove());
+    page.querySelectorAll('a[download], button, input[type="button"], input[type="submit"]').forEach(control => {
+      const label = [control.textContent, control.getAttribute('aria-label'), control.getAttribute('title'), control.getAttribute('value')].filter(Boolean).join(' ').trim();
+      const id = control.id.toLowerCase();
+      if (control.hasAttribute('download') || /(?:הורד(?:ה|ת)?|ייצוא|לייצא|export|download|save as)/i.test(label) && !/הורדת מחיר|הורדת עלות/.test(label) || /^(?:dl|download|export|csv|png|pdf|savefile)$/.test(id)) control.remove();
+    });
     if (!page.querySelector('base')) {
       const baseTag = page.createElement('base');
       baseTag.href = base;
