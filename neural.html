@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>רשת נוירונים בתנועה</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#c49bff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1250px!important}
+.cv{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+canvas{border-radius:14px;background:#0b0920;max-width:100%}
+#net{background:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🧠 רשת נוירונים בתנועה</h1>
+<p class="sub">רואים רשת נוירונים קטנה לומדת בזמן אמת להפריד בין נקודות כתומות לכחולות. משנים את מספר השכבות והנוירונים, את קצב הלמידה ואת צורת הנתונים, ורואים את קו ההחלטה משתנה.</p>
+<div class="panel row">
+  <label class="inline">נתונים <select id="ds"><option value="circle">עיגול בתוך עיגול</option><option value="xor">XOR (ארבעה רבעים)</option><option value="spiral">ספירלה</option><option value="blobs">שתי קבוצות</option><option value="moons">שני ירחים</option></select></label>
+  <label class="inline">שכבות נסתרות <select id="layers"><option>1</option><option selected>2</option><option>3</option></select></label>
+  <label class="inline">נוירונים בשכבה <input type="range" id="neur" min="2" max="10" value="6" style="width:90px"> <b id="nv">6</b></label>
+  <label class="inline">קצב למידה <select id="lr"><option>0.003</option><option>0.01</option><option selected>0.03</option><option>0.1</option><option>0.3</option></select></label>
+  <label class="inline">הפעלה <select id="act"><option value="tanh">tanh</option><option value="relu">ReLU</option><option value="sig">sigmoid</option></select></label>
+  <label class="inline">רעש <input type="range" id="noise" min="0" max="50" value="10" style="width:80px"></label>
+  <button class="pri" id="play">▶ אימון</button><button id="step">⏭ צעד</button><button id="reset">↺ אתחול</button>
+</div>
+<div class="panel cv"><canvas id="plot" width="420" height="420"></canvas><canvas id="net" width="520" height="420"></canvas></div>
+<div class="stats" id="st"></div>
+<div class="panel"><canvas id="loss" width="1100" height="140" style="width:100%"></canvas><p class="hint" style="margin-top:6px">כל נקודה מסווגת לפי הצבע של הרקע מתחתיה. עובי הקווים ברשת מראה את גודל המשקל: כתום חיובי, כחול שלילי. הגרף למטה מראה את ההפסד (loss). כשהוא יורד, הרשת לומדת. לחיצה על השטח מוסיפה נקודה: כפתור שמאלי כתומה, Shift+לחיצה כחולה.</p></div>
+<script>
+const $=id=>document.getElementById(id);let pts=[],net,epoch=0,losses=[],playing=false;
+const A={tanh:[Math.tanh,y=>1-y*y],relu:[x=>Math.max(0,x),y=>y>0?1:0],sig:[x=>1/(1+Math.exp(-x)),y=>y*(1-y)]};
+const rn=()=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
+function data(){const t=$('ds').value,n=240,nz=+$('noise').value/100;pts=[];for(let i=0;i<n;i++){let x,y,c;
+  if(t==='circle'){c=i%2;const r=c?Math.random()*.45:.65+Math.random()*.3,a=Math.random()*7;x=r*Math.cos(a);y=r*Math.sin(a)}
+  else if(t==='xor'){x=Math.random()*2-1;y=Math.random()*2-1;c=(x*y>0)?1:0}
+  else if(t==='spiral'){c=i%2;const r=(i/2)/(n/2)*.95,a=r*3.2*Math.PI+(c?Math.PI:0);x=r*Math.cos(a);y=r*Math.sin(a)}
+  else if(t==='blobs'){c=i%2;x=(c?.45:-.45)+rn()*.2;y=(c?.45:-.45)+rn()*.2}
+  else{c=i%2;const a=Math.random()*Math.PI;x=c?Math.cos(a)*.6-.25:.25-Math.cos(a)*.6;y=c?Math.sin(a)*.6-.15:.15-Math.sin(a)*.6}
+  pts.push({x:x+rn()*nz*.5,y:y+rn()*nz*.5,c})}}
+function build(){const L=+$('layers').value,N=+$('neur').value,sizes=[2,...Array(L).fill(N),1];net=sizes.slice(1).map((n,i)=>({W:[...Array(n)].map(()=>[...Array(sizes[i])].map(()=>rn()*Math.sqrt(2/sizes[i]))),b:Array(n).fill(0)}));epoch=0;losses=[]}
+function fwd(x){const act=A[$('act').value][0];const outs=[x];let a=x;net.forEach((l,li)=>{const last=li===net.length-1;a=l.W.map((w,j)=>{const z=w.reduce((s,wk,k)=>s+wk*a[k],l.b[j]);return last?1/(1+Math.exp(-z)):act(z)});outs.push(a)});return outs}
+function train(){const lr=+$('lr').value,d=A[$('act').value][1];let loss=0;const B=[...pts].sort(()=>Math.random()-.5);
+  for(const p of B){const o=fwd([p.x,p.y]),y=o.at(-1)[0];loss+=-(p.c*Math.log(y+1e-9)+(1-p.c)*Math.log(1-y+1e-9));let delta=[y-p.c];
+    for(let li=net.length-1;li>=0;li--){const l=net[li],inp=o[li];const nd=inp.map((_,k)=>l.W.reduce((s,w,j)=>s+w[k]*delta[j],0));
+      l.W.forEach((w,j)=>{w.forEach((_,k)=>w[k]-=lr*delta[j]*inp[k]);l.b[j]-=lr*delta[j]});if(li>0)delta=nd.map((v,k)=>v*d(o[li][k]))}}
+  epoch++;losses.push(loss/pts.length);if(losses.length>400)losses.shift()}
+function drawPlot(){const cv=$('plot'),x=cv.getContext('2d'),W=cv.width,S=W/2,res=6;for(let i=0;i<W;i+=res)for(let j=0;j<W;j+=res){const v=fwd([(i+res/2)/S-1,1-(j+res/2)/S]).at(-1)[0];const o=Math.abs(v-.5)*1.6;x.fillStyle=v>.5?`rgba(255,159,104,${o*.55})`:`rgba(76,201,240,${o*.55})`;x.clearRect(i,j,res,res);x.fillStyle=v>.5?`rgba(255,159,104,${.08+o*.5})`:`rgba(76,201,240,${.08+o*.5})`;x.fillRect(i,j,res,res)}
+  pts.forEach(p=>{x.beginPath();x.arc((p.x+1)*S,(1-p.y)*S,4.5,0,7);x.fillStyle=p.c?'#ff9f68':'#4cc9f0';x.fill();x.strokeStyle='#fff';x.lineWidth=1.2;x.stroke()})}
+function drawNet(){const cv=$('net'),x=cv.getContext('2d'),W=cv.width,H=cv.height;x.clearRect(0,0,W,H);const sizes=[2,...net.map(l=>l.W.length)],colX=i=>50+i*(W-100)/(sizes.length-1),rowY=(n,j)=>H/2+(j-(n-1)/2)*Math.min(46,(H-40)/n);
+  net.forEach((l,li)=>l.W.forEach((w,j)=>w.forEach((v,k)=>{x.strokeStyle=v>0?'rgba(255,159,104,.8)':'rgba(76,201,240,.8)';x.lineWidth=Math.min(6,Math.abs(v)*1.5)+.3;x.beginPath();x.moveTo(colX(li),rowY(sizes[li],k));x.lineTo(colX(li+1),rowY(sizes[li+1],j));x.stroke()})));
+  sizes.forEach((n,i)=>{for(let j=0;j<n;j++){x.beginPath();x.arc(colX(i),rowY(n,j),13,0,7);x.fillStyle='#231d4a';x.fill();x.strokeStyle='#c49bff';x.lineWidth=2;x.stroke()}});
+  x.fillStyle='#a9a3c9';x.font='12px Segoe UI';x.textAlign='center';x.fillText('קלט (x,y)',colX(0),H-6);x.fillText('פלט',colX(sizes.length-1),H-6)}
+function drawLoss(){const cv=$('loss'),x=cv.getContext('2d'),W=cv.width,H=cv.height;x.clearRect(0,0,W,H);if(losses.length<2)return;const mx=Math.max(...losses);x.strokeStyle='#c49bff';x.lineWidth=2;x.beginPath();losses.forEach((l,i)=>{const px=i/(losses.length-1)*W,py=H-6-(l/mx)*(H-14);i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke()}
+function stats(){const acc=pts.filter(p=>(fwd([p.x,p.y]).at(-1)[0]>.5)===!!p.c).length/pts.length;$('st').innerHTML=[['סבב אימון',epoch],['הפסד (loss)',losses.length?losses.at(-1).toFixed(3):'—'],['דיוק',Math.round(acc*100)+'%'],['משקלים',net.reduce((s,l)=>s+l.W.length*(l.W[0].length+1),0)]].map(([a,b])=>`<div class="stat"><small>${a}</small><b>${b}</b></div>`).join('')}
+function all(){drawPlot();drawNet();drawLoss();stats()}
+function loop(){if(!playing)return;for(let k=0;k<3;k++)train();all();requestAnimationFrame(loop)}
+$('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'⏸ עצירה':'▶ אימון';if(playing)loop()};
+$('step').onclick=()=>{train();all()};$('reset').onclick=()=>{build();all()};
+['ds','noise'].forEach(k=>$(k).oninput=()=>{data();build();all()});['layers','neur','act'].forEach(k=>$(k).oninput=()=>{$('nv').textContent=$('neur').value;build();all()});
+$('plot').addEventListener('click',e=>{const r=$('plot').getBoundingClientRect(),S=r.width/2;pts.push({x:(e.clientX-r.left)/S-1,y:1-(e.clientY-r.top)/S,c:e.shiftKey?0:1});all()});
+data();build();all();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

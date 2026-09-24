@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ארגז חול SQL</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#5fc1cf}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1250px!important}
+#q{width:100%;min-height:130px;font-family:Consolas,monospace;font-size:.95rem;direction:ltr;text-align:left;line-height:1.5}
+.res{overflow:auto;max-height:360px;border-radius:10px;border:1px solid var(--line)}
+.res table{direction:ltr}.res th,.res td{text-align:left;white-space:nowrap;font-family:Consolas,monospace;font-size:.88rem}
+.res th{background:#1d1840;position:sticky;top:0}
+.err{color:#ff8fab;font-family:Consolas,monospace;direction:ltr;text-align:left}
+.schema{font-family:Consolas,monospace;font-size:.82rem;direction:ltr;text-align:left;line-height:1.6}
+.schema b{color:var(--acc)}.schema span{cursor:pointer}.schema span:hover{text-decoration:underline}
+.ex{display:flex;flex-direction:column;gap:6px;max-height:360px;overflow:auto}
+.ex button{text-align:right;font-weight:600}.ex button.done::before{content:"✅ "}
+.venn{display:flex;gap:6px;flex-wrap:wrap}.venn button{font-family:Consolas,monospace}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🗄️ ארגז חול SQL</h1>
+<p class="sub">מסד נתונים אמיתי (SQLite) שרץ בתוך הדפדפן: טבלאות לדוגמה של חנות, תרגילים עם בדיקה אוטומטית, והסבר ויזואלי ל־JOIN. אפשר לשבור הכל, ובלחיצה אחת מתחילים מחדש.</p>
+<div class="grid2" style="grid-template-columns:260px 1fr 300px">
+  <div class="panel"><h2>📋 טבלאות</h2><div class="schema" id="schema">טוען את SQLite...</div><button id="reset" style="margin-top:10px">↺ איפוס המסד</button></div>
+  <div class="panel">
+    <textarea id="q" spellcheck="false">SELECT name, city, COUNT(o.id) AS orders
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+GROUP BY c.id
+ORDER BY orders DESC;</textarea>
+    <div class="row" style="margin-top:8px"><button class="pri" id="run">▶ הרצה (Ctrl+Enter)</button><button id="fmt">✨ יישור</button><span class="muted" id="meta"></span></div>
+    <div class="venn" style="margin-top:8px"><span class="muted">דוגמאות:</span><button data-s="inner">INNER JOIN</button><button data-s="left">LEFT JOIN</button><button data-s="group">GROUP BY</button><button data-s="sub">תת־שאילתה</button><button data-s="upd">UPDATE</button></div>
+    <div id="out" style="margin-top:10px"></div>
+  </div>
+  <div class="panel"><h2>🎯 תרגילים</h2><div class="ex" id="ex"></div><p id="exq" class="hint" style="margin-top:8px;line-height:1.7"></p><p id="exr" style="font-weight:700"></p></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+<script>
+const $=id=>document.getElementById(id);let SQL,db,cur=-1;
+const SEED=`CREATE TABLE customers(id INTEGER PRIMARY KEY,name TEXT,city TEXT,joined DATE);
+CREATE TABLE products(id INTEGER PRIMARY KEY,name TEXT,category TEXT,price REAL);
+CREATE TABLE orders(id INTEGER PRIMARY KEY,customer_id INTEGER,order_date DATE,FOREIGN KEY(customer_id) REFERENCES customers(id));
+CREATE TABLE order_items(order_id INTEGER,product_id INTEGER,qty INTEGER);
+INSERT INTO customers VALUES(1,'דנה כהן','ירושלים','2023-02-11'),(2,'יוסי לוי','בני ברק','2023-05-20'),(3,'מיכל אברהם','חיפה','2024-01-03'),(4,'אבי מזרחי','תל אביב','2024-03-17'),(5,'רותי פרץ','ירושלים','2024-07-09'),(6,'משה ביטון','אשדוד','2025-01-22');
+INSERT INTO products VALUES(1,'מחברת','כתיבה',12),(2,'עט ג׳ל','כתיבה',6.5),(3,'קלסר','משרד',18),(4,'מחשבון','משרד',49.9),(5,'תיק גב','תיקים',149),(6,'מדפסת','אלקטרוניקה',590),(7,'עכבר','אלקטרוניקה',79);
+INSERT INTO orders VALUES(1,1,'2025-01-05'),(2,1,'2025-02-10'),(3,2,'2025-02-11'),(4,3,'2025-03-01'),(5,4,'2025-03-15'),(6,1,'2025-04-02'),(7,5,'2025-04-20'),(8,2,'2025-05-05');
+INSERT INTO order_items VALUES(1,1,5),(1,2,10),(2,6,1),(3,5,2),(3,1,3),(4,4,1),(4,7,2),(5,3,6),(6,2,20),(7,5,1),(7,7,1),(8,6,1),(8,1,12);`;
+const SAMPLES={inner:`-- רק לקוחות שיש להם הזמנות
+SELECT c.name, o.id AS order_id, o.order_date
+FROM customers c
+INNER JOIN orders o ON o.customer_id = c.id;`,left:`-- כל הלקוחות, גם בלי הזמנות (NULL)
+SELECT c.name, o.id AS order_id
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id;`,group:`-- מחזור לפי קטגוריה
+SELECT p.category, SUM(oi.qty * p.price) AS revenue
+FROM order_items oi JOIN products p ON p.id = oi.product_id
+GROUP BY p.category
+ORDER BY revenue DESC;`,sub:`-- מוצרים שמחירם מעל הממוצע
+SELECT name, price FROM products
+WHERE price > (SELECT AVG(price) FROM products);`,upd:`-- העלאת מחיר ב-10% לקטגוריית כתיבה
+UPDATE products SET price = ROUND(price * 1.1, 2) WHERE category = 'כתיבה';
+SELECT * FROM products;`};
+const EX=[['כל הלקוחות מירושלים','SELECT * FROM customers WHERE city = \'ירושלים\''],['המוצרים ממוינים מהיקר לזול (שם ומחיר)','SELECT name, price FROM products ORDER BY price DESC'],['כמה הזמנות יש לכל לקוח (שם, מספר הזמנות), כולל לקוחות בלי הזמנות','SELECT c.name, COUNT(o.id) FROM customers c LEFT JOIN orders o ON o.customer_id=c.id GROUP BY c.id'],['סך ההכנסות מכל ההזמנות (מספר אחד)','SELECT SUM(oi.qty*p.price) FROM order_items oi JOIN products p ON p.id=oi.product_id'],['הלקוח שהוציא הכי הרבה כסף (שם וסכום)','SELECT c.name, SUM(oi.qty*p.price) s FROM customers c JOIN orders o ON o.customer_id=c.id JOIN order_items oi ON oi.order_id=o.id JOIN products p ON p.id=oi.product_id GROUP BY c.id ORDER BY s DESC LIMIT 1'],['מוצרים שאף פעם לא הוזמנו (שם)','SELECT name FROM products WHERE id NOT IN (SELECT product_id FROM order_items)'],['מספר הלקוחות בכל עיר, רק ערים עם יותר מלקוח אחד','SELECT city, COUNT(*) FROM customers GROUP BY city HAVING COUNT(*)>1']];
+let solved;try{solved=JSON.parse(localStorage.getItem('sql-solved'))||[]}catch{solved=[]}
+function fresh(){db=new SQL.Database();db.run(SEED);schema()}
+function schema(){const t=db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")[0];$('schema').innerHTML=t?t.values.map(([n])=>{const c=db.exec(`PRAGMA table_info(${n})`)[0].values.map(r=>r[1]);const cnt=db.exec(`SELECT COUNT(*) FROM ${n}`)[0].values[0][0];return`<div style="margin-bottom:8px"><b><span data-t="${n}">${n}</span></b> <span class="muted">(${cnt})</span><br>${c.join(', ')}</div>`}).join(''):'אין טבלאות'}
+function table(r){return`<div class="res"><table><thead><tr>${r.columns.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${r.values.map(v=>`<tr>${v.map(x=>`<td>${x===null?'<i class="muted">NULL</i>':String(x).replace(/</g,'&lt;')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
+function run(){const t0=performance.now();try{const res=db.exec($('q').value);const ch=db.getRowsModified();$('meta').textContent=`${(performance.now()-t0).toFixed(1)} ms${ch?` · ${ch} שורות שונו`:''}`;$('out').innerHTML=res.length?res.map(r=>table(r)+`<p class="muted" style="font-size:.8rem">${r.values.length} שורות</p>`).join(''):'<p class="muted">✔ בוצע (אין תוצאות להציג)</p>';schema();check(res)}catch(e){$('out').innerHTML=`<p class="err">❌ ${e.message}</p>`;$('meta').textContent=''}}
+const norm=r=>r?JSON.stringify(r.values.map(v=>v.map(x=>typeof x==='number'?Math.round(x*100)/100:x)).sort()):'';
+function check(res){if(cur<0)return;const exp=new SQL.Database();exp.run(SEED);const want=exp.exec(EX[cur][1])[0];exp.close();const got=res[res.length-1];
+  if(got&&norm(got)===norm(want)){$('exr').innerHTML='<span style="color:#90e0a0">🎉 נכון!</span>';if(!solved.includes(cur)){solved.push(cur);try{localStorage.setItem('sql-solved',JSON.stringify(solved))}catch{}exlist()}}else $('exr').innerHTML=`<span style="color:#ff8fab">עוד לא. מצופות ${want?want.values.length:0} שורות.</span>`}
+function exlist(){$('ex').innerHTML=EX.map((e,i)=>`<button data-e="${i}" class="${solved.includes(i)?'done':''} ${i===cur?'on':''}">${i+1}. ${e[0]}</button>`).join('')}
+$('ex').onclick=e=>{const i=e.target.dataset.e;if(i===undefined)return;cur=+i;exlist();$('exq').textContent='✍️ '+EX[cur][0]+'. כתבו שאילתה ולחצו הרצה.';$('exr').textContent='';$('q').value='-- '+EX[cur][0]+'\n';$('q').focus()};
+document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{cur=-1;exlist();$('q').value=SAMPLES[b.dataset.s];run()});
+$('schema').onclick=e=>{const t=e.target.dataset.t;if(t){$('q').value=`SELECT * FROM ${t};`;run()}};
+$('run').onclick=run;$('q').onkeydown=e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();run()}};
+$('reset').onclick=()=>{fresh();$('out').innerHTML='<p class="muted">המסד אופס לנתוני הדוגמה</p>'};
+$('fmt').onclick=()=>{$('q').value=$('q').value.replace(/\s+/g,' ').replace(/\s*(SELECT|FROM|WHERE|GROUP BY|ORDER BY|HAVING|LIMIT|LEFT JOIN|INNER JOIN|JOIN|UNION|SET|VALUES)\s/gi,'\n$1 ').replace(/;\s*/g,';\n').trim()};
+exlist();
+if(!window.initSqlJs){$('schema').textContent='⚠️ לא הצלחתי לטעון את SQLite. בדקו חיבור לאינטרנט.'}else initSqlJs({locateFile:f=>'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/'+f}).then(S=>{SQL=S;fresh();run()}).catch(e=>$('schema').textContent='⚠️ '+e.message);
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>

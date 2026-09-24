@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעבדת הצפנה</title>
+<style>
+:root{--bg:#0f0c24;--ink:#f3efff;--muted:#a9a3c9;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--acc:#ff8fab}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#3b1d7a 0%,transparent 55%),radial-gradient(circle at 0% 100%,#5a1d4a 0%,transparent 45%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Segoe UI","Arial Hebrew",Arial,sans-serif;padding:20px 16px 40px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:860px;display:flex;flex-direction:column;gap:16px}
+a.back{color:var(--muted);text-decoration:none;font-size:.9rem}
+a.back:hover{color:var(--ink)}
+h1{margin:0;font-size:clamp(1.8rem,5vw,2.5rem);color:var(--acc)}
+h2{margin:0 0 10px;font-size:1.15rem}
+p.sub{margin:-8px 0 0;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:.9rem}
+label.inline{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}
+input,select,textarea{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px}
+select option{background:#1d1840}
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--acc)}
+input[type=color]{padding:2px;height:40px;width:56px}
+textarea{resize:vertical}
+button{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:600;transition:background .15s,transform .1s}
+button:hover{background:rgba(255,255,255,.12)}
+button:active{transform:scale(.97)}
+button.pri,button.on{background:var(--acc);color:#140f2b;border-color:var(--acc)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:.8rem}
+.stat b{font-size:1.45rem;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{color:var(--muted);font-weight:600}
+.num{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hint{color:var(--muted);font-size:.85rem;margin:0;line-height:1.6}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{max-width:1200px!important}
+textarea{width:100%;min-height:80px;font-size:1.05rem}
+.map{display:flex;flex-wrap:wrap;gap:3px;direction:rtl}
+.map div{display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.04);border-radius:6px;padding:2px 5px;font-weight:700;min-width:26px}
+.map div span:last-child{color:var(--acc)}
+.map div.hl{background:rgba(255,143,171,.25)}
+.bars{display:flex;align-items:flex-end;gap:2px;height:120px;direction:rtl}
+.bars div{flex:1;background:var(--acc);border-radius:3px 3px 0 0;position:relative}
+.bars div span{position:absolute;bottom:-18px;left:0;right:0;text-align:center;font-size:.7rem}
+.rsa{font-family:Consolas,monospace;direction:ltr;text-align:left;line-height:1.9;font-size:.95rem}
+.rsa b{color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="התחל כאן.html">→ חזרה לקופסת ההפתעות</a>
+  <h1>🔐 מעבדת הצפנה</h1>
+<p class="sub">מצופן קיסר ועד RSA, צעד אחרי צעד: מצפינים ומפענחים, רואים איך כל אות הופכת לאחרת, ושוברים צופן קיסר בעזרת ניתוח תדירויות. RSA מוצג עם מספרים קטנים, כדי שאפשר יהיה לעקוב אחרי החשבון.</p>
+<div class="panel row" id="tabs"><button class="on" data-t="caesar">🏛️ צופן קיסר</button><button data-t="vig">🔑 ויז׳נר</button><button data-t="atbash">🔄 אתב״ש</button><button data-t="rsa">🧮 RSA</button></div>
+<div id="p-classic">
+  <div class="grid2">
+    <div class="panel"><label>טקסט גלוי<textarea id="plain">שלום עולם, זו הודעה סודית!</textarea></label><div class="row" style="margin-top:8px" id="keyrow"></div></div>
+    <div class="panel"><label>טקסט מוצפן<textarea id="ciph"></textarea></label><div class="row" style="margin-top:8px"><button id="dec">⬆ פענוח מהמוצפן</button><button id="cp">📋 העתקה</button><span class="muted" id="lang"></span></div></div>
+  </div>
+  <div class="panel"><h2>🔤 טבלת ההחלפה</h2><div class="map" id="map"></div><p class="hint" id="exp" style="margin-top:8px;line-height:1.7"></p></div>
+  <div class="panel" id="crack"><h2>🕵️ שבירת הצופן: ניתוח תדירויות</h2><div class="bars" id="bars"></div><p style="margin-top:26px" id="guess"></p></div>
+</div>
+<div id="p-rsa" hidden>
+  <div class="grid2">
+    <div class="panel"><h2>1. מפתחות</h2><div class="row"><label class="inline">p <select id="p"></select></label><label class="inline">q <select id="q"></select></label><label class="inline">e <select id="e"></select></label></div><div class="rsa" id="keys" style="margin-top:10px"></div></div>
+    <div class="panel"><h2>2. הצפנה ופענוח</h2><label>הודעה (אותיות ומספרים באנגלית)<input id="msg" value="HI" style="width:100%;direction:ltr"></label><div class="rsa" id="enc" style="margin-top:10px"></div></div>
+  </div>
+  <p class="hint">ב־RSA כל אחד יכול להצפין עם המפתח הציבורי (e, n), אבל רק מי שיודע את d יכול לפענח. כדי למצוא את d צריך לפרק את n לגורמים p ו־q. עם מספרים של 600 ספרות, זה לוקח למחשבי העל של היום יותר זמן מגיל היקום. כאן המספרים קטנים בכוונה, כדי שיהיה אפשר לראות את החשבון.</p>
+</div>
+<script>
+const $=id=>document.getElementById(id);let T='caesar';
+const HE='אבגדהוזחטיכלמנסעפצקרשת',EN='ABCDEFGHIJKLMNOPQRSTUVWXYZ',FIN={'ך':'כ','ם':'מ','ן':'נ','ף':'פ','ץ':'צ'};
+const HEF=[0.058,0.047,0.013,0.029,0.107,0.117,0.012,0.022,0.013,0.113,0.044,0.074,0.07,0.043,0.013,0.034,0.009,0.012,0.012,0.052,0.042,0.057];
+function alpha(t){return/[א-ת]/.test(t)?HE:EN}
+function shift(t,f){return[...t].map(ch=>{const c=FIN[ch]||ch,up=c.toUpperCase();for(const A of[HE,EN]){const i=A.indexOf(up);if(i>=0){const r=A[((f(i,A.length,A)%A.length)+A.length)%A.length];return c===up?r:r.toLowerCase()}}return ch}).join('')}
+function enc(t,dir=1){if(T==='caesar'){const k=+$('k').value;return shift(t,i=>i+dir*k)}if(T==='atbash')return shift(t,(i,n)=>n-1-i);
+  const key=[...($('vk').value||'א')].map(c=>FIN[c]||c).map(c=>{const u=c.toUpperCase();return HE.includes(u)?HE.indexOf(u):EN.includes(u)?EN.indexOf(u):0});let j=0;
+  return[...t].map(ch=>{const c=FIN[ch]||ch,u=c.toUpperCase();const A=HE.includes(u)?HE:EN.includes(u)?EN:null;if(!A)return ch;const r=A[(A.indexOf(u)+dir*key[j++%key.length]+A.length*10)%A.length];return c===u?r:r.toLowerCase()}).join('')}
+function keyrow(){$('keyrow').innerHTML=T==='caesar'?`<label class="inline">הזזה <input type="range" id="k" min="1" max="21" value="3" style="width:160px"> <b id="kv">3</b></label>`:T==='vig'?`<label class="inline">מילת מפתח <input id="vk" value="סוד" style="width:140px"></label>`:'<span class="muted">אתב״ש: א↔ת, ב↔ש, ג↔ר... (מופיע כבר בספר ירמיהו: "ששך" = בבל)</span>';
+  ['k','vk'].forEach(k=>{if($(k))$(k).oninput=update})}
+function update(){if($('kv'))$('kv').textContent=$('k').value;const p=$('plain').value;$('ciph').value=enc(p,1);const A=alpha(p);$('lang').textContent=A===HE?'עברית (22 אותיות)':'אנגלית (26 אותיות)';
+  const used=new Set([...p].map(c=>FIN[c]||c.toUpperCase()));$('map').innerHTML=[...A].map(c=>`<div class="${used.has(c)?'hl':''}"><span>${c}</span><span>${T==='vig'?'?':enc(c,1)}</span></div>`).join('');
+  $('exp').textContent={caesar:`כל אות זזה ${$('k')?.value} מקומות קדימה באלף־בית. יוליוס קיסר השתמש בהזזה של 3. יש רק ${A.length-1} מפתחות אפשריים, ולכן קל לשבור אותו.`,vig:'כל אות זזה לפי האות המתאימה במילת המפתח, ולכן אותה אות יכולה להפוך לאותיות שונות. במשך 300 שנה קראו לו "הצופן שאי אפשר לשבור".',atbash:'האות הראשונה מתחלפת באחרונה, השנייה בלפני האחרונה, וכן הלאה. הצפנה ופענוח הם אותה פעולה.'}[T];
+  $('crack').hidden=T!=='caesar'||A!==HE;if(T==='caesar'&&A===HE)crack()}
+function crack(){const c=[...$('ciph').value].map(x=>FIN[x]||x).filter(x=>HE.includes(x));const cnt=[...HE].map(l=>c.filter(x=>x===l).length),mx=Math.max(1,...cnt);
+  $('bars').innerHTML=[...HE].map((l,i)=>`<div style="height:${cnt[i]/mx*100}%;opacity:${cnt[i]?1:.2}"><span>${l}</span></div>`).join('');
+  let best=0,bs=-1;for(let s=0;s<22;s++){const sc=cnt.reduce((a,n,i)=>a+n*HEF[(i-s+22)%22],0);if(sc>bs){bs=sc;best=s}}
+  $('guess').innerHTML=c.length<8?'<span class="muted">צריך יותר טקסט כדי לנחש</span>':`🕵️ ניחוש לפי שכיחות האותיות בעברית (ו, י, ה, מ): הזזה של <b>${best}</b>. פענוח: "${shift($('ciph').value,i=>i-best)}"`}
+$('plain').oninput=update;$('dec').onclick=()=>{$('plain').value=enc($('ciph').value,-1);update()};
+$('cp').onclick=()=>{navigator.clipboard.writeText($('ciph').value);$('cp').textContent='✓';setTimeout(()=>$('cp').textContent='📋 העתקה',1200)};
+$('tabs').onclick=e=>{const t=e.target.dataset.t;if(!t)return;T=t;document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('p-classic').hidden=t==='rsa';$('p-rsa').hidden=t!=='rsa';if(t==='rsa')rsa();else{keyrow();update()}};
+// RSA with BigInt
+const PR=[11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97];const gcd=(a,b)=>b?gcd(b,a%b):a;
+const modpow=(b,e,m)=>{let r=1n;b%=m;while(e>0n){if(e&1n)r=r*b%m;b=b*b%m;e>>=1n}return r};
+const inv=(a,m)=>{let[o,r]=[a,m],[s0,s1]=[1n,0n];while(r){const q=o/r;[o,r]=[r,o-q*r];[s0,s1]=[s1,s0-q*s1]}return((s0%m)+m)%m};
+$('p').innerHTML=PR.map(x=>`<option ${x===61?'selected':''}>${x}</option>`).join('');$('q').innerHTML=PR.map(x=>`<option ${x===53?'selected':''}>${x}</option>`).join('');
+function rsa(){const p=+$('p').value,q=+$('q').value;if(p===q){$('keys').innerHTML='<b>p ו־q צריכים להיות שונים</b>';return}const n=p*q,phi=(p-1)*(q-1);
+  const es=[3,5,7,11,13,17,19,23,29,31,37,65537].filter(e=>e<phi&&gcd(e,phi)===1);const cur=+$('e').value;$('e').innerHTML=es.map(x=>`<option ${x===cur?'selected':''}>${x}</option>`).join('');const e=+$('e').value||es[0];const d=Number(inv(BigInt(e),BigInt(phi)));
+  $('keys').innerHTML=`n = p × q = ${p} × ${q} = <b>${n}</b><br>φ(n) = (p−1)(q−1) = <b>${phi}</b><br>e = <b>${e}</b> (זר ל־φ)<br>d = e⁻¹ mod φ = <b>${d}</b>  (כי ${e}×${d} mod ${phi} = ${e*d%phi})<br><br>🔓 מפתח ציבורי: (e=${e}, n=${n})<br>🔒 מפתח פרטי: (d=${d}, n=${n})`;
+  const m=[...$('msg').value.toUpperCase()].filter(c=>/[A-Z0-9 ]/.test(c));const rows=m.map(ch=>{const M=BigInt(ch.charCodeAt(0))%BigInt(n),C=modpow(M,BigInt(e),BigInt(n)),D=modpow(C,BigInt(d),BigInt(n));return`'${ch}' → m=${M} → c = ${M}^${e} mod ${n} = <b>${C}</b> → c^${d} mod ${n} = ${D} → '${String.fromCharCode(Number(D))}'`});
+  $('enc').innerHTML=rows.join('<br>')||'הקלידו הודעה'}
+['p','q','e','msg'].forEach(k=>$(k).oninput=rsa);
+keyrow();update();
+</script>
+</div>
+<script src="dl.js" defer></script>
+</body>
+</html>
